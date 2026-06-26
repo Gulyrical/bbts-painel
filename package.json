@@ -1,7 +1,7 @@
 {
   "name": "bbts-painel",
   "version": "1.0.0",
-  "description": "Portal de BI BBTS — dados reais do Notion",
+  "description": "Portal BI BBTS",
   "private": true,
-  "engines": { "node": "18.x" }
+  "engines": { "node": "24.x" }
 }
