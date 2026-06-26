@@ -42,7 +42,7 @@ async function fetchAll(dbId) {
 }
 
 function prop(props, name, type) {
-  const p = props[name];
+  var p = props[name];
   if (!p) return null;
   switch (type) {
     case 'title':    return p.title && p.title[0] ? p.title[0].plain_text : null;
