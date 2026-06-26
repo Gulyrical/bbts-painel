@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBTS — Portal BI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F5F6F8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    color: #111827;
+  }
+  .card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    padding: 40px 48px;
+    text-align: center;
+    max-width: 480px;
+    width: 90%;
+  }
+  .logo {
+    width: 52px; height: 52px;
+    background: #465EFF;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 600; color: white;
+    margin: 0 auto 20px;
+  }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+  p  { font-size: 14px; color: #6B7280; line-height: 1.6; }
+  .status {
+    margin-top: 24px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .status.ok     { background: #ECFDF5; color: #065F46; }
+  .status.erro   { background: #FDECEA; color: #7A1F17; }
+  .status.loading { background: #EFF6FF; color: #1E40AF; }
+  .dados {
+    margin-top: 16px;
+    text-align: left;
+    font-size: 12px;
+    color: #6B7280;
+    line-height: 2;
+  }
+  .dados span { color: #111827; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">BI</div>
+  <h1>Portal BBTS</h1>
+  <p>Servidor conectado ao Notion. Verificando acesso às databases...</p>
+  <div class="status loading" id="status">⏳ Verificando conexão...</div>
+  <div class="dados" id="dados"></div>
+</div>
+
+<script>
+async function verificar() {
+  try {
+    const res = await fetch('/api/notion?db=vinculos');
+    const data = await res.json();
+
+    if (data.error) throw new Error(data.error);
+
+    const total = data.vinculos?.length || 0;
+    const ativos = data.vinculos?.filter(v => v.status === 'Ativo').length || 0;
+    const deslig = data.vinculos?.filter(v => v.status === 'Desligado').length || 0;
+
+    document.getElementById('status').className = 'status ok';
+    document.getElementById('status').textContent = '✓ Conexão com o Notion funcionando!';
+    document.getElementById('dados').innerHTML = `
+      <div>Total de vínculos: <span>${total}</span></div>
+      <div>Colaboradores ativos: <span>${ativos}</span></div>
+      <div>Desligados: <span>${deslig}</span></div>
+      <div style="margin-top:8px;color:#9CA3AF;font-size:11px">
+        Atualizado em: ${new Date().toLocaleString('pt-BR')}
+      </div>
+    `;
+  } catch(err) {
+    document.getElementById('status').className = 'status erro';
+    document.getElementById('status').textContent = '✗ Erro: ' + err.message;
+  }
+}
+
+verificar();
+</script>
+</body>
+</html>
