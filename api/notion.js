@@ -24,7 +24,10 @@ async function queryDB(dbId, cursor) {
     },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error('Notion API ' + res.status + ' on ' + dbId);
+  if (!res.ok)   {
+    const errBody = await res.text();
+    throw new Error('Notion API ' + res.status + ' on ' + dbId + ': ' + errBody);
+  }
   return res.json();
 }
 
