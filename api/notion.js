@@ -61,7 +61,7 @@ function parsePessoa(pg) {
   var p = pg.properties;
   return {
     id:            pg.id,
-    nome:          prop(p, 'Nome Completo', 'title'),
+    nome: prop(p, 'Nome Completo', 'title') || prop(p, 'Nome', 'title'),
     cpf:           prop(p, 'CPF', 'text'),
     rg:            prop(p, 'RG', 'text'),
     sexo:          prop(p, 'Sexo', 'select'),
