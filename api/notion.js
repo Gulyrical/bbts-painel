@@ -57,49 +57,67 @@ function prop(props, name, type) {
   }
 }
 
+function getRelId(props, name) {
+  var p = props[name];
+  if (!p || !p.relation || p.relation.length === 0) return null;
+  return p.relation[0].id;
+}
+
 function parsePessoa(pg) {
   var p = pg.properties;
+  var ddd = prop(p, 'DDD', 'text') || '';
+  var tel = prop(p, 'Telefone', 'text') || '';
+  var telefone = ddd && tel ? '(' + ddd + ') ' + tel : tel || ddd || null;
   return {
     id:            pg.id,
-    nome: prop(p, 'Nome Completo', 'title') || prop(p, 'Nome', 'title'),
+    nome:          prop(p, 'Nome Completo', 'title') || prop(p, 'Nome', 'title'),
     cpf:           prop(p, 'CPF', 'text'),
     rg:            prop(p, 'RG', 'text'),
+    orgao_rg:      prop(p, 'Órgão Emissor RG', 'text'),
+    estado_rg:     prop(p, 'Estado Emissor RG', 'text'),
+    nascimento:    prop(p, 'date:Data de Nascimento:start', 'date'),
     sexo:          prop(p, 'Sexo', 'select'),
     estado_civil:  prop(p, 'Estado Civil', 'select'),
-    telefone:      prop(p, 'Telefone', 'text'),
+    nacionalidade: prop(p, 'Nacionalidade', 'text'),
+    telefone:      telefone,
     logradouro:    prop(p, 'Logradouro', 'text'),
     numero:        prop(p, 'Número', 'text'),
     complemento:   prop(p, 'Complemento', 'text'),
     bairro:        prop(p, 'Bairro', 'text'),
     cidade:        prop(p, 'Cidade', 'text'),
     estado:        prop(p, 'Estado', 'text'),
+    cep:           prop(p, 'CEP', 'text'),
     email_pessoal: prop(p, 'Email Pessoal', 'email'),
     email_corp:    prop(p, 'Email Corporativo', 'email'),
     banco:         prop(p, 'Banco', 'text'),
     agencia:       prop(p, 'Agência', 'text'),
     conta:         prop(p, 'Conta Bancária', 'text'),
+    tipo_conta:    prop(p, 'Tipo de Conta', 'text'),
     nome_mae:      prop(p, 'Nome da Mãe', 'text'),
     nome_pai:      prop(p, 'Nome do Pai', 'text'),
     jornada:       prop(p, 'Jornada de Trabalho', 'text'),
     tipo_contrato: prop(p, 'Tipo de Contrato', 'text'),
+    grau_instrucao: prop(p, 'Grau de Instrução', 'text'),
+    pis:           prop(p, 'PIS', 'text'),
+    ctps:          prop(p, 'CTPS', 'text'),
   };
 }
 
 function parseVinculo(pg) {
   var p = pg.properties;
-  var rel = p['Pessoa'] && p['Pessoa'].relation ? p['Pessoa'].relation : [];
-  var pessoaId = rel.length > 0 ? rel[0].id : null;
   return {
     id:            pg.id,
     matricula:     prop(p, 'Matrícula', 'title'),
     status:        prop(p, 'Status', 'select'),
+    uor:           prop(p, 'UOR', 'text'),
     data_admissao: prop(p, 'date:Data de Admissão:start', 'date'),
     data_deslig:   prop(p, 'date:Data de Desligamento:start', 'date'),
     ocorrencia:    prop(p, 'Ocorrência', 'text'),
     gestor:        prop(p, 'Gestor', 'text'),
     ultimo_dia:    prop(p, 'date:Último Dia de Trabalho:start', 'date'),
     data_solic:    prop(p, 'date:Data de Solicitação:start', 'date'),
-    pessoa_id:     pessoaId,
+    pessoa_id:     getRelId(p, 'Pessoa'),
+    cargo_id:      getRelId(p, 'Cargo'),
   };
 }
 
@@ -116,7 +134,6 @@ function parseCargo(pg) {
 
 function parseEquipamento(pg) {
   var p = pg.properties;
-  var rel = p['Pessoa'] && p['Pessoa'].relation ? p['Pessoa'].relation : [];
   return {
     id:             pg.id,
     patrimonio:     prop(p, 'Patrimônio', 'title'),
@@ -125,33 +142,31 @@ function parseEquipamento(pg) {
     situacao:       prop(p, 'Situação Devolução', 'select'),
     responsavel:    prop(p, 'Responsável Recebimento', 'text'),
     data_devolucao: prop(p, 'date:Data de Devolução:start', 'date'),
-    pessoa_id:      rel.length > 0 ? rel[0].id : null,
+    pessoa_id:      getRelId(p, 'Pessoa'),
   };
 }
 
 function parseAfastamento(pg) {
   var p = pg.properties;
-  var rel = p['Pessoa'] && p['Pessoa'].relation ? p['Pessoa'].relation : [];
   return {
     id:        pg.id,
     tipo:      prop(p, 'Tipo de Afastamento', 'select') || prop(p, 'Tipo', 'select'),
     dias:      prop(p, 'Qtd Dias', 'number') || prop(p, 'Dias', 'number'),
     data_ini:  prop(p, 'date:Data Início:start', 'date') || prop(p, 'date:Data de Início:start', 'date'),
     data_fim:  prop(p, 'date:Data Fim:start', 'date') || prop(p, 'date:Data de Fim:start', 'date'),
-    pessoa_id: rel.length > 0 ? rel[0].id : null,
+    pessoa_id: getRelId(p, 'Pessoa'),
   };
 }
 
 function parseCurriculo(pg) {
   var p = pg.properties;
-  var rel = p['Pessoa'] && p['Pessoa'].relation ? p['Pessoa'].relation : [];
   return {
     id:          pg.id,
     tipo:        prop(p, 'Tipo', 'select'),
     descricao:   prop(p, 'Descrição', 'title') || prop(p, 'Curso', 'title'),
     instituicao: prop(p, 'Instituição', 'text'),
     ano:         prop(p, 'Ano', 'number'),
-    pessoa_id:   rel.length > 0 ? rel[0].id : null,
+    pessoa_id:   getRelId(p, 'Pessoa'),
   };
 }
 
@@ -198,25 +213,17 @@ module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 's-maxage=60');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-
-  if (!NOTION_TOKEN) {
-    return res.status(500).json({ error: 'NOTION_TOKEN não configurado' });
-  }
+  if (!NOTION_TOKEN) return res.status(500).json({ error: 'NOTION_TOKEN não configurado' });
 
   var db = req.query && req.query.db;
 
   try {
     if (db && DBS[db]) {
       var parsers = {
-        pessoas:      parsePessoa,
-        vinculos:     parseVinculo,
-        cargos:       parseCargo,
-        equipamentos: parseEquipamento,
-        afastamentos: parseAfastamento,
-        curriculo:    parseCurriculo,
-        solicitacoes: parseSolicitacao,
-        envios:       parseEnvio,
-        candidatos:   parseCandidato,
+        pessoas: parsePessoa, vinculos: parseVinculo, cargos: parseCargo,
+        equipamentos: parseEquipamento, afastamentos: parseAfastamento,
+        curriculo: parseCurriculo, solicitacoes: parseSolicitacao,
+        envios: parseEnvio, candidatos: parseCandidato,
       };
       var pages = await fetchAll(DBS[db]);
       var result = {};
@@ -225,7 +232,6 @@ module.exports = async function handler(req, res) {
       return res.status(200).json(result);
     }
 
-    // Busca todas
     var results = await Promise.all([
       fetchAll(DBS.vinculos),
       fetchAll(DBS.equipamentos),
