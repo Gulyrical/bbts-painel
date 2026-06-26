@@ -13,9 +13,9 @@ const DBS = {
 };
 
 async function queryDB(dbId, cursor) {
-  const body = { page_size: 100 };
+  var body = { page_size: 100 };
   if (cursor) body.start_cursor = cursor;
-  const res = await fetch('https://api.notion.com/v1/databases/' + dbId + '/query', {
+  var res = await fetch('https://api.notion.com/v1/databases/' + dbId + '/query', {
     method: 'POST',
     headers: {
       'Authorization': 'Bearer ' + NOTION_TOKEN,
@@ -24,17 +24,17 @@ async function queryDB(dbId, cursor) {
     },
     body: JSON.stringify(body),
   });
-  if (!res.ok)   {
-    const errBody = await res.text();
+  if (!res.ok) {
+    var errBody = await res.text();
     throw new Error('Notion API ' + res.status + ' on ' + dbId + ': ' + errBody);
   }
   return res.json();
 }
 
 async function fetchAll(dbId) {
-  let all = [], cursor = null;
+  var all = [], cursor = null;
   do {
-    const data = await queryDB(dbId, cursor);
+    var data = await queryDB(dbId, cursor);
     all = all.concat(data.results);
     cursor = data.has_more ? data.next_cursor : null;
   } while (cursor);
@@ -57,11 +57,40 @@ function prop(props, name, type) {
   }
 }
 
+function parsePessoa(pg) {
+  var p = pg.properties;
+  return {
+    id:            pg.id,
+    nome:          prop(p, 'Nome Completo', 'title'),
+    cpf:           prop(p, 'CPF', 'text'),
+    rg:            prop(p, 'RG', 'text'),
+    sexo:          prop(p, 'Sexo', 'select'),
+    estado_civil:  prop(p, 'Estado Civil', 'select'),
+    telefone:      prop(p, 'Telefone', 'text'),
+    logradouro:    prop(p, 'Logradouro', 'text'),
+    numero:        prop(p, 'Número', 'text'),
+    complemento:   prop(p, 'Complemento', 'text'),
+    bairro:        prop(p, 'Bairro', 'text'),
+    cidade:        prop(p, 'Cidade', 'text'),
+    estado:        prop(p, 'Estado', 'text'),
+    email_pessoal: prop(p, 'Email Pessoal', 'email'),
+    email_corp:    prop(p, 'Email Corporativo', 'email'),
+    banco:         prop(p, 'Banco', 'text'),
+    agencia:       prop(p, 'Agência', 'text'),
+    conta:         prop(p, 'Conta Bancária', 'text'),
+    nome_mae:      prop(p, 'Nome da Mãe', 'text'),
+    nome_pai:      prop(p, 'Nome do Pai', 'text'),
+    jornada:       prop(p, 'Jornada de Trabalho', 'text'),
+    tipo_contrato: prop(p, 'Tipo de Contrato', 'text'),
+  };
+}
+
 function parseVinculo(pg) {
   var p = pg.properties;
-  var pessoaRel = p['Pessoa'] && p['Pessoa'].relation ? p['Pessoa'].relation : [];
+  var rel = p['Pessoa'] && p['Pessoa'].relation ? p['Pessoa'].relation : [];
+  var pessoaId = rel.length > 0 ? rel[0].id : null;
   return {
-    id: pg.id,
+    id:            pg.id,
     matricula:     prop(p, 'Matrícula', 'title'),
     status:        prop(p, 'Status', 'select'),
     data_admissao: prop(p, 'date:Data de Admissão:start', 'date'),
@@ -70,50 +99,66 @@ function parseVinculo(pg) {
     gestor:        prop(p, 'Gestor', 'text'),
     ultimo_dia:    prop(p, 'date:Último Dia de Trabalho:start', 'date'),
     data_solic:    prop(p, 'date:Data de Solicitação:start', 'date'),
-    pessoa_id:     pessoaRel.length > 0 ? pessoaRel[0].id : null,
+    pessoa_id:     pessoaId,
   };
+}
 
+function parseCargo(pg) {
+  var p = pg.properties;
+  return {
+    id:      pg.id,
+    codigo:  prop(p, 'Código do Cargo', 'title'),
+    cargo:   prop(p, 'Cargo', 'text'),
+    salario: prop(p, 'Salário', 'number'),
+    nivel:   prop(p, 'Nível', 'select'),
+  };
 }
 
 function parseEquipamento(pg) {
   var p = pg.properties;
+  var rel = p['Pessoa'] && p['Pessoa'].relation ? p['Pessoa'].relation : [];
   return {
-    id: pg.id,
+    id:             pg.id,
     patrimonio:     prop(p, 'Patrimônio', 'title'),
     marca:          prop(p, 'Marca', 'text'),
     tipo:           prop(p, 'Tipo de Equipamento', 'select'),
     situacao:       prop(p, 'Situação Devolução', 'select'),
     responsavel:    prop(p, 'Responsável Recebimento', 'text'),
     data_devolucao: prop(p, 'date:Data de Devolução:start', 'date'),
-    pessoa:         prop(p, 'Pessoa', 'relation'),
+    pessoa_id:      rel.length > 0 ? rel[0].id : null,
   };
 }
 
 function parseAfastamento(pg) {
   var p = pg.properties;
+  var rel = p['Pessoa'] && p['Pessoa'].relation ? p['Pessoa'].relation : [];
   return {
-    id: pg.id,
-    tipo:     prop(p, 'Tipo de Afastamento', 'select') || prop(p, 'Tipo', 'select'),
-    dias:     prop(p, 'Qtd Dias', 'number') || prop(p, 'Dias', 'number'),
-    data_ini: prop(p, 'date:Data Início:start', 'date') || prop(p, 'date:Data de Início:start', 'date'),
-    pessoa:   prop(p, 'Pessoa', 'relation'),
+    id:        pg.id,
+    tipo:      prop(p, 'Tipo de Afastamento', 'select') || prop(p, 'Tipo', 'select'),
+    dias:      prop(p, 'Qtd Dias', 'number') || prop(p, 'Dias', 'number'),
+    data_ini:  prop(p, 'date:Data Início:start', 'date') || prop(p, 'date:Data de Início:start', 'date'),
+    data_fim:  prop(p, 'date:Data Fim:start', 'date') || prop(p, 'date:Data de Fim:start', 'date'),
+    pessoa_id: rel.length > 0 ? rel[0].id : null,
   };
 }
 
 function parseCurriculo(pg) {
   var p = pg.properties;
+  var rel = p['Pessoa'] && p['Pessoa'].relation ? p['Pessoa'].relation : [];
   return {
-    id: pg.id,
-    tipo:      prop(p, 'Tipo', 'select'),
-    descricao: prop(p, 'Descrição', 'title') || prop(p, 'Curso', 'title'),
-    pessoa:    prop(p, 'Pessoa', 'relation'),
+    id:          pg.id,
+    tipo:        prop(p, 'Tipo', 'select'),
+    descricao:   prop(p, 'Descrição', 'title') || prop(p, 'Curso', 'title'),
+    instituicao: prop(p, 'Instituição', 'text'),
+    ano:         prop(p, 'Ano', 'number'),
+    pessoa_id:   rel.length > 0 ? rel[0].id : null,
   };
 }
 
 function parseSolicitacao(pg) {
   var p = pg.properties;
   return {
-    id: pg.id,
+    id:               pg.id,
     numero_sps:       prop(p, 'Número SPS', 'title'),
     fiscal:           prop(p, 'Fiscal do Contrato', 'text'),
     gerente:          prop(p, 'Gerente Demandante', 'text'),
@@ -128,10 +173,20 @@ function parseSolicitacao(pg) {
   };
 }
 
+function parseEnvio(pg) {
+  var p = pg.properties;
+  return {
+    id:         pg.id,
+    nome:       prop(p, 'Envio', 'title'),
+    data_envio: prop(p, 'date:Data de Envio:start', 'date'),
+    quantidade: prop(p, 'Quantidade de Currículos', 'number'),
+  };
+}
+
 function parseCandidato(pg) {
   var p = pg.properties;
   return {
-    id: pg.id,
+    id:     pg.id,
     nome:   prop(p, 'Nome do Candidato', 'title'),
     status: prop(p, 'Status', 'select'),
   };
@@ -148,40 +203,29 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'NOTION_TOKEN não configurado' });
   }
 
-  var dbParam = req.query && req.query.db;
+  var db = req.query && req.query.db;
 
   try {
-    if (dbParam === 'vinculos') {
-      var pages = await fetchAll(DBS.vinculos);
-      return res.status(200).json({ vinculos: pages.map(parseVinculo), timestamp: new Date().toISOString() });
+    if (db && DBS[db]) {
+      var parsers = {
+        pessoas:      parsePessoa,
+        vinculos:     parseVinculo,
+        cargos:       parseCargo,
+        equipamentos: parseEquipamento,
+        afastamentos: parseAfastamento,
+        curriculo:    parseCurriculo,
+        solicitacoes: parseSolicitacao,
+        envios:       parseEnvio,
+        candidatos:   parseCandidato,
+      };
+      var pages = await fetchAll(DBS[db]);
+      var result = {};
+      result[db] = pages.map(parsers[db]);
+      result.timestamp = new Date().toISOString();
+      return res.status(200).json(result);
     }
 
-    if (dbParam === 'solicitacoes') {
-      var pages = await fetchAll(DBS.solicitacoes);
-      return res.status(200).json({ solicitacoes: pages.map(parseSolicitacao), timestamp: new Date().toISOString() });
-    }
-
-    if (dbParam === 'candidatos') {
-      var pages = await fetchAll(DBS.candidatos);
-      return res.status(200).json({ candidatos: pages.map(parseCandidato), timestamp: new Date().toISOString() });
-    }
-
-    if (dbParam === 'equipamentos') {
-      var pages = await fetchAll(DBS.equipamentos);
-      return res.status(200).json({ equipamentos: pages.map(parseEquipamento), timestamp: new Date().toISOString() });
-    }
-
-    if (dbParam === 'afastamentos') {
-      var pages = await fetchAll(DBS.afastamentos);
-      return res.status(200).json({ afastamentos: pages.map(parseAfastamento), timestamp: new Date().toISOString() });
-    }
-
-    if (dbParam === 'curriculo') {
-      var pages = await fetchAll(DBS.curriculo);
-      return res.status(200).json({ curriculo: pages.map(parseCurriculo), timestamp: new Date().toISOString() });
-    }
-
-    // Busca todas as databases em paralelo
+    // Busca todas
     var results = await Promise.all([
       fetchAll(DBS.vinculos),
       fetchAll(DBS.equipamentos),
