@@ -1,15 +1,15 @@
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
 
 const DBS = {
-  pessoas:       '22af1aaa-8d47-43ce-a573-b397b5aedbb3',
-  vinculos:      '382268ad-ef1d-4275-9ad3-aa08e4018af6',
-  cargos:        'e11e6ed3-8c42-4abb-b56d-3e0b7f3c68e4',
-  equipamentos:  '31946474-2c1c-4755-8a88-986ce2e0703f',
-  afastamentos:  '51c1dadf-2605-466d-9502-f6a7f6fb9ee7',
-  curriculo:     '256d9706-61b0-4842-b75b-7b47909f178c',
-  solicitacoes:  '83f104c0-3fb4-4771-9133-d7fd4f6b07d0',
-  envios:        '03a4a676-fe76-469e-a96c-5fa41c750cc8',
-  candidatos:    '015f6b6c-6e0e-40d5-a790-6b9e67c37ef9',
+  pessoas:       'c3d305b6-6c8c-45fe-be86-ebde62f624df',
+  vinculos:      '7e8aae2c-7799-4a47-9bfd-f2f8dd705089',
+  cargos:        'd26e55bc-e591-4a4c-9f31-25026a89f519',
+  equipamentos:  '43c2d242-f755-4fca-96ce-d6b8bff6164d',
+  afastamentos:  '730a04f3-e5b5-4dfa-988e-6d10ae833b6a',
+  curriculo:     '5129428f-b760-4b3d-aab2-910a06df3cbf',
+  solicitacoes:  '7cf89395-eab1-41d8-bd22-6e209ec7073f',
+  envios:        'b701ee07-4324-40db-96e3-1e864b20b3b8',
+  candidatos:    'd289f1f6-e5c4-49c4-b1f4-62613e168a4d',
 };
 
 async function queryDB(dbId, cursor) {
