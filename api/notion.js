@@ -59,6 +59,7 @@ function prop(props, name, type) {
 
 function parseVinculo(pg) {
   var p = pg.properties;
+  var pessoaRel = p['Pessoa'] && p['Pessoa'].relation ? p['Pessoa'].relation : [];
   return {
     id: pg.id,
     matricula:     prop(p, 'Matrícula', 'title'),
@@ -68,8 +69,10 @@ function parseVinculo(pg) {
     ocorrencia:    prop(p, 'Ocorrência', 'text'),
     gestor:        prop(p, 'Gestor', 'text'),
     ultimo_dia:    prop(p, 'date:Último Dia de Trabalho:start', 'date'),
-    pessoa:        prop(p, 'Pessoa', 'relation'),
+    data_solic:    prop(p, 'date:Data de Solicitação:start', 'date'),
+    pessoa_id:     pessoaRel.length > 0 ? pessoaRel[0].id : null,
   };
+
 }
 
 function parseEquipamento(pg) {
