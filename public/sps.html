@@ -317,7 +317,7 @@ function render(){
   lista.innerHTML=slice.map(function(r,i){
     var n=duLiq(r);
     var s=semaforo(n,r.status);
-    var diasHTML=n!==null?'<span class="dias-badge '+s+'">'+n+' dias úteis</span>':'';
+    var diasHTML=(n!==null&&n>0)?'<span class="dias-badge '+s+'">'+n+' dias úteis</span>':'';
     return '<div class="card-sps '+s+'" onclick="openModal('+(start+i)+')">' +
       '<div class="card-top">' +
         '<div style="display:flex;align-items:center;gap:12px">' +
