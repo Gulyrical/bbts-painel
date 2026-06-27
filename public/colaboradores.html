@@ -28,7 +28,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .toolbar input:focus,.toolbar select:focus{outline:none;border-color:var(--blue)}
 .table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
 table{width:100%;border-collapse:collapse;table-layout:fixed}
-thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);background:#FAFAFA;white-space:nowrap}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);background:#FAFAFA;white-space:nowrap;user-select:none}
+thead th.sortable{cursor:pointer}
+thead th.sortable:hover{color:var(--blue);background:#F0F4FF}
+thead th.sort-active{color:var(--blue)}
+.sort-icon{margin-left:4px;opacity:0.5;font-size:10px}
+thead th.sort-active .sort-icon{opacity:1}
 tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:#F0F4FF}
@@ -40,7 +45,6 @@ tbody td{padding:11px 14px;font-size:13px;overflow:hidden;text-overflow:ellipsis
 .pag button{padding:4px 12px;border:1px solid var(--border);border-radius:6px;background:var(--white);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif}
 .pag button:disabled{opacity:0.4;cursor:default}
 .empty{padding:40px;text-align:center;color:var(--text2);font-size:13px}
-/* Modal */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:flex-start;justify-content:center;padding-top:48px;overflow-y:auto}
 .overlay.open{display:flex}
 .modal{background:var(--white);border-radius:12px;width:min(780px,95vw);padding:24px;margin-bottom:48px}
@@ -100,10 +104,18 @@ tbody td{padding:11px 14px;font-size:13px;overflow:hidden;text-overflow:ellipsis
     <table>
       <thead>
         <tr>
-          <th style="width:38%">Nome</th>
-          <th style="width:12%">Matrícula</th>
-          <th style="width:14%">Admissão</th>
-          <th style="width:22%">Cargo</th>
+          <th class="sortable sort-active" style="width:36%" onclick="sortBy('nome')" id="th-nome">
+            Nome <span class="sort-icon" id="si-nome">↑</span>
+          </th>
+          <th class="sortable" style="width:12%" onclick="sortBy('matricula')" id="th-matricula">
+            Matrícula <span class="sort-icon" id="si-matricula">↕</span>
+          </th>
+          <th class="sortable" style="width:14%" onclick="sortBy('data_admissao')" id="th-data_admissao">
+            Admissão <span class="sort-icon" id="si-data_admissao">↕</span>
+          </th>
+          <th class="sortable" style="width:22%" onclick="sortBy('cargo')" id="th-cargo">
+            Cargo <span class="sort-icon" id="si-cargo">↕</span>
+          </th>
           <th style="width:14%;text-align:center">Status</th>
         </tr>
       </thead>
@@ -122,7 +134,6 @@ tbody td{padding:11px 14px;font-size:13px;overflow:hidden;text-overflow:ellipsis
   </div>
 </main>
 
-<!-- Modal -->
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-hd">
@@ -143,262 +154,134 @@ tbody td{padding:11px 14px;font-size:13px;overflow:hidden;text-overflow:ellipsis
 const API = '/api/notion';
 let rows = [], filt = [], page = 1;
 const PER = 20;
+let sortField = 'nome';
+let sortAsc = true;
 
 function fmt(x) {
   if (!x || x === 'None' || x === 'nan' || x === 'null' || x === 'undefined') return null;
   return String(x).trim();
 }
-
 function fmtDate(d) {
   if (!d) return null;
-  try {
-    var parts = d.split('-');
-    return parts[2] + '/' + parts[1] + '/' + parts[0];
-  } catch(e) { return d; }
+  try { var p = d.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; } catch(e) { return d; }
 }
-
 function campo(label, val) {
   var v = fmt(val);
-  return '<div class="campo"><div class="campo-l">' + label + '</div><div class="campo-v">' +
-    (v ? v : '<span class="campo-e">Em branco</span>') + '</div></div>';
+  return '<div class="campo"><div class="campo-l">'+label+'</div><div class="campo-v">'+(v?v:'<span class="campo-e">Em branco</span>')+'</div></div>';
+}
+
+function sortBy(field) {
+  if (sortField === field) { sortAsc = !sortAsc; }
+  else { sortField = field; sortAsc = true; }
+  ['nome','matricula','data_admissao','cargo'].forEach(function(f) {
+    var th = document.getElementById('th-'+f);
+    var si = document.getElementById('si-'+f);
+    if (f === sortField) { th.classList.add('sort-active'); si.textContent = sortAsc ? '↑' : '↓'; }
+    else { th.classList.remove('sort-active'); si.textContent = '↕'; }
+  });
+  applyFilter();
 }
 
 async function loadData() {
   var btn = document.getElementById('btn');
   btn.classList.add('spin');
-
   try {
     var [rv, rp, rc] = await Promise.all([
-      fetch(API + '?db=vinculos').then(r => r.json()),
-      fetch(API + '?db=pessoas').then(r => r.json()),
-      fetch(API + '?db=cargos').then(r => r.json()),
+      fetch(API+'?db=vinculos').then(r=>r.json()),
+      fetch(API+'?db=pessoas').then(r=>r.json()),
+      fetch(API+'?db=cargos').then(r=>r.json()),
     ]);
-
     if (rv.error) throw new Error(rv.error);
-
-    // Mapas
-    var pMap = {};
-    (rp.pessoas || []).forEach(p => { pMap[p.id] = p; });
-
-    var cMap = {};
-    (rc.cargos || []).forEach(c => { cMap[c.id] = c; });
-
-    // Cruzar vínculos + pessoas + cargos
-    rows = (rv.vinculos || []).map(v => {
-      var p = pMap[v.pessoa_id] || {};
-      var c = cMap[v.cargo_id]  || {};
+    var pMap = {}; (rp.pessoas||[]).forEach(p=>{pMap[p.id]=p;});
+    var cMap = {}; (rc.cargos||[]).forEach(c=>{cMap[c.id]=c;});
+    rows = (rv.vinculos||[]).map(v=>{
+      var p=pMap[v.pessoa_id]||{}; var c=cMap[v.cargo_id]||{};
       return {
-        nome:          fmt(p.nome) || '—',
-        matricula:     fmt(v.matricula),
-        status:        fmt(v.status),
-        data_admissao: v.data_admissao,
-        data_deslig:   v.data_deslig,
-        ocorrencia:    fmt(v.ocorrencia),
-        gestor:        fmt(v.gestor),
-        ultimo_dia:    v.ultimo_dia,
-        tipo_contrato: fmt(p.tipo_contrato),
-        jornada:       fmt(p.jornada),
-        uor:           fmt(v.uor),
-        cod_cargo:     fmt(c.codigo),
-        cargo:         fmt(c.cargo),
-        salario:       c.salario ? 'R$ ' + c.salario.toLocaleString('pt-BR', {minimumFractionDigits:2}) : null,
-        nivel:         fmt(c.nivel),
-        cpf:           fmt(p.cpf),
-        rg:            fmt(p.rg),
-        orgao_rg:      fmt(p.orgao_rg),
-        nascimento:    p.nascimento,
-        sexo:          fmt(p.sexo),
-        estado_civil:  fmt(p.estado_civil),
-        nacionalidade: fmt(p.nacionalidade),
-        telefone:      fmt(p.telefone),
-        logradouro:    fmt(p.logradouro),
-        numero:        fmt(p.numero),
-        complemento:   fmt(p.complemento),
-        bairro:        fmt(p.bairro),
-        cidade:        fmt(p.cidade),
-        estado:        fmt(p.estado),
-        cep:           fmt(p.cep),
-        email_pessoal: fmt(p.email_pessoal),
-        email_corp:    fmt(p.email_corp),
-        banco:         fmt(p.banco),
-        agencia:       fmt(p.agencia),
-        conta:         fmt(p.conta),
-        tipo_conta:    fmt(p.tipo_conta),
-        mae:           fmt(p.nome_mae),
-        pai:           fmt(p.nome_pai),
-        grau_instrucao: fmt(p.grau_instrucao),
-        pis:           fmt(p.pis),
-        ctps:          fmt(p.ctps),
+        nome:fmt(p.nome)||'—', matricula:fmt(v.matricula), status:fmt(v.status),
+        data_admissao:v.data_admissao, data_deslig:v.data_deslig,
+        ocorrencia:fmt(v.ocorrencia), gestor:fmt(v.gestor), ultimo_dia:v.ultimo_dia,
+        tipo_contrato:fmt(p.tipo_contrato), jornada:fmt(p.jornada), uor:fmt(v.uor),
+        cod_cargo:fmt(c.codigo), cargo:fmt(c.cargo),
+        salario:c.salario?'R$ '+c.salario.toLocaleString('pt-BR',{minimumFractionDigits:2}):null,
+        nivel:fmt(c.nivel), cpf:fmt(p.cpf), rg:fmt(p.rg), orgao_rg:fmt(p.orgao_rg),
+        nascimento:p.nascimento, sexo:fmt(p.sexo), estado_civil:fmt(p.estado_civil),
+        nacionalidade:fmt(p.nacionalidade), telefone:fmt(p.telefone),
+        logradouro:fmt(p.logradouro), numero:fmt(p.numero), complemento:fmt(p.complemento),
+        bairro:fmt(p.bairro), cidade:fmt(p.cidade), estado:fmt(p.estado), cep:fmt(p.cep),
+        email_pessoal:fmt(p.email_pessoal), email_corp:fmt(p.email_corp),
+        banco:fmt(p.banco), agencia:fmt(p.agencia), conta:fmt(p.conta), tipo_conta:fmt(p.tipo_conta),
+        mae:fmt(p.nome_mae), pai:fmt(p.nome_pai), grau_instrucao:fmt(p.grau_instrucao),
+        pis:fmt(p.pis), ctps:fmt(p.ctps),
       };
     });
-
-    var ativos = rows.filter(r => r.status === 'Ativo').length;
-    var deslig = rows.filter(r => r.status === 'Desligado').length;
-    var emails = rows.filter(r => r.email_pessoal).length;
-    document.getElementById('k-total').textContent  = rows.length;
-    document.getElementById('k-ativos').textContent = ativos;
-    document.getElementById('k-deslig').textContent = deslig;
-    document.getElementById('k-email').textContent  = emails;
-    document.getElementById('sub').textContent = rows.length + ' colaboradores';
-    document.getElementById('upd').textContent = 'Atualizado às ' +
-      new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-
+    var ativos=rows.filter(r=>r.status==='Ativo').length;
+    var deslig=rows.filter(r=>r.status==='Desligado').length;
+    var emails=rows.filter(r=>r.email_pessoal).length;
+    document.getElementById('k-total').textContent=rows.length;
+    document.getElementById('k-ativos').textContent=ativos;
+    document.getElementById('k-deslig').textContent=deslig;
+    document.getElementById('k-email').textContent=emails;
+    document.getElementById('sub').textContent=rows.length+' colaboradores';
+    document.getElementById('upd').textContent='Atualizado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     applyFilter();
-
   } catch(e) {
-    document.getElementById('sub').textContent = 'Erro: ' + e.message;
-    document.getElementById('tb').innerHTML = '<tr><td colspan="5" class="empty">⚠ ' + e.message + '</td></tr>';
+    document.getElementById('sub').textContent='Erro: '+e.message;
+    document.getElementById('tb').innerHTML='<tr><td colspan="5" class="empty">⚠ '+e.message+'</td></tr>';
   }
-
   btn.classList.remove('spin');
 }
 
 function applyFilter() {
-  var q = document.getElementById('sq').value.toLowerCase();
-  var s = document.getElementById('ss').value;
-  filt = rows.filter(r =>
-    (!q || (r.nome||'').toLowerCase().includes(q) || (r.matricula||'').includes(q)) &&
-    (!s || r.status === s)
-  );
-  page = 1;
-  render();
+  var q=document.getElementById('sq').value.toLowerCase();
+  var s=document.getElementById('ss').value;
+  filt=rows.filter(r=>(!q||(r.nome||'').toLowerCase().includes(q)||(r.matricula||'').includes(q))&&(!s||r.status===s));
+  filt.sort(function(a,b){
+    var va=(a[sortField]||'').toString().toLowerCase();
+    var vb=(b[sortField]||'').toString().toLowerCase();
+    return sortAsc?va.localeCompare(vb,'pt-BR'):vb.localeCompare(va,'pt-BR');
+  });
+  page=1; render();
 }
 
-function changePage(d) {
-  page = Math.max(1, Math.min(Math.ceil(filt.length/PER), page+d));
-  render();
-}
+function changePage(d){page=Math.max(1,Math.min(Math.ceil(filt.length/PER),page+d));render();}
 
-function render() {
-  var tb = document.getElementById('tb');
-  var start = (page-1)*PER;
-  var slice = filt.slice(start, start+PER);
-  var total = filt.length;
-
-  document.getElementById('pi').textContent =
-    total > 0 ? (start+1) + '–' + Math.min(start+PER,total) + ' de ' + total + ' colaboradores' : '0 resultados';
-  document.getElementById('pp').disabled = page <= 1;
-  document.getElementById('pn').disabled = page >= Math.ceil(total/PER);
-
-  if (!slice.length) {
-    tb.innerHTML = '<tr><td colspan="5" class="empty">Nenhum resultado encontrado</td></tr>';
-    return;
-  }
-
-  tb.innerHTML = slice.map((r,i) => {
-    var ini = (r.nome||'?').split(' ').slice(0,2).map(n=>n[0]).join('');
-    return '<tr onclick="openModal(' + (start+i) + ')">' +
-      '<td><div style="display:flex;align-items:center;gap:9px">' +
-        '<div class="avatar">' + ini + '</div>' +
-        '<span>' + (r.nome||'—') + '</span>' +
-      '</div></td>' +
-      '<td style="color:var(--text2)">' + (r.matricula||'—') + '</td>' +
-      '<td style="color:var(--text2)">' + (fmtDate(r.data_admissao)||'—') + '</td>' +
-      '<td style="color:var(--text2)">' + (r.cargo||'—') + '</td>' +
-      '<td style="text-align:center"><span class="' + (r.status==='Ativo'?'badge-a':'badge-d') + '">' + (r.status||'—') + '</span></td>' +
-    '</tr>';
+function render(){
+  var tb=document.getElementById('tb');
+  var start=(page-1)*PER; var slice=filt.slice(start,start+PER); var total=filt.length;
+  document.getElementById('pi').textContent=total>0?(start+1)+'–'+Math.min(start+PER,total)+' de '+total+' colaboradores':'0 resultados';
+  document.getElementById('pp').disabled=page<=1;
+  document.getElementById('pn').disabled=page>=Math.ceil(total/PER);
+  if(!slice.length){tb.innerHTML='<tr><td colspan="5" class="empty">Nenhum resultado encontrado</td></tr>';return;}
+  tb.innerHTML=slice.map((r,i)=>{
+    var ini=(r.nome||'?').split(' ').slice(0,2).map(n=>n[0]).join('');
+    return '<tr onclick="openModal('+(start+i)+')"><td><div style="display:flex;align-items:center;gap:9px"><div class="avatar">'+ini+'</div><span>'+(r.nome||'—')+'</span></div></td><td style="color:var(--text2)">'+(r.matricula||'—')+'</td><td style="color:var(--text2)">'+(fmtDate(r.data_admissao)||'—')+'</td><td style="color:var(--text2)">'+(r.cargo||'—')+'</td><td style="text-align:center"><span class="'+(r.status==='Ativo'?'badge-a':'badge-d')+'">'+(r.status||'—')+'</span></td></tr>';
   }).join('');
 }
 
-function openModal(idx) {
-  var r = filt[idx];
-  if (!r) return;
-  var ini = (r.nome||'?').split(' ').slice(0,2).map(n=>n[0]).join('');
-  document.getElementById('m-av').textContent = ini;
-  document.getElementById('m-nome').textContent = r.nome || '—';
-  document.getElementById('m-sub').textContent =
-    'Matrícula: ' + (r.matricula||'—') + ' · ' + (r.status||'—') +
-    (r.uor ? ' · UOR: ' + r.uor : '');
-
-  document.getElementById('mb').innerHTML =
-    '<div class="secao">Vínculo</div>' +
-    '<div class="g4">' +
-      campo('Matrícula', r.matricula) +
-      campo('Status', r.status) +
-      campo('Admissão', fmtDate(r.data_admissao)) +
-      campo('Desligamento', fmtDate(r.data_deslig)) +
-    '</div>' +
-    '<div class="g3" style="margin-top:8px">' +
-      campo('Tipo de Contrato', r.tipo_contrato) +
-      campo('Jornada', r.jornada) +
-      campo('Ocorrência', r.ocorrencia) +
-    '</div>' +
-    (r.gestor ? '<div class="g2" style="margin-top:8px">' +
-      campo('Gestor', r.gestor) +
-      campo('Último dia', fmtDate(r.ultimo_dia)) +
-    '</div>' : '') +
-
-    '<div class="secao">Cargo</div>' +
-    '<div class="g3">' +
-      campo('Código do Cargo', r.cod_cargo) +
-      campo('Cargo', r.cargo) +
-      campo('Nível', r.nivel) +
-    '</div>' +
-    '<div class="g2" style="margin-top:8px">' +
-      campo('Salário', r.salario) +
-      campo('UOR', r.uor) +
-    '</div>' +
-
-    '<div class="secao">Dados Pessoais</div>' +
-    '<div class="g4">' +
-      campo('CPF', r.cpf) +
-      campo('RG', r.rg) +
-      campo('Órgão Emissor', r.orgao_rg) +
-      campo('Data de Nascimento', fmtDate(r.nascimento)) +
-    '</div>' +
-    '<div class="g4" style="margin-top:8px">' +
-      campo('Sexo', r.sexo) +
-      campo('Estado Civil', r.estado_civil) +
-      campo('Nacionalidade', r.nacionalidade) +
-      campo('Telefone', r.telefone) +
-    '</div>' +
-
-    '<div class="secao">Endereço</div>' +
-    '<div class="g4">' +
-      campo('Logradouro', r.logradouro) +
-      campo('Número', r.numero) +
-      campo('Complemento', r.complemento) +
-      campo('CEP', r.cep) +
-    '</div>' +
-    '<div class="g3" style="margin-top:8px">' +
-      campo('Bairro', r.bairro) +
-      campo('Cidade', r.cidade) +
-      campo('Estado', r.estado) +
-    '</div>' +
-
-    '<div class="secao">Contato</div>' +
-    '<div class="g2">' +
-      campo('E-mail Pessoal', r.email_pessoal) +
-      campo('E-mail Corporativo', r.email_corp) +
-    '</div>' +
-
-    '<div class="secao">Dados Bancários</div>' +
-    '<div class="g4">' +
-      campo('Banco', r.banco) +
-      campo('Agência', r.agencia) +
-      campo('Conta', r.conta) +
-      campo('Tipo de Conta', r.tipo_conta) +
-    '</div>' +
-
-    '<div class="secao">Formação</div>' +
-    '<div class="g2">' +
-      campo('Grau de Instrução', r.grau_instrucao) +
-      campo('PIS', r.pis) +
-    '</div>' +
-
-    '<div class="secao">Filiação</div>' +
-    '<div class="g2">' +
-      campo('Nome da Mãe', r.mae) +
-      campo('Nome do Pai', r.pai) +
-    '</div>';
-
+function openModal(idx){
+  var r=filt[idx]; if(!r)return;
+  var ini=(r.nome||'?').split(' ').slice(0,2).map(n=>n[0]).join('');
+  document.getElementById('m-av').textContent=ini;
+  document.getElementById('m-nome').textContent=r.nome||'—';
+  document.getElementById('m-sub').textContent='Matrícula: '+(r.matricula||'—')+' · '+(r.status||'—')+(r.uor?' · UOR: '+r.uor:'');
+  document.getElementById('mb').innerHTML=
+    '<div class="secao">Vínculo</div><div class="g4">'+campo('Matrícula',r.matricula)+campo('Status',r.status)+campo('Admissão',fmtDate(r.data_admissao))+campo('Desligamento',fmtDate(r.data_deslig))+'</div>'+
+    '<div class="g3" style="margin-top:8px">'+campo('Tipo de Contrato',r.tipo_contrato)+campo('Jornada',r.jornada)+campo('Ocorrência',r.ocorrencia)+'</div>'+
+    (r.gestor?'<div class="g2" style="margin-top:8px">'+campo('Gestor',r.gestor)+campo('Último dia',fmtDate(r.ultimo_dia))+'</div>':'')+
+    '<div class="secao">Cargo</div><div class="g3">'+campo('Código do Cargo',r.cod_cargo)+campo('Cargo',r.cargo)+campo('Nível',r.nivel)+'</div>'+
+    '<div class="g2" style="margin-top:8px">'+campo('Salário',r.salario)+campo('UOR',r.uor)+'</div>'+
+    '<div class="secao">Dados Pessoais</div><div class="g4">'+campo('CPF',r.cpf)+campo('RG',r.rg)+campo('Órgão Emissor',r.orgao_rg)+campo('Data de Nascimento',fmtDate(r.nascimento))+'</div>'+
+    '<div class="g4" style="margin-top:8px">'+campo('Sexo',r.sexo)+campo('Estado Civil',r.estado_civil)+campo('Nacionalidade',r.nacionalidade)+campo('Telefone',r.telefone)+'</div>'+
+    '<div class="secao">Endereço</div><div class="g4">'+campo('Logradouro',r.logradouro)+campo('Número',r.numero)+campo('Complemento',r.complemento)+campo('CEP',r.cep)+'</div>'+
+    '<div class="g3" style="margin-top:8px">'+campo('Bairro',r.bairro)+campo('Cidade',r.cidade)+campo('Estado',r.estado)+'</div>'+
+    '<div class="secao">Contato</div><div class="g2">'+campo('E-mail Pessoal',r.email_pessoal)+campo('E-mail Corporativo',r.email_corp)+'</div>'+
+    '<div class="secao">Dados Bancários</div><div class="g4">'+campo('Banco',r.banco)+campo('Agência',r.agencia)+campo('Conta',r.conta)+campo('Tipo de Conta',r.tipo_conta)+'</div>'+
+    '<div class="secao">Formação</div><div class="g2">'+campo('Grau de Instrução',r.grau_instrucao)+campo('PIS',r.pis)+'</div>'+
+    '<div class="secao">Filiação</div><div class="g2">'+campo('Nome da Mãe',r.mae)+campo('Nome do Pai',r.pai)+'</div>';
   document.getElementById('overlay').classList.add('open');
 }
 
-function closeModal() {
-  document.getElementById('overlay').classList.remove('open');
-}
-
+function closeModal(){document.getElementById('overlay').classList.remove('open');}
 loadData();
 </script>
 </body>
