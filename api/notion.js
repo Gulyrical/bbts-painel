@@ -45,15 +45,15 @@ function prop(props, name, type) {
   var p = props[name];
   if (!p) return null;
   switch (type) {
-    case 'title':        return p.title && p.title[0] ? p.title[0].plain_text : null;
-    case 'text':         return p.rich_text && p.rich_text[0] ? p.rich_text[0].plain_text : null;
-    case 'select':       return p.select ? p.select.name : null;
-    case 'date':         return p.date ? p.date.start : null;
-    case 'number':       return p.number !== undefined ? p.number : null;
-    case 'email':        return p.email || null;
+    case 'title':    return p.title && p.title[0] ? p.title[0].plain_text : null;
+    case 'text':     return p.rich_text && p.rich_text[0] ? p.rich_text[0].plain_text : null;
+    case 'select':   return p.select ? p.select.name : null;
+    case 'date':     return p.date ? p.date.start : null;
+    case 'number':   return p.number !== undefined ? p.number : null;
+    case 'email':    return p.email || null;
     case 'phone_number': return p.phone_number || null;
-    case 'rollup_n':     return p.rollup ? p.rollup.number : null;
-    case 'relation':     return p.relation ? p.relation.map(function(r) { return r.id; }) : [];
+    case 'rollup_n': return p.rollup ? p.rollup.number : null;
+    case 'relation': return p.relation ? p.relation.map(function(r) { return r.id; }) : [];
     default: return null;
   }
 }
@@ -179,12 +179,12 @@ function parseSolicitacao(pg) {
     fiscal:           prop(p, 'Fiscal do Contrato', 'text'),
     gerente:          prop(p, 'Gerente Demandante', 'text'),
     status:           prop(p, 'Status', 'select'),
-    data_email:       prop(p, 'Data E-mail Recebido', 'date'),
-    data_curriculos:  prop(p, 'Data Currículos Enviados', 'date'),
-    data_entrevista:  prop(p, 'Data Pedido Entrevista', 'date'),
-    data_escolhido:   prop(p, 'Data Candidato Escolhido', 'date'),
-    data_autorizacao: prop(p, 'Data Autorização', 'date'),
-    data_admissao:    prop(p, 'Data Admissão', 'date'),
+    data_email:       prop(p, 'date:Data E-mail Recebido:start', 'date'),
+    data_curriculos:  prop(p, 'date:Data Currículos Enviados:start', 'date'),
+    data_entrevista:  prop(p, 'date:Data Pedido Entrevista:start', 'date'),
+    data_escolhido:   prop(p, 'date:Data Candidato Escolhido:start', 'date'),
+    data_autorizacao: prop(p, 'date:Data Autorização:start', 'date'),
+    data_admissao:    prop(p, 'date:Data Admissão:start', 'date'),
     total_curriculos: prop(p, 'Total Currículos Enviados', 'rollup_n'),
   };
 }
