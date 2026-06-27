@@ -322,7 +322,7 @@ function render(){
       '<div class="card-top">' +
         '<div style="display:flex;align-items:center;gap:12px">' +
           '<span class="card-sps-num">'+(r.numero_sps||'—')+'</span>' +
-          '<span class="card-fiscal">'+( r.fiscal||'—')+'</span>' +
+          '<span class="card-fiscal" style="font-size:14px;font-weight:500;color:var(--text)">'+(r.gerente||'—')+'</span>' +
         '</div>' +
         '<div class="card-right">' +
           diasHTML +
@@ -332,11 +332,11 @@ function render(){
       '</div>' +
       '<div class="trilho-wrap">'+trilhoHTML(r.status)+'</div>' +
       '<div class="card-bottom">' +
+        '<div class="card-info">👤 Fiscal: <strong>'+(r.fiscal||'—')+'</strong></div>' +
         '<div class="card-info">📅 E-mail: <strong>'+fmtD(r.data_email)+'</strong></div>' +
         (r.data_curriculos?'<div class="card-info">📄 Currículos: <strong>'+fmtD(r.data_curriculos)+'</strong></div>':'')+
         (r.data_admissao?'<div class="card-info">✅ Admissão: <strong>'+fmtD(r.data_admissao)+'</strong></div>':'')+
         (r.total_curriculos?'<div class="card-info">👤 Currículos enviados: <strong>'+r.total_curriculos+'</strong></div>':'')+
-        (r.gerente?'<div class="card-info">🏢 Gerente: <strong>'+r.gerente+'</strong></div>':'')+
       '</div>' +
     '</div>';
   }).join('');
