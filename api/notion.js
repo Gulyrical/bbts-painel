@@ -125,10 +125,10 @@ function parseCargo(pg) {
   var p = pg.properties;
   return {
     id:      pg.id,
-    codigo:  prop(p, 'Código do Cargo', 'title'),
-    cargo:   prop(p, 'Cargo', 'text'),
+    codigo:  prop(p, 'Código SGPS', 'title'),
+    cargo:   prop(p, 'Descrição do Posto', 'text'),
     salario: prop(p, 'Salário', 'number'),
-    nivel:   prop(p, 'Nível', 'select'),
+    nivel:   prop(p, 'Senioridade', 'select'),
   };
 }
 
