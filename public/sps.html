@@ -14,34 +14,39 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .brand-mark{width:32px;height:32px;background:rgba(255,255,255,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff}
 .brand-name{font-size:14px;font-weight:600;letter-spacing:0.03em}
 .brand-sub{font-size:11px;opacity:0.65;margin-top:1px}
-.btn-voltar{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif}
-.btn-voltar:hover{background:rgba(255,255,255,0.25)}
-.btn-atualizar{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif}
-.btn-atualizar:hover{background:rgba(255,255,255,0.25)}
-.btn-atualizar.spin span{display:inline-block;animation:spin 0.8s linear infinite}
+.btn-acao{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif}
+.btn-acao:hover{background:rgba(255,255,255,0.25)}
+.btn-acao.spin span{display:inline-block;animation:spin 0.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.main{max-width:1280px;margin:0 auto;padding:24px 28px}
+.main{max-width:1200px;margin:0 auto;padding:24px 28px}
 
-.legenda{display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap}
-.leg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)}
-.leg-dot{width:8px;height:8px;border-radius:50%}
+.legenda{display:flex;gap:20px;margin-bottom:16px;flex-wrap:wrap;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px}
+.leg{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+.leg-dot{width:10px;height:10px;border-radius:50%}
 
-.toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .toolbar input,.toolbar select{padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:'Inter',sans-serif;background:var(--white)}
 .toolbar input{flex:1;min-width:200px}
 .toolbar input:focus,.toolbar select:focus{outline:none;border-color:var(--blue)}
 
-.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
-table{width:100%;border-collapse:collapse;table-layout:fixed}
-thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);background:#FAFAFA;white-space:nowrap}
-tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s}
-tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:#F0F4FF}
-tbody td{padding:12px 14px;font-size:13px;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Cards em vez de tabela */
+.lista{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
 
-.sem{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
-.sem-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.card-sps{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;cursor:pointer;transition:all 0.12s;border-left:4px solid transparent}
+.card-sps:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(70,94,255,0.1);border-left-color:var(--blue)}
+.card-sps.verde{border-left-color:var(--green)}
+.card-sps.amarelo{border-left-color:var(--amber)}
+.card-sps.vermelho{border-left-color:var(--red)}
+.card-sps.cinza{border-left-color:#D1D5DB}
+
+.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.card-sps-num{font-family:monospace;font-size:13px;font-weight:600;color:var(--blue)}
+.card-fiscal{font-size:13px;color:var(--text2)}
+.card-right{display:flex;align-items:center;gap:10px}
+
+.sem{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.sem-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .sem-verde{background:var(--green-lt);color:#1A5C44}.sem-verde .sem-dot{background:var(--green)}
 .sem-amarelo{background:var(--amber-lt);color:#7A4E00}.sem-amarelo .sem-dot{background:var(--amber);animation:pulse 1.4s infinite}
 .sem-vermelho{background:var(--red-lt);color:#7A1F17}.sem-vermelho .sem-dot{background:var(--red);animation:pulseR .9s infinite}
@@ -49,29 +54,39 @@ tbody td{padding:12px 14px;font-size:13px;vertical-align:middle;overflow:hidden;
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes pulseR{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(1.3)}}
 
-.trilho{display:flex;align-items:flex-start;gap:0;min-width:220px}
-.t-step{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;flex:1}
-.t-dot{width:8px;height:8px;border-radius:50%;background:#E5E7EB;border:1.5px solid #D1D5DB;z-index:1}
-.t-step.done .t-dot{background:var(--green);border-color:var(--green)}
-.t-step.current .t-dot{background:var(--blue);border-color:var(--blue);width:10px;height:10px;box-shadow:0 0 0 3px rgba(70,94,255,.15)}
-.t-line{flex:1;height:1.5px;background:#E5E7EB;margin:0 -1px;margin-top:-16px;z-index:0}
-.t-line.done{background:var(--green)}
-.t-label{font-size:8px;color:var(--text2);text-align:center;line-height:1.2;max-width:36px}
-.t-step.done .t-label{color:var(--green)}
-.t-step.current .t-label{color:var(--blue);font-weight:500}
+.dias-badge{font-size:13px;font-weight:600;padding:3px 10px;border-radius:6px;background:#F3F4F6;color:var(--text)}
+.dias-badge.verde{background:var(--green-lt);color:#1A5C44}
+.dias-badge.amarelo{background:var(--amber-lt);color:#7A4E00}
+.dias-badge.vermelho{background:var(--red-lt);color:#7A1F17}
 
-.dias-n{font-size:15px;font-weight:500}
-.dias-s{font-size:10px;color:var(--text2);display:block}
+/* Trilho de progresso */
+.trilho-wrap{margin-bottom:4px}
+.trilho{display:flex;align-items:flex-start}
+.t-item{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
+.t-item:not(:last-child)::after{content:'';position:absolute;top:7px;left:50%;width:100%;height:2px;background:#E5E7EB;z-index:0}
+.t-item.done:not(:last-child)::after{background:var(--green)}
+.t-dot{width:14px;height:14px;border-radius:50%;border:2px solid #D1D5DB;background:#fff;z-index:1;position:relative;flex-shrink:0}
+.t-item.done .t-dot{background:var(--green);border-color:var(--green)}
+.t-item.current .t-dot{background:var(--blue);border-color:var(--blue);width:16px;height:16px;box-shadow:0 0 0 3px rgba(70,94,255,.2)}
+.t-label{font-size:9px;color:#9CA3AF;text-align:center;margin-top:4px;line-height:1.3;max-width:52px}
+.t-item.done .t-label{color:var(--green)}
+.t-item.current .t-label{color:var(--blue);font-weight:500}
+
+.card-bottom{display:flex;align-items:center;gap:16px;margin-top:10px;flex-wrap:wrap}
+.card-info{font-size:11px;color:var(--text2)}
+.card-info strong{color:var(--text)}
+
+.status-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500}
 
 .pag{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text2)}
 .pag button{padding:4px 12px;border:1px solid var(--border);border-radius:6px;background:var(--white);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif}
 .pag button:disabled{opacity:0.4;cursor:default}
-.empty{padding:40px;text-align:center;color:var(--text2);font-size:13px}
+.empty{padding:40px;text-align:center;color:var(--text2);font-size:13px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius)}
 
 /* Modal */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:flex-start;justify-content:center;padding-top:48px;overflow-y:auto}
 .overlay.open{display:flex}
-.modal{background:var(--white);border-radius:12px;width:min(680px,95vw);padding:24px;margin-bottom:48px}
+.modal{background:var(--white);border-radius:12px;width:min(700px,95vw);padding:24px;margin-bottom:48px}
 .modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
 .modal-titulo{font-size:16px;font-weight:500}
 .modal-sub{font-size:12px;color:var(--text2);margin-top:3px}
@@ -99,10 +114,10 @@ tbody td{padding:12px 14px;font-size:13px;vertical-align:middle;overflow:hidden;
   </div>
   <div style="display:flex;align-items:center;gap:10px">
     <span style="font-size:11px;color:rgba(255,255,255,0.55)" id="upd">—</span>
-    <button class="btn-atualizar" id="btn" onclick="loadData()">
+    <button class="btn-acao" id="btn" onclick="loadData()">
       <span id="ri">↻</span> Atualizar
     </button>
-    <a href="/" class="btn-voltar">← Portal</a>
+    <a href="/" class="btn-acao">← Portal</a>
   </div>
 </header>
 
@@ -125,24 +140,7 @@ tbody td{padding:12px 14px;font-size:13px;vertical-align:middle;overflow:hidden;
     </select>
   </div>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:13%">SPS</th>
-          <th style="width:18%">Fiscal</th>
-          <th style="width:28%">Progresso</th>
-          <th style="width:11%">Dias úteis</th>
-          <th style="width:14%">Prazo</th>
-          <th style="width:10%;text-align:center">Currículos</th>
-          <th style="width:6%;text-align:center">Status</th>
-        </tr>
-      </thead>
-      <tbody id="tb">
-        <tr><td colspan="7" class="empty">Carregando dados...</td></tr>
-      </tbody>
-    </table>
-  </div>
+  <div class="lista" id="lista"></div>
 
   <div class="pag">
     <span id="pi">—</span>
@@ -169,17 +167,17 @@ tbody td{padding:12px 14px;font-size:13px;vertical-align:middle;overflow:hidden;
 
 <script>
 const API = '/api/notion';
-const PER = 15;
+const PER = 10;
 let rows = [], filt = [], page = 1;
 
 const ETAPAS = [
-  {k:'Aguardando Currículos', l:'E-mail'},
-  {k:'Currículos Enviados',   l:'Currículos'},
-  {k:'Em Entrevista',         l:'Entrevista'},
-  {k:'Candidato Escolhido',   l:'Escolhido'},
-  {k:'Aguardando Autorização',l:'Autorização'},
+  {k:'Aguardando Currículos', l:'E-mail\nrecebido'},
+  {k:'Currículos Enviados',   l:'Currículos\nenviados'},
+  {k:'Em Entrevista',         l:'Em\nentrevista'},
+  {k:'Candidato Escolhido',   l:'Candidato\nescolhido'},
+  {k:'Aguardando Autorização',l:'Aguard.\nautorização'},
   {k:'Autorizado',            l:'Autorizado'},
-  {k:'Em Contratação',        l:'Contratando'},
+  {k:'Em Contratação',        l:'Em\ncontratação'},
   {k:'Contratado',            l:'Contratado'},
 ];
 const EI = Object.fromEntries(ETAPAS.map((e,i)=>[e.k,i]));
@@ -200,8 +198,7 @@ function calcDU(s,e,pausas=[]){
   for(var d=new Date(sd);d<=ed;d.setDate(d.getDate()+1)){
     if(!isDU(d))continue;
     var ds=d.toISOString().slice(0,10);
-    var p=pausas.some(function(p){return ds>=p.i&&ds<p.f;});
-    if(!p)n++;
+    if(!pausas.some(function(p){return ds>=p.i&&ds<p.f;}))n++;
   }
   return n;
 }
@@ -229,8 +226,7 @@ function trilhoHTML(status){
   var h='<div class="trilho">';
   ETAPAS.forEach(function(e,i){
     var cls=i<idx?'done':i===idx?'current':'';
-    if(i>0)h+='<div class="t-line '+(i<=idx?'done':'')+'"></div>';
-    h+='<div class="t-step '+cls+'"><div class="t-dot"></div><div class="t-label">'+e.l+'</div></div>';
+    h+='<div class="t-item '+cls+'"><div class="t-dot"></div><div class="t-label">'+e.l.replace('\n','<br>')+'</div></div>';
   });
   return h+'</div>';
 }
@@ -244,17 +240,17 @@ function semHTML(n,status){
 function statusBadge(st){
   var map={
     'Aguardando Currículos':{bg:'#EEF2FF',c:'#3730A3'},
-    'Currículos Enviados':{bg:'#EFF6FF',c:'#1D4ED8'},
+    'Currículos Enviados':{bg:'#DBEAFE',c:'#1E40AF'},
     'Em Entrevista':{bg:'#FFF7ED',c:'#C2410C'},
     'Candidato Escolhido':{bg:'#F5F3FF',c:'#6D28D9'},
-    'Aguardando Autorização':{bg:'#F9FAFB',c:'#6B7280'},
+    'Aguardando Autorização':{bg:'#F3F4F6',c:'#374151'},
     'Autorizado':{bg:'#ECFDF5',c:'#065F46'},
     'Em Contratação':{bg:'#EFF6FF',c:'#1E40AF'},
     'Contratado':{bg:'#ECFDF5',c:'#065F46'},
     'Cancelado':{bg:'#FEF2F2',c:'#991B1B'},
   };
   var m=map[st]||{bg:'#F3F4F6',c:'#374151'};
-  return '<span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500;background:'+m.bg+';color:'+m.c+'">'+st+'</span>';
+  return '<span class="status-badge" style="background:'+m.bg+';color:'+m.c+'">'+st+'</span>';
 }
 
 function campo(label,val){
@@ -271,17 +267,10 @@ async function loadData(){
     if(data.error)throw new Error(data.error);
     rows=(data.solicitacoes||[]).map(function(s){
       return {
-        id:s.id,
-        numero_sps:s.numero_sps,
-        fiscal:s.fiscal,
-        gerente:s.gerente,
-        status:s.status,
-        data_email:s.data_email,
-        data_curriculos:s.data_curriculos,
-        data_entrevista:s.data_entrevista,
-        data_escolhido:s.data_escolhido,
-        data_autorizacao:s.data_autorizacao,
-        data_admissao:s.data_admissao,
+        id:s.id, numero_sps:s.numero_sps, fiscal:s.fiscal, gerente:s.gerente,
+        status:s.status, data_email:s.data_email, data_curriculos:s.data_curriculos,
+        data_entrevista:s.data_entrevista, data_escolhido:s.data_escolhido,
+        data_autorizacao:s.data_autorizacao, data_admissao:s.data_admissao,
         total_curriculos:s.total_curriculos,
       };
     });
@@ -290,7 +279,7 @@ async function loadData(){
     applyFilter();
   }catch(e){
     document.getElementById('sub').textContent='Erro: '+e.message;
-    document.getElementById('tb').innerHTML='<tr><td colspan="7" class="empty">⚠ '+e.message+'</td></tr>';
+    document.getElementById('lista').innerHTML='<div class="empty">⚠ '+e.message+'</div>';
   }
   btn.classList.remove('spin');
 }
@@ -311,27 +300,45 @@ function applyFilter(){
 function changePage(d){page=Math.max(1,Math.min(Math.ceil(filt.length/PER),page+d));render();}
 
 function render(){
-  var tb=document.getElementById('tb');
+  var lista=document.getElementById('lista');
   var start=(page-1)*PER;
   var slice=filt.slice(start,start+PER);
   var total=filt.length;
+
   document.getElementById('pi').textContent=total>0?(start+1)+'–'+Math.min(start+PER,total)+' de '+total+' SPS':'0 resultados';
   document.getElementById('pp').disabled=page<=1;
   document.getElementById('pn').disabled=page>=Math.ceil(total/PER);
-  if(!slice.length){tb.innerHTML='<tr><td colspan="7" class="empty">Nenhuma SPS encontrada</td></tr>';return;}
-  tb.innerHTML=slice.map(function(r,i){
+
+  if(!slice.length){
+    lista.innerHTML='<div class="empty">Nenhuma SPS encontrada</div>';
+    return;
+  }
+
+  lista.innerHTML=slice.map(function(r,i){
     var n=duLiq(r);
-    var sem=semaforo(n,r.status);
-    var cor=sem==='vermelho'?'var(--red)':sem==='amarelo'?'var(--amber)':'var(--text)';
-    return '<tr onclick="openModal('+(start+i)+')">'+
-      '<td style="font-family:monospace;font-size:11px;color:var(--blue);font-weight:500">'+(r.numero_sps||'—')+'</td>'+
-      '<td style="color:var(--text2);font-size:12px">'+(r.fiscal||'—')+'</td>'+
-      '<td>'+trilhoHTML(r.status)+'</td>'+
-      '<td>'+(n!==null?'<span class="dias-n" style="color:'+cor+'">'+n+'</span><span class="dias-s">dias úteis</span>':'<span style="color:var(--text2)">—</span>')+'</td>'+
-      '<td>'+semHTML(n,r.status)+'</td>'+
-      '<td style="text-align:center;font-family:monospace;color:var(--text2)">'+(r.total_curriculos??'—')+'</td>'+
-      '<td style="text-align:center">'+statusBadge(r.status)+'</td>'+
-    '</tr>';
+    var s=semaforo(n,r.status);
+    var diasHTML=n!==null?'<span class="dias-badge '+s+'">'+n+' dias úteis</span>':'';
+    return '<div class="card-sps '+s+'" onclick="openModal('+(start+i)+')">' +
+      '<div class="card-top">' +
+        '<div style="display:flex;align-items:center;gap:12px">' +
+          '<span class="card-sps-num">'+(r.numero_sps||'—')+'</span>' +
+          '<span class="card-fiscal">'+( r.fiscal||'—')+'</span>' +
+        '</div>' +
+        '<div class="card-right">' +
+          diasHTML +
+          semHTML(n,r.status) +
+          statusBadge(r.status) +
+        '</div>' +
+      '</div>' +
+      '<div class="trilho-wrap">'+trilhoHTML(r.status)+'</div>' +
+      '<div class="card-bottom">' +
+        '<div class="card-info">📅 E-mail: <strong>'+fmtD(r.data_email)+'</strong></div>' +
+        (r.data_curriculos?'<div class="card-info">📄 Currículos: <strong>'+fmtD(r.data_curriculos)+'</strong></div>':'')+
+        (r.data_admissao?'<div class="card-info">✅ Admissão: <strong>'+fmtD(r.data_admissao)+'</strong></div>':'')+
+        (r.total_curriculos?'<div class="card-info">👤 Currículos enviados: <strong>'+r.total_curriculos+'</strong></div>':'')+
+        (r.gerente?'<div class="card-info">🏢 Gerente: <strong>'+r.gerente+'</strong></div>':'')+
+      '</div>' +
+    '</div>';
   }).join('');
 }
 
@@ -341,7 +348,7 @@ function openModal(idx){
   document.getElementById('m-titulo').textContent=r.numero_sps||'SPS';
   document.getElementById('m-sub').textContent='Fiscal: '+(r.fiscal||'—')+' · '+(r.status||'—');
   document.getElementById('mb').innerHTML=
-    '<div style="margin-bottom:14px">'+trilhoHTML(r.status)+'</div>'+
+    '<div style="margin-bottom:16px">'+trilhoHTML(r.status)+'</div>'+
     '<div class="secao">Identificação</div>'+
     '<div class="g3">'+campo('Número SPS',r.numero_sps)+campo('Status',statusBadge(r.status))+campo('Currículos enviados',r.total_curriculos)+'</div>'+
     '<div class="g2" style="margin-top:8px">'+campo('Fiscal do Contrato',r.fiscal)+campo('Gerente Demandante',r.gerente)+'</div>'+
@@ -354,7 +361,6 @@ function openModal(idx){
 }
 
 function closeModal(){document.getElementById('overlay').classList.remove('open');}
-
 loadData();
 </script>
 </body>
