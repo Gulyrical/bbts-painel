@@ -45,14 +45,15 @@ function prop(props, name, type) {
   var p = props[name];
   if (!p) return null;
   switch (type) {
-    case 'title':    return p.title && p.title[0] ? p.title[0].plain_text : null;
-    case 'text':     return p.rich_text && p.rich_text[0] ? p.rich_text[0].plain_text : null;
-    case 'select':   return p.select ? p.select.name : null;
-    case 'date':     return p.date ? p.date.start : null;
-    case 'number':   return p.number !== undefined ? p.number : null;
-    case 'email':    return p.email || null;
-    case 'rollup_n': return p.rollup ? p.rollup.number : null;
-    case 'relation': return p.relation ? p.relation.map(function(r) { return r.id; }) : [];
+    case 'title':        return p.title && p.title[0] ? p.title[0].plain_text : null;
+    case 'text':         return p.rich_text && p.rich_text[0] ? p.rich_text[0].plain_text : null;
+    case 'select':       return p.select ? p.select.name : null;
+    case 'date':         return p.date ? p.date.start : null;
+    case 'number':       return p.number !== undefined ? p.number : null;
+    case 'email':        return p.email || null;
+    case 'phone_number': return p.phone_number || null;
+    case 'rollup_n':     return p.rollup ? p.rollup.number : null;
+    case 'relation':     return p.relation ? p.relation.map(function(r) { return r.id; }) : [];
     default: return null;
   }
 }
@@ -66,7 +67,7 @@ function getRelId(props, name) {
 function parsePessoa(pg) {
   var p = pg.properties;
   var ddd = prop(p, 'DDD', 'text') || '';
-  var tel = prop(p, 'Telefone', 'text') || '';
+  var tel = prop(p, 'Telefone', 'phone_number') || '';
   var telefone = ddd && tel ? '(' + ddd + ') ' + tel : tel || ddd || null;
   return {
     id:            pg.id,
