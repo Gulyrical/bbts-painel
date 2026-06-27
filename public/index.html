@@ -11,7 +11,7 @@
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
 .header{background:var(--blue);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
 .header-left{display:flex;align-items:center;gap:14px}
-.logo{width:40px;height:40px;background:rgba(255,255,255,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;letter-spacing:-0.5px}
+.logo{width:40px;height:40px;background:rgba(255,255,255,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff}
 .brand{color:#fff}
 .brand-name{font-size:16px;font-weight:600;letter-spacing:0.02em}
 .brand-sub{font-size:11px;opacity:0.6;margin-top:1px}
@@ -40,7 +40,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </style>
 </head>
 <body>
-
 <header class="header">
   <div class="header-left">
     <div class="logo">BI</div>
@@ -51,13 +50,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
   <div class="header-right" id="data-hora">—</div>
 </header>
-
 <main class="main">
   <div class="hero">
     <div class="hero-title">Bem-vindo ao Portal BBTS</div>
     <div class="hero-sub">Selecione um painel para acessar os dados</div>
   </div>
-
   <div class="grid">
     <a href="/colaboradores.html" class="card">
       <div class="card-icon blue">👥</div>
@@ -67,16 +64,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div class="card-footer">Acessar painel →</div>
     </a>
-
-    <div class="card em-breve">
+    <a href="/sps.html" class="card">
       <div class="card-icon green">📋</div>
       <div>
-        <div class="card-title">Contratações / SPS <span class="badge-breve">Em breve</span></div>
+        <div class="card-title">Contratações / SPS</div>
         <div class="card-desc">Acompanhamento de solicitações de posto, prazos, candidatos e semáforo de progresso.</div>
       </div>
-      <div class="card-footer">Em desenvolvimento</div>
-    </div>
-
+      <div class="card-footer">Acessar painel →</div>
+    </a>
     <div class="card em-breve">
       <div class="card-icon amber">💻</div>
       <div>
@@ -85,7 +80,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div class="card-footer">Em desenvolvimento</div>
     </div>
-
     <div class="card em-breve">
       <div class="card-icon red">🏥</div>
       <div>
@@ -96,19 +90,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
   </div>
 </main>
-
 <footer class="footer">
   Portal BBTS · Dados sincronizados com <span>Notion</span> em tempo real
 </footer>
-
 <script>
-function atualizarHora() {
-  var agora = new Date();
-  var opts = {weekday:'long',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'};
-  document.getElementById('data-hora').textContent = agora.toLocaleDateString('pt-BR', opts);
+function atualizarHora(){
+  var agora=new Date();
+  var opts={weekday:'long',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'};
+  document.getElementById('data-hora').textContent=agora.toLocaleDateString('pt-BR',opts);
 }
 atualizarHora();
-setInterval(atualizarHora, 60000);
+setInterval(atualizarHora,60000);
 </script>
 </body>
 </html>
