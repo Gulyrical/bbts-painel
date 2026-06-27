@@ -75,7 +75,7 @@ function parsePessoa(pg) {
     rg:            prop(p, 'RG', 'text'),
     orgao_rg:      prop(p, 'Órgão Emissor RG', 'text'),
     estado_rg:     prop(p, 'Estado Emissor RG', 'text'),
-    nascimento:    prop(p, 'date:Data de Nascimento:start', 'date'),
+    nascimento:    prop(p, 'Data de Nascimento', 'date'),
     sexo:          prop(p, 'Sexo', 'select'),
     estado_civil:  prop(p, 'Estado Civil', 'select'),
     nacionalidade: prop(p, 'Nacionalidade', 'text'),
@@ -110,12 +110,12 @@ function parseVinculo(pg) {
     matricula:     prop(p, 'Matrícula', 'title'),
     status:        prop(p, 'Status', 'select'),
     uor:           prop(p, 'UOR', 'text'),
-    data_admissao: prop(p, 'date:Data de Admissão:start', 'date'),
-    data_deslig:   prop(p, 'date:Data de Desligamento:start', 'date'),
+    data_admissao: prop(p, 'Data de Admissão', 'date'),
+    data_deslig:   prop(p, 'Data de Desligamento', 'date'),
     ocorrencia:    prop(p, 'Ocorrência', 'text'),
     gestor:        prop(p, 'Gestor', 'text'),
-    ultimo_dia:    prop(p, 'date:Último Dia de Trabalho:start', 'date'),
-    data_solic:    prop(p, 'date:Data de Solicitação:start', 'date'),
+    ultimo_dia:    prop(p, 'Último Dia de Trabalho', 'date'),
+    data_solic:    prop(p, 'Data de Solicitação', 'date'),
     pessoa_id:     getRelId(p, 'Pessoa'),
     cargo_id:      getRelId(p, 'Cargo'),
   };
@@ -141,7 +141,7 @@ function parseEquipamento(pg) {
     tipo:           prop(p, 'Tipo de Equipamento', 'select'),
     situacao:       prop(p, 'Situação Devolução', 'select'),
     responsavel:    prop(p, 'Responsável Recebimento', 'text'),
-    data_devolucao: prop(p, 'date:Data de Devolução:start', 'date'),
+    data_devolucao: prop(p, 'Data de Devolução', 'date'),
     pessoa_id:      getRelId(p, 'Pessoa'),
   };
 }
@@ -152,8 +152,8 @@ function parseAfastamento(pg) {
     id:        pg.id,
     tipo:      prop(p, 'Tipo de Afastamento', 'select') || prop(p, 'Tipo', 'select'),
     dias:      prop(p, 'Qtd Dias', 'number') || prop(p, 'Dias', 'number'),
-    data_ini:  prop(p, 'date:Data Início:start', 'date') || prop(p, 'date:Data de Início:start', 'date'),
-    data_fim:  prop(p, 'date:Data Fim:start', 'date') || prop(p, 'date:Data de Fim:start', 'date'),
+    data_ini:  prop(p, 'Data Início', 'date') || prop(p, 'Data de Início', 'date'),
+    data_fim:  prop(p, 'Data Fim', 'date') || prop(p, 'Data de Fim', 'date'),
     pessoa_id: getRelId(p, 'Pessoa'),
   };
 }
@@ -178,12 +178,12 @@ function parseSolicitacao(pg) {
     fiscal:           prop(p, 'Fiscal do Contrato', 'text'),
     gerente:          prop(p, 'Gerente Demandante', 'text'),
     status:           prop(p, 'Status', 'select'),
-    data_email:       prop(p, 'date:Data E-mail Recebido:start', 'date'),
-    data_curriculos:  prop(p, 'date:Data Currículos Enviados:start', 'date'),
-    data_entrevista:  prop(p, 'date:Data Pedido Entrevista:start', 'date'),
-    data_escolhido:   prop(p, 'date:Data Candidato Escolhido:start', 'date'),
-    data_autorizacao: prop(p, 'date:Data Autorização:start', 'date'),
-    data_admissao:    prop(p, 'date:Data Admissão:start', 'date'),
+    data_email:       prop(p, 'Data E-mail Recebido', 'date'),
+    data_curriculos:  prop(p, 'Data Currículos Enviados', 'date'),
+    data_entrevista:  prop(p, 'Data Pedido Entrevista', 'date'),
+    data_escolhido:   prop(p, 'Data Candidato Escolhido', 'date'),
+    data_autorizacao: prop(p, 'Data Autorização', 'date'),
+    data_admissao:    prop(p, 'Data Admissão', 'date'),
     total_curriculos: prop(p, 'Total Currículos Enviados', 'rollup_n'),
   };
 }
@@ -193,7 +193,7 @@ function parseEnvio(pg) {
   return {
     id:         pg.id,
     nome:       prop(p, 'Envio', 'title'),
-    data_envio: prop(p, 'date:Data de Envio:start', 'date'),
+    data_envio: prop(p, 'Data de Envio', 'date'),
     quantidade: prop(p, 'Quantidade de Currículos', 'number'),
   };
 }
