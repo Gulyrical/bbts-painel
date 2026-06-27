@@ -1,10 +1,9 @@
 {
   "version": 2,
-  "functions": {
-    "api/notion.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
+  "builds": [
+    { "src": "api/notion.js", "use": "@vercel/node" },
+    { "src": "public/**", "use": "@vercel/static" }
+  ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/notion.js" },
     { "src": "/(.*)", "dest": "/public/$1" }
