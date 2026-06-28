@@ -266,25 +266,48 @@ module.exports = async function handler(req, res) {
 
       if (action === 'atualizar_sps') {
         var pid = body.page_id;
+
+        // Monta propriedades usando nomes corretos da API do Notion
         var props2 = {};
         if (dados.status) props2['Status'] = { select: { name: dados.status } };
         if (dados.gerente !== undefined) props2['Gerente Demandante'] = { rich_text: dados.gerente ? [{ text: { content: dados.gerente } }] : [] };
         if (dados.fiscal !== undefined) props2['Fiscal do Contrato'] = { rich_text: dados.fiscal ? [{ text: { content: dados.fiscal } }] : [] };
         if (dados.observacoes !== undefined) props2['Observações'] = { rich_text: dados.observacoes ? [{ text: { content: dados.observacoes } }] : [] };
-        // Só envia datas se estiverem preenchidas — evita sobrescrever com null
-        if (dados.data_curriculos) props2['date:Data Currículos Enviados:start'] = { date: { start: dados.data_curriculos } };
-        if (dados.data_entrevista) props2['date:Data Pedido Entrevista:start'] = { date: { start: dados.data_entrevista } };
-        if (dados.data_escolhido) props2['date:Data Candidato Escolhido:start'] = { date: { start: dados.data_escolhido } };
-        if (dados.data_autorizacao) props2['date:Data Autorização:start'] = { date: { start: dados.data_autorizacao } };
-        if (dados.data_admissao) props2['date:Data Admissão:start'] = { date: { start: dados.data_admissao } };
 
+        // Salva primeiro o status e campos de texto
         var r2 = await fetch('https://api.notion.com/v1/pages/' + pid, {
           method: 'PATCH',
           headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
           body: JSON.stringify({ properties: props2 })
         });
         var d2 = await r2.json();
-        if (d2.object === 'error') return res.status(400).json({ error: d2.message, props_enviados: Object.keys(props2) });
+        if (d2.object === 'error') return res.status(400).json({ error: 'Status: ' + d2.message });
+
+        // Salva as datas em chamadas separadas (API do Notion exige nome exato da propriedade)
+        var errosDatas = [];
+        var datas = [
+          ['date:Data Currículos Enviados:start', dados.data_curriculos],
+          ['date:Data Pedido Entrevista:start', dados.data_entrevista],
+          ['date:Data Candidato Escolhido:start', dados.data_escolhido],
+          ['date:Data Autorização:start', dados.data_autorizacao],
+          ['date:Data Admissão:start', dados.data_admissao],
+        ];
+        for (var di = 0; di < datas.length; di++) {
+          var nomeCampo = datas[di][0];
+          var valorData = datas[di][1];
+          if (!valorData) continue;
+          var propData = {};
+          propData[nomeCampo] = { date: { start: valorData } };
+          var rd = await fetch('https://api.notion.com/v1/pages/' + pid, {
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ properties: propData })
+          });
+          var dd = await rd.json();
+          if (dd.object === 'error') errosDatas.push(nomeCampo + ': ' + dd.message);
+        }
+
+        if (errosDatas.length > 0) return res.status(400).json({ error: errosDatas.join(' | ') });
         return res.status(200).json({ ok: true });
       }
 
