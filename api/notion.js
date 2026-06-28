@@ -371,14 +371,16 @@ module.exports = async function handler(req, res) {
           var p = pg.properties;
           var titulo = prop(p, 'ID Afastamento', 'title') || '';
           var partes = titulo.split(' - ');
-          var nome = partes.length >= 2 ? partes.slice(1, partes.length - 1).join(' - ') : titulo;
+          // Remove first part (tipo) and last part (data), join the rest as nome
+          var nome = partes.length >= 3 ? partes.slice(1, partes.length - 1).join(' - ') :
+                     partes.length === 2 ? partes[0] : titulo;
           return {
             id:          pg.id,
             nome:        nome,
             tipo:        prop(p, 'Tipo de Afastamento', 'select'),
             cid:         prop(p, 'CID', 'text'),
-            data_inicio: prop(p, 'Data de Início', 'date'),
-            data_fim:    prop(p, 'Data de Fim', 'date'),
+            data_inicio: prop(p, 'date:Data de Início:start', 'date'),
+            data_fim:    prop(p, 'date:Data de Fim:start', 'date'),
             dias:        prop(p, 'Qtd Dias', 'number'),
             observacao:  prop(p, 'Observação', 'text'),
           };
