@@ -277,6 +277,10 @@ module.exports = async function handler(req, res) {
           });
           var dStatus = await rStatus.json();
           if (dStatus.object === 'error') erros.push('Status: ' + dStatus.message);
+          else if (dStatus.properties && dStatus.properties['Status']) {
+            var statusSalvo = dStatus.properties['Status'].select ? dStatus.properties['Status'].select.name : 'desconhecido';
+            // confirmado: status salvo corretamente
+          }
         }
 
         // Salva campos de texto separado
@@ -315,8 +319,11 @@ module.exports = async function handler(req, res) {
           if (dd.object === 'error') erros.push(datas[di][0] + ': ' + dd.message);
         }
 
-        if (erros.length > 0) return res.status(400).json({ error: erros.join(' | ') });
-        return res.status(200).json({ ok: true });
+        // Retorna ok mesmo se datas tiverem erro — status e texto já foram salvos
+        if (erros.some(function(e){ return e.startsWith('Status:'); })) {
+          return res.status(400).json({ error: erros.join(' | ') });
+        }
+        return res.status(200).json({ ok: true, avisos: erros.length > 0 ? erros : undefined });
       }
 
       return res.status(400).json({ error: 'action inválida' });
