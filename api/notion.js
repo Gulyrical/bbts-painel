@@ -239,51 +239,63 @@ module.exports = async function handler(req, res) {
   try {
     // Endpoint especial para ferias (filtra afastamentos por tipo Ferias)
     if (db === 'banco_horas') {
-      var pages = await fetchAll(DBS.banco_horas);
-      // Agrupar por matrícula
-      var porMat = {};
-      pages.forEach(function(pg) {
+      // Busca APENAS a última semana (campo Comparação preenchido) = 351 registros
+      var body = { page_size: 100, filter: { property: 'Comparação', select: { is_not_empty: true } } };
+      var pages = [];
+      var cursor = null;
+      while (true) {
+        if (cursor) body.start_cursor = cursor;
+        var r = await fetch('https://api.notion.com/v1/databases/' + DBS.banco_horas + '/query', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        var data = await r.json();
+        pages = pages.concat(data.results || []);
+        if (!data.has_more) break;
+        cursor = data.next_cursor;
+        delete body.start_cursor;
+      }
+
+      var resultado = pages.map(function(pg) {
         var p = pg.properties;
         var mat = prop(p, 'Matrícula', 'number');
-        var nome = prop(p, 'Nome', 'text');
-        var semana = prop(p, 'Semana', 'number');
         var saldo = prop(p, 'Saldo de Horas', 'number');
         var comp = prop(p, 'Comparação', 'select');
-        var dias_uteis = prop(p, 'Dias Úteis', 'number');
-        if (!mat) return;
-        if (!porMat[mat]) porMat[mat] = {matricula: mat, nome: nome, semanas: {}, comparacao: null, dias_uteis: null};
-        if (semana) porMat[mat].semanas[semana] = saldo;
-        if (comp) porMat[mat].comparacao = comp;
-        if (dias_uteis) porMat[mat].dias_uteis = dias_uteis;
-      });
-
-      var resultado = Object.values(porMat).map(function(r) {
-        var semanas = Object.keys(r.semanas).map(Number).sort(function(a,b){return a-b;});
-        var ultima_semana = semanas.length ? semanas[semanas.length-1] : 0;
-        var saldo_atual = ultima_semana ? r.semanas[ultima_semana] : null;
-        var saldo_ant = semanas.length > 1 ? r.semanas[semanas[semanas.length-2]] : null;
-        // Dias para zerar = ROUND(saldo / 8.0, 0)
-        var dias_zerar = saldo_atual !== null ? Math.round(saldo_atual / 8.0) : 0;
-        // Comparação
-        var comparacao = r.comparacao;
-        if (!comparacao && saldo_atual !== null && saldo_ant !== null) {
-          comparacao = saldo_atual > saldo_ant ? 'Aumentou' : saldo_atual < saldo_ant ? 'Diminuiu' : 'Inalterado';
-        }
-        // Últimas 5 semanas como array
-        var ult5 = semanas.slice(-5).map(function(s){return r.semanas[s];});
+        var semana = prop(p, 'Semana', 'number');
+        var dias_zerar = saldo !== null ? Math.round(saldo / 8.0) : 0;
         return {
-          matricula: r.matricula,
-          nome: r.nome,
-          saldo_atual: saldo_atual,
-          semanas: ult5,
-          ultima_semana: ultima_semana,
-          comparacao: comparacao,
+          matricula: mat,
+          nome: prop(p, 'Nome', 'text'),
+          saldo_atual: saldo,
+          ultima_semana: semana,
+          comparacao: comp,
           dias_zerar: dias_zerar,
+          semanas: [saldo], // será expandido via historico
         };
       });
 
       resultado.sort(function(a,b){return (b.saldo_atual||0)-(a.saldo_atual||0);});
       return res.status(200).json({ banco_horas: resultado, timestamp: new Date().toISOString() });
+    }
+
+    if (db === 'banco_horas_historico') {
+      // Busca últimas 5 semanas de um colaborador específico
+      var mat = req.query && req.query.mat;
+      if (!mat) return res.status(400).json({ error: 'mat é obrigatório' });
+      var body2 = { page_size: 5, filter: { property: 'Matrícula', number: { equals: Number(mat) } },
+        sorts: [{ property: 'Semana', direction: 'descending' }] };
+      var r2 = await fetch('https://api.notion.com/v1/databases/' + DBS.banco_horas + '/query', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body2)
+      });
+      var data2 = await r2.json();
+      var hist = (data2.results || []).reverse().map(function(pg) {
+        var p = pg.properties;
+        return { semana: prop(p, 'Semana', 'number'), saldo: prop(p, 'Saldo de Horas', 'number') };
+      });
+      return res.status(200).json({ historico: hist, timestamp: new Date().toISOString() });
     }
 
     if (db === 'solicitacoes') {
