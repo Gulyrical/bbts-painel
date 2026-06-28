@@ -189,6 +189,22 @@ function parseSolicitacao(pg) {
   };
 }
 
+
+function parseAfastamentoFerias(pg) {
+  var p = pg.properties;
+  var titulo = prop(p, 'ID Afastamento', 'title') || '';
+  var partes = titulo.split(' - ');
+  var nome = partes.length >= 2 ? partes.slice(1, partes.length - 1).join(' - ') : titulo;
+  return {
+    id:          pg.id,
+    nome:        nome,
+    data_inicio: prop(p, 'date:Data de Inícío:start', 'date'),
+    data_fim:    prop(p, 'date:Data de Fim:start', 'date'),
+    qtd_dias:    prop(p, 'Qtd Dias', 'number'),
+    dias_abono:  prop(p, 'Dias de Abono', 'number'),
+    tipo:        prop(p, 'Tipo de Afastamento', 'select'),
+  };
+}
 function parseEnvio(pg) {
   var p = pg.properties;
   return {
@@ -219,12 +235,19 @@ module.exports = async function handler(req, res) {
   var db = req.query && req.query.db;
 
   try {
+    // Endpoint especial para ferias (filtra afastamentos por tipo Ferias)
+    if (db === 'afastamentos_ferias') {
+      var pages = await fetchAll(DBS.afastamentos);
+      var ferias = pages.map(parseAfastamentoFerias).filter(function(r){ return r.tipo === 'Férias'; });
+      return res.status(200).json({ ferias: ferias, timestamp: new Date().toISOString() });
+    }
+
     if (db && DBS[db]) {
       var parsers = {
         pessoas: parsePessoa, vinculos: parseVinculo, cargos: parseCargo,
         equipamentos: parseEquipamento, afastamentos: parseAfastamento,
         curriculo: parseCurriculo, solicitacoes: parseSolicitacao,
-        envios: parseEnvio, candidatos: parseCandidato,
+        envios: parseEnvio, candidatos: parseCandidato, afastamentos_ferias: parseAfastamentoFerias,
       };
       var pages = await fetchAll(DBS[db]);
       var result = {};
