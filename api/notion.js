@@ -364,6 +364,29 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ solicitacoes: solicitacoes, timestamp: new Date().toISOString() });
     }
 
+    if (db === 'atestados') {
+      var pages = await fetchAll(DBS.afastamentos);
+      var atestados = pages
+        .map(function(pg) {
+          var p = pg.properties;
+          var titulo = prop(p, 'ID Afastamento', 'title') || '';
+          var partes = titulo.split(' - ');
+          var nome = partes.length >= 2 ? partes.slice(1, partes.length - 1).join(' - ') : titulo;
+          return {
+            id:          pg.id,
+            nome:        nome,
+            tipo:        prop(p, 'Tipo de Afastamento', 'select'),
+            cid:         prop(p, 'CID', 'text'),
+            data_inicio: prop(p, 'Data de Início', 'date'),
+            data_fim:    prop(p, 'Data de Fim', 'date'),
+            dias:        prop(p, 'Qtd Dias', 'number'),
+            observacao:  prop(p, 'Observação', 'text'),
+          };
+        })
+        .filter(function(r) { return r.tipo === 'Atestado médico'; });
+      return res.status(200).json({ atestados: atestados, timestamp: new Date().toISOString() });
+    }
+
     if (db === 'afastamentos_ferias') {
       var pages = await fetchAll(DBS.afastamentos);
       var ferias = pages.map(parseAfastamentoFerias).filter(function(r){ return r.tipo === 'Férias'; });
