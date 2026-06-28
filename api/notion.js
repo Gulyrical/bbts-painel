@@ -186,6 +186,7 @@ function parseSolicitacao(pg) {
     data_autorizacao: prop(p, 'date:Data Autorização:start', 'date'),
     data_admissao:    prop(p, 'date:Data Admissão:start', 'date'),
     total_curriculos: prop(p, 'Total Currículos Enviados', 'rollup_n'),
+    cargo_rel:        getRelId(p, 'Cargo'),
   };
 }
 
@@ -236,6 +237,31 @@ module.exports = async function handler(req, res) {
 
   try {
     // Endpoint especial para ferias (filtra afastamentos por tipo Ferias)
+    if (db === 'solicitacoes') {
+      var [solPages, cargoPages] = await Promise.all([
+        fetchAll(DBS.solicitacoes),
+        fetchAll(DBS.cargos),
+      ]);
+      // Mapa page_id -> {codigo, descricao}
+      var cargoMap = {};
+      cargoPages.forEach(function(pg) {
+        var p = pg.properties;
+        cargoMap[pg.id] = {
+          codigo: prop(p, 'Código SGPS', 'title'),
+          descricao: prop(p, 'Descrição do Posto', 'text'),
+        };
+      });
+      var solicitacoes = solPages.map(function(pg) {
+        var s = parseSolicitacao(pg);
+        if (s.cargo_rel && cargoMap[s.cargo_rel]) {
+          s.cargo_codigo = cargoMap[s.cargo_rel].codigo;
+          s.cargo_desc   = cargoMap[s.cargo_rel].descricao;
+        }
+        return s;
+      });
+      return res.status(200).json({ solicitacoes: solicitacoes, timestamp: new Date().toISOString() });
+    }
+
     if (db === 'afastamentos_ferias') {
       var pages = await fetchAll(DBS.afastamentos);
       var ferias = pages.map(parseAfastamentoFerias).filter(function(r){ return r.tipo === 'Férias'; });
