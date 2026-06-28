@@ -7,10 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--blue:#465EFF;--green:#2E7D5E;--green-lt:#E6F4EF;--red:#C0392B;--red-lt:#FDECEA;--amber:#E8A020;--amber-lt:#FEF3DC;--bg:#F5F6F8;--white:#fff;--border:#E5E7EB;--text:#111827;--text2:#6B7280;--radius:8px}
+:root{--blue:#465EFF;--green:#2E7D5E;--green-lt:#E6F4EF;--red:#C0392B;--red-lt:#FDECEA;--bg:#F5F6F8;--white:#fff;--border:#E5E7EB;--text:#111827;--text2:#6B7280;--radius:8px}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
-
-/* TELA DE SENHA */
 .senha-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100}
 .senha-box{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:40px;width:340px;text-align:center}
 .senha-logo{font-size:32px;margin-bottom:12px}
@@ -21,8 +19,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .senha-btn{width:100%;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
 .senha-btn:hover{background:#3548e0}
 .senha-erro{color:var(--red);font-size:12px;margin-top:8px;display:none}
-
-/* HEADER */
 .header{background:var(--blue);color:#fff;padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .brand-mark{width:32px;height:32px;background:rgba(255,255,255,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px}
 .brand-name{font-size:14px;font-weight:600}
@@ -30,80 +26,59 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .header-right{display:flex;align-items:center;gap:10px}
 .btn-acao{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif}
 .btn-acao:hover{background:rgba(255,255,255,0.25)}
-
 .main{max-width:900px;margin:0 auto;padding:24px 28px}
-
-/* ABAS */
 .tabs{display:flex;gap:2px;background:#E5E7EB;border-radius:8px;padding:3px;margin-bottom:24px;width:fit-content}
 .tab{padding:7px 20px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);transition:all 0.15s}
 .tab.active{background:var(--white);color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
 .tab:hover:not(.active){color:var(--text)}
-
-/* FORMULÁRIO */
 .form-section{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
-.form-titulo{font-size:13px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.form-titulo{font-size:11px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.form-grid.cols3{grid-template-columns:1fr 1fr 1fr}
 .form-group{display:flex;flex-direction:column;gap:5px}
 .form-group.full{grid-column:1/-1}
 .form-label{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em}
 .form-input,.form-select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:'Inter',sans-serif;background:var(--white);color:var(--text)}
 .form-input:focus,.form-select:focus{outline:none;border-color:var(--blue)}
-.form-input:disabled{background:#F9FAFB;color:var(--text2)}
-
-/* Etapas com data */
-.etapa-row{display:grid;grid-template-columns:1fr 180px;gap:12px;align-items:end;padding:12px;border-radius:6px;border:1px solid var(--border);background:#FAFAFA;margin-bottom:8px;transition:background 0.15s}
+.etapa-row{display:grid;grid-template-columns:1fr 180px;gap:12px;align-items:center;padding:12px;border-radius:6px;border:1px solid var(--border);background:#FAFAFA;margin-bottom:8px}
 .etapa-row:last-child{margin-bottom:0}
 .etapa-row.ativa{background:#EEF0FF;border-color:var(--blue)}
 .etapa-row.concluida{background:var(--green-lt);border-color:#A7D4C0}
-.etapa-nome{font-size:13px;font-weight:500;color:var(--text)}
+.etapa-nome{font-size:13px;font-weight:500}
 .etapa-desc{font-size:11px;color:var(--text2);margin-top:2px}
-
-/* Botões */
 .btn-primary{padding:10px 24px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
 .btn-primary:hover{background:#3548e0}
 .btn-primary:disabled{opacity:0.5;cursor:not-allowed}
 .btn-secondary{padding:10px 20px;background:var(--white);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif}
-.btn-secondary:hover{background:#F9FAFB}
-
-/* Busca de SPS */
 .busca-wrap{display:flex;gap:8px;margin-bottom:16px}
 .busca-input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:'Inter',sans-serif}
 .busca-input:focus{outline:none;border-color:var(--blue)}
-
-/* Card SPS encontrada */
 .sps-card{background:#EEF0FF;border:1px solid var(--blue);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;display:none}
 .sps-card.visible{display:block}
 .sps-card-num{font-size:16px;font-weight:600;color:var(--blue)}
 .sps-card-info{font-size:12px;color:var(--text2);margin-top:4px}
-
-/* Toast */
+.sps-list-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:6px;border:1px solid var(--border);margin-bottom:6px;cursor:pointer;background:var(--white);transition:all 0.12s}
+.sps-list-item:hover{border-color:var(--blue);background:#F0F4FF}
+.sps-num{font-family:monospace;font-size:13px;font-weight:600;color:var(--blue);min-width:110px}
+.sps-info{font-size:12px;color:var(--text2);flex:1;padding:0 12px}
+.sps-badge{font-size:11px;font-weight:500;padding:2px 10px;border-radius:20px;background:#EEF0FF;color:var(--blue);white-space:nowrap}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:200;transform:translateY(100px);opacity:0;transition:all 0.3s}
 .toast.visible{transform:translateY(0);opacity:1}
 .toast.success{background:var(--green)}
 .toast.error{background:var(--red)}
-
-.sps-list-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:6px;border:1px solid var(--border);margin-bottom:6px;cursor:pointer;transition:all 0.12s;background:var(--white)}
-.sps-list-item:hover{border-color:var(--blue);background:#F0F4FF}
-.sps-list-item:last-child{margin-bottom:0}
-.sps-num{font-family:monospace;font-size:13px;font-weight:600;color:var(--blue);min-width:110px}
-.sps-info{font-size:12px;color:var(--text2);flex:1;padding:0 12px}
-.sps-status{font-size:11px;font-weight:500;padding:2px 10px;border-radius:20px;background:#EEF0FF;color:var(--blue);white-space:nowrap}
-.spinner-inline{width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
+.spin-icon{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px}
 </style>
 </head>
 <body>
 
-<!-- Tela de senha -->
-<div class="senha-screen" id="senha-screen">
+<div class="senha-screen" id="tela-senha">
   <div class="senha-box">
     <div class="senha-logo">🔐</div>
     <div class="senha-titulo">Gestão de SPS</div>
     <div class="senha-sub">Digite a senha para acessar</div>
-    <input type="password" class="senha-input" id="senha-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')verificarSenha()">
-    <button class="senha-btn" onclick="verificarSenha()">Entrar</button>
-    <div class="senha-erro" id="senha-erro">Senha incorreta. Tente novamente.</div>
+    <input type="password" class="senha-input" id="campo-senha" placeholder="••••••••">
+    <button class="senha-btn" id="btn-entrar">Entrar</button>
+    <div class="senha-erro" id="msg-erro">Senha incorreta. Tente novamente.</div>
   </div>
 </div>
 
@@ -123,12 +98,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 
 <main class="main">
   <div class="tabs">
-    <div class="tab active" onclick="setTab('nova')">➕ Nova SPS</div>
-    <div class="tab" onclick="setTab('atualizar')">✏️ Atualizar SPS</div>
+    <div class="tab active" id="tab-btn-nova">➕ Nova SPS</div>
+    <div class="tab" id="tab-btn-atualizar">✏️ Atualizar SPS</div>
   </div>
 
-  <!-- ABA: NOVA SPS -->
-  <div id="tab-nova">
+  <!-- ABA NOVA -->
+  <div id="aba-nova">
     <div class="form-section">
       <div class="form-titulo">Dados da Solicitação</div>
       <div class="form-grid">
@@ -154,250 +129,153 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
         </div>
       </div>
     </div>
-
     <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button class="btn-secondary" onclick="limparNova()">Limpar</button>
-      <button class="btn-primary" id="btn-criar" onclick="criarSPS()">Criar SPS</button>
+      <button class="btn-secondary" id="btn-limpar-nova">Limpar</button>
+      <button class="btn-primary" id="btn-criar">Criar SPS</button>
     </div>
   </div>
 
-  <!-- ABA: ATUALIZAR SPS -->
-  <div id="tab-atualizar" style="display:none">
+  <!-- ABA ATUALIZAR -->
+  <div id="aba-atualizar" style="display:none">
     <div class="busca-wrap">
-      <input type="text" class="busca-input" id="busca-sps" placeholder="Buscar por número ou gerente..." oninput="filtrarLista()" onkeydown="if(event.key==='Enter')buscarSPS()">
-      <button class="btn-primary" onclick="buscarSPS()">Buscar</button>
+      <input type="text" class="busca-input" id="campo-busca" placeholder="Filtrar por número, gerente ou fiscal...">
+      <button class="btn-primary" id="btn-buscar">Buscar</button>
     </div>
 
-    <!-- Lista de SPS existentes -->
     <div class="form-section" style="margin-bottom:16px">
-      <div class="form-titulo" style="margin-bottom:12px">SPS Cadastradas <span id="lista-count" style="font-weight:400;color:var(--text2);text-transform:none;letter-spacing:0"></span></div>
-      <div id="lista-sps" style="max-height:320px;overflow-y:auto">
-        <div style="text-align:center;padding:20px;color:var(--text2)"><div class="spinner-inline" style="border-top-color:var(--blue);border-color:#EEF0FF;width:20px;height:20px;display:inline-block"></div> Carregando...</div>
+      <div class="form-titulo">SPS Cadastradas <span id="count-sps" style="font-weight:400;color:var(--text2);text-transform:none;letter-spacing:0"></span></div>
+      <div id="lista-sps" style="max-height:300px;overflow-y:auto">
+        <div style="text-align:center;padding:20px;color:var(--text2)">Carregando...</div>
       </div>
     </div>
 
-    <div class="sps-card" id="sps-card">
-      <div class="sps-card-num" id="sps-card-num">—</div>
-      <div class="sps-card-info" id="sps-card-info">—</div>
+    <div class="sps-card" id="sps-selecionada">
+      <div class="sps-card-num" id="card-numero">—</div>
+      <div class="sps-card-info" id="card-info">—</div>
     </div>
 
-    <div id="form-atualizar" style="display:none">
+    <div id="form-editar" style="display:none">
       <div class="form-section">
-        <div class="form-titulo">Status e Cronograma</div>
-        <div style="margin-bottom:16px">
-          <label class="form-label" style="display:block;margin-bottom:6px">Status Atual</label>
-          <select class="form-select" id="a-status" style="width:100%">
-            <option value="Aguardando Currículos">Aguardando Currículos</option>
-            <option value="Currículos Enviados">Currículos Enviados</option>
-            <option value="Em Entrevista">Em Entrevista</option>
-            <option value="Candidato Escolhido">Candidato Escolhido</option>
-            <option value="Aguardando Autorização">Aguardando Autorização</option>
-            <option value="Autorizado">Autorizado</option>
-            <option value="Em Contratação">Em Contratação</option>
-            <option value="Contratado">Contratado</option>
-            <option value="Cancelado">Cancelado</option>
-          </select>
+        <div class="form-titulo">Status Atual</div>
+        <select class="form-select" id="a-status" style="width:100%">
+          <option>Aguardando Currículos</option>
+          <option>Currículos Enviados</option>
+          <option>Em Entrevista</option>
+          <option>Candidato Escolhido</option>
+          <option>Aguardando Autorização</option>
+          <option>Autorizado</option>
+          <option>Em Contratação</option>
+          <option>Contratado</option>
+          <option>Cancelado</option>
+        </select>
+      </div>
+
+      <div class="form-section">
+        <div class="form-titulo">Cronograma de Datas</div>
+        <div class="etapa-row" id="et-curriculos">
+          <div><div class="etapa-nome">📄 Currículos Enviados</div><div class="etapa-desc">Data do envio dos currículos ao fiscal</div></div>
+          <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-curriculos"></div>
         </div>
-
-        <!-- Etapas com datas -->
-        <div class="form-titulo" style="margin-top:16px">Datas do Cronograma</div>
-
-        <div class="etapa-row" id="etapa-curriculos">
-          <div>
-            <div class="etapa-nome">📄 Currículos Enviados</div>
-            <div class="etapa-desc">Data em que os currículos foram enviados ao fiscal</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Data</label>
-            <input type="date" class="form-input" id="a-data-curriculos">
-          </div>
+        <div class="etapa-row" id="et-entrevista">
+          <div><div class="etapa-nome">🎯 Pedido de Entrevista</div><div class="etapa-desc">Data da solicitação de entrevista</div></div>
+          <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-entrevista"></div>
         </div>
-
-        <div class="etapa-row" id="etapa-entrevista">
-          <div>
-            <div class="etapa-nome">🎯 Pedido de Entrevista</div>
-            <div class="etapa-desc">Data em que a entrevista foi solicitada</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Data</label>
-            <input type="date" class="form-input" id="a-data-entrevista">
-          </div>
+        <div class="etapa-row" id="et-escolhido">
+          <div><div class="etapa-nome">✅ Candidato Escolhido</div><div class="etapa-desc">Data da seleção do candidato</div></div>
+          <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-escolhido"></div>
         </div>
-
-        <div class="etapa-row" id="etapa-escolhido">
-          <div>
-            <div class="etapa-nome">✅ Candidato Escolhido</div>
-            <div class="etapa-desc">Data em que o candidato foi selecionado</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Data</label>
-            <input type="date" class="form-input" id="a-data-escolhido">
-          </div>
+        <div class="etapa-row" id="et-autorizacao">
+          <div><div class="etapa-nome">📝 Autorização</div><div class="etapa-desc">Data do recebimento da autorização</div></div>
+          <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-autorizacao"></div>
         </div>
-
-        <div class="etapa-row" id="etapa-autorizacao">
-          <div>
-            <div class="etapa-nome">📝 Autorização</div>
-            <div class="etapa-desc">Data em que a autorização foi recebida</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Data</label>
-            <input type="date" class="form-input" id="a-data-autorizacao">
-          </div>
-        </div>
-
-        <div class="etapa-row" id="etapa-admissao">
-          <div>
-            <div class="etapa-nome">🎉 Admissão</div>
-            <div class="etapa-desc">Data de admissão do colaborador</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Data</label>
-            <input type="date" class="form-input" id="a-data-admissao">
-          </div>
+        <div class="etapa-row" id="et-admissao">
+          <div><div class="etapa-nome">🎉 Admissão</div><div class="etapa-desc">Data de admissão do colaborador</div></div>
+          <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-admissao"></div>
         </div>
       </div>
 
       <div class="form-section">
         <div class="form-titulo">Outras Informações</div>
         <div class="form-grid">
-          <div class="form-group">
-            <label class="form-label">Gerente Demandante</label>
-            <input type="text" class="form-input" id="a-gerente">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Fiscal do Contrato</label>
-            <input type="text" class="form-input" id="a-fiscal">
-          </div>
-          <div class="form-group full">
-            <label class="form-label">Observações</label>
-            <input type="text" class="form-input" id="a-obs">
-          </div>
+          <div class="form-group"><label class="form-label">Gerente Demandante</label><input type="text" class="form-input" id="a-gerente"></div>
+          <div class="form-group"><label class="form-label">Fiscal do Contrato</label><input type="text" class="form-input" id="a-fiscal"></div>
+          <div class="form-group full"><label class="form-label">Observações</label><input type="text" class="form-input" id="a-obs"></div>
         </div>
       </div>
 
       <div style="display:flex;gap:10px;justify-content:flex-end">
-        <button class="btn-secondary" onclick="cancelarAtualizacao()">Cancelar</button>
-        <button class="btn-primary" id="btn-atualizar" onclick="atualizarSPS()">Salvar Alterações</button>
+        <button class="btn-secondary" id="btn-cancelar">Cancelar</button>
+        <button class="btn-primary" id="btn-salvar">Salvar Alterações</button>
       </div>
     </div>
   </div>
 </main>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast-msg"></div>
 
 <script>
-const API = '/api/notion';
-const SENHA = 'digisystem';
-let spsAtualId = null;
-
-// ── Senha ──────────────────────────────────────────────────────────────────
-function verificarSenha() {
-  var v = document.getElementById('senha-input').value;
-  if (v === SENHA) {
-    document.getElementById('senha-screen').style.display = 'none';
-  } else {
-    document.getElementById('senha-erro').style.display = 'block';
-    document.getElementById('senha-input').value = '';
-    document.getElementById('senha-input').focus();
-  }
-}
-
-// ── Abas ───────────────────────────────────────────────────────────────────
+var SENHA_CORRETA = 'digisystem';
+var API = '/api/notion';
+var spsId = null;
 var todasSPS = [];
-function setTab(tab) {
-  document.querySelectorAll('.tab').forEach(function(t, i) {
-    t.classList.toggle('active', (tab === 'nova' && i === 0) || (tab === 'atualizar' && i === 1));
-  });
-  document.getElementById('tab-nova').style.display = tab === 'nova' ? 'block' : 'none';
-  document.getElementById('tab-atualizar').style.display = tab === 'atualizar' ? 'block' : 'none';
-  if (tab === 'atualizar' && todasSPS.length === 0) carregarListaSPS();
-}
 
-async function carregarListaSPS() {
-  try {
-    var res = await fetch(API + '?db=solicitacoes');
-    var data = await res.json();
-    todasSPS = (data.solicitacoes || []).sort(function(a,b){
-      return (b.numero_sps||'').localeCompare(a.numero_sps||'');
-    });
-    renderListaSPS(todasSPS);
-  } catch(e) {
-    document.getElementById('lista-sps').innerHTML = '<div style="color:var(--red);padding:12px">Erro ao carregar SPS</div>';
+// Senha
+document.getElementById('btn-entrar').addEventListener('click', function() {
+  var v = document.getElementById('campo-senha').value;
+  if (v === SENHA_CORRETA) {
+    document.getElementById('tela-senha').style.display = 'none';
+  } else {
+    document.getElementById('msg-erro').style.display = 'block';
+    document.getElementById('campo-senha').value = '';
+    document.getElementById('campo-senha').focus();
   }
-}
+});
+document.getElementById('campo-senha').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('btn-entrar').click();
+});
 
-function filtrarLista() {
-  var q = document.getElementById('busca-sps').value.toLowerCase();
-  var filtradas = q ? todasSPS.filter(function(s){
-    return (s.numero_sps||'').toLowerCase().includes(q) ||
-           (s.gerente||'').toLowerCase().includes(q) ||
-           (s.fiscal||'').toLowerCase().includes(q);
-  }) : todasSPS;
-  renderListaSPS(filtradas);
-}
+// Abas
+document.getElementById('tab-btn-nova').addEventListener('click', function() {
+  document.getElementById('tab-btn-nova').classList.add('active');
+  document.getElementById('tab-btn-atualizar').classList.remove('active');
+  document.getElementById('aba-nova').style.display = 'block';
+  document.getElementById('aba-atualizar').style.display = 'none';
+});
+document.getElementById('tab-btn-atualizar').addEventListener('click', function() {
+  document.getElementById('tab-btn-atualizar').classList.add('active');
+  document.getElementById('tab-btn-nova').classList.remove('active');
+  document.getElementById('aba-atualizar').style.display = 'block';
+  document.getElementById('aba-nova').style.display = 'none';
+  if (todasSPS.length === 0) carregarSPS();
+});
 
-function renderListaSPS(lista) {
-  document.getElementById('lista-count').textContent = '(' + lista.length + ')';
-  if (!lista.length) {
-    document.getElementById('lista-sps').innerHTML = '<div style="color:var(--text2);padding:12px;text-align:center">Nenhuma SPS encontrada</div>';
-    return;
-  }
-  var statusCores = {
-    'Aguardando Currículos': '#FEF3DC',
-    'Currículos Enviados': '#DBEAFE',
-    'Em Entrevista': '#FFF7ED',
-    'Candidato Escolhido': '#F5F3FF',
-    'Aguardando Autorização': '#F3F4F6',
-    'Autorizado': '#ECFDF5',
-    'Em Contratação': '#EFF6FF',
-    'Contratado': '#ECFDF5',
-    'Cancelado': '#FEF2F2',
-  };
-  document.getElementById('lista-sps').innerHTML = lista.map(function(s) {
-    var cor = statusCores[s.status] || '#F3F4F6';
-    return '<div class="sps-list-item" onclick="selecionarSPS('' + s.id + '')">' +
-      '<span class="sps-num">' + (s.numero_sps||'—') + '</span>' +
-      '<span class="sps-info">' + (s.gerente||'—') + ' · ' + (s.fiscal||'—') + '</span>' +
-      '<span class="sps-status" style="background:' + cor + '">' + (s.status||'—') + '</span>' +
-    '</div>';
-  }).join('');
-}
-
-function selecionarSPS(id) {
-  var sps = todasSPS.find(function(s){ return s.id === id; });
-  if (!sps) return;
-  preencherFormulario(sps);
-}
-
-// ── Toast ──────────────────────────────────────────────────────────────────
-function showToast(msg, tipo) {
-  var t = document.getElementById('toast');
+// Toast
+function toast(msg, tipo) {
+  var t = document.getElementById('toast-msg');
   t.textContent = msg;
   t.className = 'toast visible ' + (tipo || '');
   setTimeout(function() { t.className = 'toast'; }, 3500);
 }
 
-// ── Nova SPS ───────────────────────────────────────────────────────────────
-function limparNova() {
-  ['n-numero', 'n-email', 'n-gerente', 'n-fiscal', 'n-obs'].forEach(function(id) {
+// Limpar nova
+document.getElementById('btn-limpar-nova').addEventListener('click', function() {
+  ['n-numero','n-email','n-gerente','n-fiscal','n-obs'].forEach(function(id) {
     document.getElementById(id).value = '';
   });
-}
+});
 
-async function criarSPS() {
+// Criar SPS
+document.getElementById('btn-criar').addEventListener('click', async function() {
   var numero = document.getElementById('n-numero').value.trim();
   var email = document.getElementById('n-email').value;
-  if (!numero || !email) { showToast('Preencha o número da SPS e a data do e-mail!', 'error'); return; }
-
-  var btn = document.getElementById('btn-criar');
+  if (!numero || !email) { toast('Preencha o número e a data do e-mail!', 'error'); return; }
+  var btn = this;
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-inline"></span>Criando...';
-
+  btn.innerHTML = '<span class="spin-icon"></span>Criando...';
   try {
     var res = await fetch(API, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         action: 'criar_sps',
         dados: {
@@ -409,120 +287,160 @@ async function criarSPS() {
         }
       })
     });
-    var data = await res.json();
-    if (data.error) throw new Error(data.error);
-    showToast('✅ SPS ' + numero + ' criada com sucesso!', 'success');
-    limparNova();
-  } catch(e) {
-    showToast('Erro: ' + e.message, 'error');
-  }
+    var d = await res.json();
+    if (d.error) throw new Error(d.error);
+    toast('SPS ' + numero + ' criada com sucesso!', 'success');
+    document.getElementById('btn-limpar-nova').click();
+    todasSPS = []; // reset cache
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
   btn.disabled = false;
   btn.innerHTML = 'Criar SPS';
+});
+
+// Carregar lista de SPS
+async function carregarSPS() {
+  document.getElementById('lista-sps').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">Carregando...</div>';
+  try {
+    var res = await fetch(API + '?db=solicitacoes');
+    var d = await res.json();
+    todasSPS = (d.solicitacoes || []).sort(function(a,b) {
+      return (b.numero_sps||'').localeCompare(a.numero_sps||'');
+    });
+    renderLista(todasSPS);
+  } catch(e) {
+    document.getElementById('lista-sps').innerHTML = '<div style="color:var(--red);padding:12px">Erro ao carregar</div>';
+  }
 }
 
-// ── Buscar SPS ────────────────────────────────────────────────────────────
-function buscarSPS() {
-  var busca = document.getElementById('busca-sps').value.trim();
-  if (!busca) return;
-  var sps = todasSPS.find(function(s){
-    return (s.numero_sps||'').toLowerCase() === busca.toLowerCase();
+function renderLista(lista) {
+  document.getElementById('count-sps').textContent = '(' + lista.length + ')';
+  if (!lista.length) {
+    document.getElementById('lista-sps').innerHTML = '<div style="color:var(--text2);padding:12px;text-align:center">Nenhuma SPS encontrada</div>';
+    return;
+  }
+  var html = lista.map(function(s) {
+    return '<div class="sps-list-item" data-id="' + s.id + '">' +
+      '<span class="sps-num">' + (s.numero_sps||'—') + '</span>' +
+      '<span class="sps-info">' + (s.gerente||'—') + ' · ' + (s.fiscal||'—') + '</span>' +
+      '<span class="sps-badge">' + (s.status||'—') + '</span>' +
+    '</div>';
+  }).join('');
+  document.getElementById('lista-sps').innerHTML = html;
+  document.querySelectorAll('.sps-list-item').forEach(function(el) {
+    el.addEventListener('click', function() {
+      var id = this.getAttribute('data-id');
+      var sps = todasSPS.find(function(s) { return s.id === id; });
+      if (sps) preencherForm(sps);
+    });
   });
-  if (!sps) { showToast('SPS não encontrada: ' + busca, 'error'); return; }
-  preencherFormulario(sps);
 }
 
-function preencherFormulario(sps) {
-  spsAtualId = sps.id;
-  document.getElementById('sps-card-num').textContent = sps.numero_sps;
-  document.getElementById('sps-card-info').textContent =
-    'Gerente: ' + (sps.gerente||'—') + ' · Fiscal: ' + (sps.fiscal||'—') + ' · Status: ' + (sps.status||'—');
-  document.getElementById('sps-card').classList.add('visible');
+// Filtro
+document.getElementById('campo-busca').addEventListener('input', function() {
+  var q = this.value.toLowerCase();
+  var filtrado = q ? todasSPS.filter(function(s) {
+    return (s.numero_sps||'').toLowerCase().includes(q) ||
+           (s.gerente||'').toLowerCase().includes(q) ||
+           (s.fiscal||'').toLowerCase().includes(q);
+  }) : todasSPS;
+  renderLista(filtrado);
+});
+
+document.getElementById('btn-buscar').addEventListener('click', function() {
+  var q = document.getElementById('campo-busca').value.trim().toLowerCase();
+  if (!q) return;
+  var sps = todasSPS.find(function(s) {
+    return (s.numero_sps||'').toLowerCase() === q;
+  });
+  if (sps) preencherForm(sps);
+  else toast('SPS não encontrada: ' + q, 'error');
+});
+
+function preencherForm(sps) {
+  spsId = sps.id;
+  document.getElementById('card-numero').textContent = sps.numero_sps || '—';
+  document.getElementById('card-info').textContent = 'Gerente: ' + (sps.gerente||'—') + ' · Fiscal: ' + (sps.fiscal||'—') + ' · Status: ' + (sps.status||'—');
+  document.getElementById('sps-selecionada').classList.add('visible');
   document.getElementById('a-status').value = sps.status || 'Aguardando Currículos';
   document.getElementById('a-gerente').value = sps.gerente || '';
   document.getElementById('a-fiscal').value = sps.fiscal || '';
   document.getElementById('a-obs').value = sps.observacoes || '';
-  document.getElementById('a-data-curriculos').value = sps.data_curriculos || '';
-  document.getElementById('a-data-entrevista').value = sps.data_entrevista || '';
-  document.getElementById('a-data-escolhido').value = sps.data_escolhido || '';
-  document.getElementById('a-data-autorizacao').value = sps.data_autorizacao || '';
-  document.getElementById('a-data-admissao').value = sps.data_admissao || '';
-  document.getElementById('form-atualizar').style.display = 'block';
-  document.getElementById('form-atualizar').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('a-curriculos').value = sps.data_curriculos || '';
+  document.getElementById('a-entrevista').value = sps.data_entrevista || '';
+  document.getElementById('a-escolhido').value = sps.data_escolhido || '';
+  document.getElementById('a-autorizacao').value = sps.data_autorizacao || '';
+  document.getElementById('a-admissao').value = sps.data_admissao || '';
+  document.getElementById('form-editar').style.display = 'block';
   atualizarEtapas();
+  document.getElementById('form-editar').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function atualizarEtapas() {
   var status = document.getElementById('a-status').value;
   var ordem = ['Aguardando Currículos','Currículos Enviados','Em Entrevista','Candidato Escolhido','Aguardando Autorização','Autorizado','Em Contratação','Contratado'];
   var idx = ordem.indexOf(status);
-
-  var mapEtapa = {
-    'etapa-curriculos': 1,
-    'etapa-entrevista': 2,
-    'etapa-escolhido': 3,
-    'etapa-autorizacao': 5,
-    'etapa-admissao': 7,
-  };
-
-  Object.keys(mapEtapa).forEach(function(id) {
-    var etapaIdx = mapEtapa[id];
+  var mapa = {'et-curriculos':1,'et-entrevista':2,'et-escolhido':3,'et-autorizacao':5,'et-admissao':7};
+  Object.keys(mapa).forEach(function(id) {
     var el = document.getElementById(id);
-    el.classList.remove('ativa', 'concluida');
-    if (idx > etapaIdx) el.classList.add('concluida');
-    else if (idx === etapaIdx) el.classList.add('ativa');
+    el.classList.remove('ativa','concluida');
+    if (idx > mapa[id]) el.classList.add('concluida');
+    else if (idx === mapa[id]) el.classList.add('ativa');
   });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  var sel = document.getElementById('a-status');
-  if (sel) sel.addEventListener('change', atualizarEtapas);
+document.getElementById('a-status').addEventListener('change', atualizarEtapas);
+
+document.getElementById('btn-cancelar').addEventListener('click', function() {
+  spsId = null;
+  document.getElementById('form-editar').style.display = 'none';
+  document.getElementById('sps-selecionada').classList.remove('visible');
 });
 
-function cancelarAtualizacao() {
-  document.getElementById('form-atualizar').style.display = 'none';
-  document.getElementById('sps-card').classList.remove('visible');
-  document.getElementById('busca-sps').value = '';
-  spsAtualId = null;
-}
-
-async function atualizarSPS() {
-  if (!spsAtualId) return;
-  var btn = document.getElementById('btn-atualizar');
+// Salvar
+document.getElementById('btn-salvar').addEventListener('click', async function() {
+  if (!spsId) return;
+  var btn = this;
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-inline"></span>Salvando...';
-
+  btn.innerHTML = '<span class="spin-icon"></span>Salvando...';
   try {
     var res = await fetch(API, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         action: 'atualizar_sps',
-        page_id: spsAtualId,
+        page_id: spsId,
         dados: {
           status: document.getElementById('a-status').value,
           gerente: document.getElementById('a-gerente').value.trim(),
           fiscal: document.getElementById('a-fiscal').value.trim(),
           observacoes: document.getElementById('a-obs').value.trim(),
-          data_curriculos: document.getElementById('a-data-curriculos').value || null,
-          data_entrevista: document.getElementById('a-data-entrevista').value || null,
-          data_escolhido: document.getElementById('a-data-escolhido').value || null,
-          data_autorizacao: document.getElementById('a-data-autorizacao').value || null,
-          data_admissao: document.getElementById('a-data-admissao').value || null,
+          data_curriculos: document.getElementById('a-curriculos').value || null,
+          data_entrevista: document.getElementById('a-entrevista').value || null,
+          data_escolhido: document.getElementById('a-escolhido').value || null,
+          data_autorizacao: document.getElementById('a-autorizacao').value || null,
+          data_admissao: document.getElementById('a-admissao').value || null,
         }
       })
     });
-    var data = await res.json();
-    if (data.error) throw new Error(data.error);
-    showToast('✅ SPS atualizada com sucesso!', 'success');
+    var d = await res.json();
+    if (d.error) throw new Error(d.error);
+    toast('SPS atualizada com sucesso!', 'success');
     // Atualizar card
-    document.getElementById('sps-card-info').textContent =
-      'Gerente: ' + document.getElementById('a-gerente').value + ' · Fiscal: ' + document.getElementById('a-fiscal').value + ' · Status: ' + document.getElementById('a-status').value;
-  } catch(e) {
-    showToast('Erro: ' + e.message, 'error');
-  }
+    document.getElementById('card-info').textContent =
+      'Gerente: ' + document.getElementById('a-gerente').value +
+      ' · Fiscal: ' + document.getElementById('a-fiscal').value +
+      ' · Status: ' + document.getElementById('a-status').value;
+    // Atualizar cache local
+    var sps = todasSPS.find(function(s) { return s.id === spsId; });
+    if (sps) {
+      sps.status = document.getElementById('a-status').value;
+      sps.gerente = document.getElementById('a-gerente').value;
+      sps.fiscal = document.getElementById('a-fiscal').value;
+    }
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
   btn.disabled = false;
   btn.innerHTML = 'Salvar Alterações';
-}
+});
 </script>
 </body>
 </html>
