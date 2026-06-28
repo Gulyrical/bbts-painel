@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBTS — Gestão SPS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#465EFF;--green:#2E7D5E;--green-lt:#E6F4EF;--red:#C0392B;--red-lt:#FDECEA;--amber:#E8A020;--amber-lt:#FEF3DC;--bg:#F5F6F8;--white:#fff;--border:#E5E7EB;--text:#111827;--text2:#6B7280;--radius:8px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+
+/* TELA DE SENHA */
+.senha-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100}
+.senha-box{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:40px;width:340px;text-align:center}
+.senha-logo{font-size:32px;margin-bottom:12px}
+.senha-titulo{font-size:18px;font-weight:600;margin-bottom:4px}
+.senha-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+.senha-input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-family:'Inter',sans-serif;text-align:center;letter-spacing:0.1em;margin-bottom:12px}
+.senha-input:focus{outline:none;border-color:var(--blue)}
+.senha-btn{width:100%;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
+.senha-btn:hover{background:#3548e0}
+.senha-erro{color:var(--red);font-size:12px;margin-top:8px;display:none}
+
+/* HEADER */
+.header{background:var(--blue);color:#fff;padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.brand-mark{width:32px;height:32px;background:rgba(255,255,255,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.brand-name{font-size:14px;font-weight:600}
+.brand-sub{font-size:11px;opacity:0.65;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:10px}
+.btn-acao{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif}
+.btn-acao:hover{background:rgba(255,255,255,0.25)}
+
+.main{max-width:900px;margin:0 auto;padding:24px 28px}
+
+/* ABAS */
+.tabs{display:flex;gap:2px;background:#E5E7EB;border-radius:8px;padding:3px;margin-bottom:24px;width:fit-content}
+.tab{padding:7px 20px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);transition:all 0.15s}
+.tab.active{background:var(--white);color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.tab:hover:not(.active){color:var(--text)}
+
+/* FORMULÁRIO */
+.form-section{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
+.form-titulo{font-size:13px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid.cols3{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em}
+.form-input,.form-select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:'Inter',sans-serif;background:var(--white);color:var(--text)}
+.form-input:focus,.form-select:focus{outline:none;border-color:var(--blue)}
+.form-input:disabled{background:#F9FAFB;color:var(--text2)}
+
+/* Etapas com data */
+.etapa-row{display:grid;grid-template-columns:1fr 180px;gap:12px;align-items:end;padding:12px;border-radius:6px;border:1px solid var(--border);background:#FAFAFA;margin-bottom:8px;transition:background 0.15s}
+.etapa-row:last-child{margin-bottom:0}
+.etapa-row.ativa{background:#EEF0FF;border-color:var(--blue)}
+.etapa-row.concluida{background:var(--green-lt);border-color:#A7D4C0}
+.etapa-nome{font-size:13px;font-weight:500;color:var(--text)}
+.etapa-desc{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* Botões */
+.btn-primary{padding:10px 24px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-primary:hover{background:#3548e0}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed}
+.btn-secondary{padding:10px 20px;background:var(--white);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-secondary:hover{background:#F9FAFB}
+
+/* Busca de SPS */
+.busca-wrap{display:flex;gap:8px;margin-bottom:16px}
+.busca-input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:'Inter',sans-serif}
+.busca-input:focus{outline:none;border-color:var(--blue)}
+
+/* Card SPS encontrada */
+.sps-card{background:#EEF0FF;border:1px solid var(--blue);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;display:none}
+.sps-card.visible{display:block}
+.sps-card-num{font-size:16px;font-weight:600;color:var(--blue)}
+.sps-card-info{font-size:12px;color:var(--text2);margin-top:4px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:200;transform:translateY(100px);opacity:0;transition:all 0.3s}
+.toast.visible{transform:translateY(0);opacity:1}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+
+.spinner-inline{width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- Tela de senha -->
+<div class="senha-screen" id="senha-screen">
+  <div class="senha-box">
+    <div class="senha-logo">🔐</div>
+    <div class="senha-titulo">Gestão de SPS</div>
+    <div class="senha-sub">Digite a senha para acessar</div>
+    <input type="password" class="senha-input" id="senha-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')verificarSenha()">
+    <button class="senha-btn" onclick="verificarSenha()">Entrar</button>
+    <div class="senha-erro" id="senha-erro">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
+
+<header class="header">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="brand-mark">📋</div>
+    <div>
+      <div class="brand-name">BBTS — Gestão de SPS</div>
+      <div class="brand-sub">Criar e atualizar solicitações de posto</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <a href="/sps.html" class="btn-acao">📊 Ver Painel</a>
+    <a href="/" class="btn-acao">← Portal</a>
+  </div>
+</header>
+
+<main class="main">
+  <div class="tabs">
+    <div class="tab active" onclick="setTab('nova')">➕ Nova SPS</div>
+    <div class="tab" onclick="setTab('atualizar')">✏️ Atualizar SPS</div>
+  </div>
+
+  <!-- ABA: NOVA SPS -->
+  <div id="tab-nova">
+    <div class="form-section">
+      <div class="form-titulo">Dados da Solicitação</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Número SPS *</label>
+          <input type="text" class="form-input" id="n-numero" placeholder="Ex: SPS0001400">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data do E-mail Recebido *</label>
+          <input type="date" class="form-input" id="n-email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gerente Demandante</label>
+          <input type="text" class="form-input" id="n-gerente" placeholder="Nome do gerente">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fiscal do Contrato</label>
+          <input type="text" class="form-input" id="n-fiscal" placeholder="Nome do fiscal">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Observações</label>
+          <input type="text" class="form-input" id="n-obs" placeholder="Observações gerais">
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn-secondary" onclick="limparNova()">Limpar</button>
+      <button class="btn-primary" id="btn-criar" onclick="criarSPS()">Criar SPS</button>
+    </div>
+  </div>
+
+  <!-- ABA: ATUALIZAR SPS -->
+  <div id="tab-atualizar" style="display:none">
+    <div class="busca-wrap">
+      <input type="text" class="busca-input" id="busca-sps" placeholder="Digite o número da SPS (ex: SPS0001371)" onkeydown="if(event.key==='Enter')buscarSPS()">
+      <button class="btn-primary" onclick="buscarSPS()">Buscar</button>
+    </div>
+
+    <div class="sps-card" id="sps-card">
+      <div class="sps-card-num" id="sps-card-num">—</div>
+      <div class="sps-card-info" id="sps-card-info">—</div>
+    </div>
+
+    <div id="form-atualizar" style="display:none">
+      <div class="form-section">
+        <div class="form-titulo">Status e Cronograma</div>
+        <div style="margin-bottom:16px">
+          <label class="form-label" style="display:block;margin-bottom:6px">Status Atual</label>
+          <select class="form-select" id="a-status" style="width:100%">
+            <option value="Aguardando Currículos">Aguardando Currículos</option>
+            <option value="Currículos Enviados">Currículos Enviados</option>
+            <option value="Em Entrevista">Em Entrevista</option>
+            <option value="Candidato Escolhido">Candidato Escolhido</option>
+            <option value="Aguardando Autorização">Aguardando Autorização</option>
+            <option value="Autorizado">Autorizado</option>
+            <option value="Em Contratação">Em Contratação</option>
+            <option value="Contratado">Contratado</option>
+            <option value="Cancelado">Cancelado</option>
+          </select>
+        </div>
+
+        <!-- Etapas com datas -->
+        <div class="form-titulo" style="margin-top:16px">Datas do Cronograma</div>
+
+        <div class="etapa-row" id="etapa-curriculos">
+          <div>
+            <div class="etapa-nome">📄 Currículos Enviados</div>
+            <div class="etapa-desc">Data em que os currículos foram enviados ao fiscal</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data</label>
+            <input type="date" class="form-input" id="a-data-curriculos">
+          </div>
+        </div>
+
+        <div class="etapa-row" id="etapa-entrevista">
+          <div>
+            <div class="etapa-nome">🎯 Pedido de Entrevista</div>
+            <div class="etapa-desc">Data em que a entrevista foi solicitada</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data</label>
+            <input type="date" class="form-input" id="a-data-entrevista">
+          </div>
+        </div>
+
+        <div class="etapa-row" id="etapa-escolhido">
+          <div>
+            <div class="etapa-nome">✅ Candidato Escolhido</div>
+            <div class="etapa-desc">Data em que o candidato foi selecionado</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data</label>
+            <input type="date" class="form-input" id="a-data-escolhido">
+          </div>
+        </div>
+
+        <div class="etapa-row" id="etapa-autorizacao">
+          <div>
+            <div class="etapa-nome">📝 Autorização</div>
+            <div class="etapa-desc">Data em que a autorização foi recebida</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data</label>
+            <input type="date" class="form-input" id="a-data-autorizacao">
+          </div>
+        </div>
+
+        <div class="etapa-row" id="etapa-admissao">
+          <div>
+            <div class="etapa-nome">🎉 Admissão</div>
+            <div class="etapa-desc">Data de admissão do colaborador</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data</label>
+            <input type="date" class="form-input" id="a-data-admissao">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-titulo">Outras Informações</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Gerente Demandante</label>
+            <input type="text" class="form-input" id="a-gerente">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fiscal do Contrato</label>
+            <input type="text" class="form-input" id="a-fiscal">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Observações</label>
+            <input type="text" class="form-input" id="a-obs">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn-secondary" onclick="cancelarAtualizacao()">Cancelar</button>
+        <button class="btn-primary" id="btn-atualizar" onclick="atualizarSPS()">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '/api/notion';
+const SENHA = 'digisystem';
+let spsAtualId = null;
+
+// ── Senha ──────────────────────────────────────────────────────────────────
+function verificarSenha() {
+  var v = document.getElementById('senha-input').value;
+  if (v === SENHA) {
+    document.getElementById('senha-screen').style.display = 'none';
+  } else {
+    document.getElementById('senha-erro').style.display = 'block';
+    document.getElementById('senha-input').value = '';
+    document.getElementById('senha-input').focus();
+  }
+}
+
+// ── Abas ───────────────────────────────────────────────────────────────────
+function setTab(tab) {
+  document.querySelectorAll('.tab').forEach(function(t, i) {
+    t.classList.toggle('active', (tab === 'nova' && i === 0) || (tab === 'atualizar' && i === 1));
+  });
+  document.getElementById('tab-nova').style.display = tab === 'nova' ? 'block' : 'none';
+  document.getElementById('tab-atualizar').style.display = tab === 'atualizar' ? 'block' : 'none';
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+function showToast(msg, tipo) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast visible ' + (tipo || '');
+  setTimeout(function() { t.className = 'toast'; }, 3500);
+}
+
+// ── Nova SPS ───────────────────────────────────────────────────────────────
+function limparNova() {
+  ['n-numero', 'n-email', 'n-gerente', 'n-fiscal', 'n-obs'].forEach(function(id) {
+    document.getElementById(id).value = '';
+  });
+}
+
+async function criarSPS() {
+  var numero = document.getElementById('n-numero').value.trim();
+  var email = document.getElementById('n-email').value;
+  if (!numero || !email) { showToast('Preencha o número da SPS e a data do e-mail!', 'error'); return; }
+
+  var btn = document.getElementById('btn-criar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-inline"></span>Criando...';
+
+  try {
+    var res = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'criar_sps',
+        dados: {
+          numero_sps: numero,
+          data_email: email,
+          gerente: document.getElementById('n-gerente').value.trim(),
+          fiscal: document.getElementById('n-fiscal').value.trim(),
+          observacoes: document.getElementById('n-obs').value.trim(),
+        }
+      })
+    });
+    var data = await res.json();
+    if (data.error) throw new Error(data.error);
+    showToast('✅ SPS ' + numero + ' criada com sucesso!', 'success');
+    limparNova();
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Criar SPS';
+}
+
+// ── Buscar SPS ────────────────────────────────────────────────────────────
+async function buscarSPS() {
+  var busca = document.getElementById('busca-sps').value.trim();
+  if (!busca) return;
+
+  try {
+    var res = await fetch(API + '?db=solicitacoes');
+    var data = await res.json();
+    var sps = (data.solicitacoes || []).find(function(s) {
+      return (s.numero_sps || '').toLowerCase() === busca.toLowerCase();
+    });
+
+    if (!sps) { showToast('SPS não encontrada: ' + busca, 'error'); return; }
+
+    spsAtualId = sps.id;
+
+    // Preencher card
+    document.getElementById('sps-card-num').textContent = sps.numero_sps;
+    document.getElementById('sps-card-info').textContent =
+      'Gerente: ' + (sps.gerente || '—') + ' · Fiscal: ' + (sps.fiscal || '—') + ' · Status: ' + (sps.status || '—');
+    document.getElementById('sps-card').classList.add('visible');
+
+    // Preencher formulário
+    document.getElementById('a-status').value = sps.status || 'Aguardando Currículos';
+    document.getElementById('a-gerente').value = sps.gerente || '';
+    document.getElementById('a-fiscal').value = sps.fiscal || '';
+    document.getElementById('a-obs').value = sps.observacoes || '';
+    document.getElementById('a-data-curriculos').value = sps.data_curriculos || '';
+    document.getElementById('a-data-entrevista').value = sps.data_entrevista || '';
+    document.getElementById('a-data-escolhido').value = sps.data_escolhido || '';
+    document.getElementById('a-data-autorizacao').value = sps.data_autorizacao || '';
+    document.getElementById('a-data-admissao').value = sps.data_admissao || '';
+
+    document.getElementById('form-atualizar').style.display = 'block';
+    atualizarEtapas();
+
+  } catch(e) {
+    showToast('Erro ao buscar: ' + e.message, 'error');
+  }
+}
+
+function atualizarEtapas() {
+  var status = document.getElementById('a-status').value;
+  var ordem = ['Aguardando Currículos','Currículos Enviados','Em Entrevista','Candidato Escolhido','Aguardando Autorização','Autorizado','Em Contratação','Contratado'];
+  var idx = ordem.indexOf(status);
+
+  var mapEtapa = {
+    'etapa-curriculos': 1,
+    'etapa-entrevista': 2,
+    'etapa-escolhido': 3,
+    'etapa-autorizacao': 5,
+    'etapa-admissao': 7,
+  };
+
+  Object.keys(mapEtapa).forEach(function(id) {
+    var etapaIdx = mapEtapa[id];
+    var el = document.getElementById(id);
+    el.classList.remove('ativa', 'concluida');
+    if (idx > etapaIdx) el.classList.add('concluida');
+    else if (idx === etapaIdx) el.classList.add('ativa');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var sel = document.getElementById('a-status');
+  if (sel) sel.addEventListener('change', atualizarEtapas);
+});
+
+function cancelarAtualizacao() {
+  document.getElementById('form-atualizar').style.display = 'none';
+  document.getElementById('sps-card').classList.remove('visible');
+  document.getElementById('busca-sps').value = '';
+  spsAtualId = null;
+}
+
+async function atualizarSPS() {
+  if (!spsAtualId) return;
+  var btn = document.getElementById('btn-atualizar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-inline"></span>Salvando...';
+
+  try {
+    var res = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'atualizar_sps',
+        page_id: spsAtualId,
+        dados: {
+          status: document.getElementById('a-status').value,
+          gerente: document.getElementById('a-gerente').value.trim(),
+          fiscal: document.getElementById('a-fiscal').value.trim(),
+          observacoes: document.getElementById('a-obs').value.trim(),
+          data_curriculos: document.getElementById('a-data-curriculos').value || null,
+          data_entrevista: document.getElementById('a-data-entrevista').value || null,
+          data_escolhido: document.getElementById('a-data-escolhido').value || null,
+          data_autorizacao: document.getElementById('a-data-autorizacao').value || null,
+          data_admissao: document.getElementById('a-data-admissao').value || null,
+        }
+      })
+    });
+    var data = await res.json();
+    if (data.error) throw new Error(data.error);
+    showToast('✅ SPS atualizada com sucesso!', 'success');
+    // Atualizar card
+    document.getElementById('sps-card-info').textContent =
+      'Gerente: ' + document.getElementById('a-gerente').value + ' · Fiscal: ' + document.getElementById('a-fiscal').value + ' · Status: ' + document.getElementById('a-status').value;
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Salvar Alterações';
+}
+</script>
+</body>
+</html>
