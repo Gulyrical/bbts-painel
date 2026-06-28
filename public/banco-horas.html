@@ -176,7 +176,11 @@ function saldoClass(v){
   return'ok';
 }
 
-function sparkHTML(semanas){
+function sparkHTML(semanas, mat){
+  // Retorna placeholder clicável que carrega histórico ao clicar
+  return '<span class="spark-load" onclick="loadHistorico('+mat+',this)" title="Clique para ver evolução" style="cursor:pointer;font-size:11px;color:var(--blue)">📊 Ver</span>';
+}
+function sparkHTMLData(semanas){
   // últimas 5 semanas com dados
   var vals = semanas.filter(s=>s!==null).slice(-5);
   if(!vals.length)return'—';
@@ -190,6 +194,35 @@ function sparkHTML(semanas){
     return`<div class="spark-bar ${cls}" style="height:${h}px" title="${fmtH(v)}"></div>`;
   }).join('');
   return`<div class="spark">${bars}</div>`;
+}
+
+async function loadHistorico(mat, el){
+  el.textContent = '...';
+  try {
+    var res = await fetch(API+'?db=banco_horas_historico&mat='+mat);
+    var data = await res.json();
+    var hist = data.historico || [];
+    var vals = hist.map(function(h){return h.saldo;});
+    var sems = hist.map(function(h){return h.semana;});
+    var cell = document.getElementById('spark-'+mat);
+    if (cell) cell.innerHTML = sparkHTMLData(vals, sems);
+  } catch(e) {
+    el.textContent = 'Erro';
+  }
+}
+
+function sparkHTMLData(vals, sems){
+  if(!vals.length) return '—';
+  var max=Math.max(...vals.map(Math.abs),1);
+  var last=vals[vals.length-1];
+  var prev=vals.length>1?vals[vals.length-2]:last;
+  var trend=last>prev?'up':last<prev?'down':'';
+  return '<div class="spark" style="display:inline-flex">'+vals.map(function(v,i){
+    var h=Math.max(Math.round((Math.abs(v)/max)*28),2);
+    var cls=(i===vals.length-1?'last '+trend:'');
+    var s=sems?'S'+String(sems[i]).padStart(2,'0')+': ':'';
+    return '<div class="spark-bar '+cls+'" style="height:'+h+'px" title="'+s+fmtH(v)+'"></div>';
+  }).join('')+'</div>';
 }
 
 async function loadData(){
@@ -279,7 +312,7 @@ function render(){
       <td style="font-family:monospace;color:var(--text2)">${r.matricula||'—'}</td>
       <td style="font-weight:500">${r.nome||'—'}</td>
       <td class="right"><span class="saldo ${sc}">${fmtH(r.saldo_atual)}</span></td>
-      <td style="text-align:center">${sparkHTML(r.semanas||[])}</td>
+      <td style="text-align:center" id="spark-${r.matricula}">${sparkHTML(r.semanas||[], r.matricula)}</td>
       <td style="text-align:center">${compTag(r.comparacao)}</td>
       <td class="right"><span class="dias-zerar">${r.dias_zerar||0}d</span></td>
     </tr>`;
