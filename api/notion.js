@@ -6,6 +6,7 @@ const DBS = {
   cargos:        'd26e55bc-e591-4a4c-9f31-25026a89f519',
   equipamentos:  '43c2d242-f755-4fca-96ce-d6b8bff6164d',
   afastamentos:  '730a04f3-e5b5-4dfa-988e-6d10ae833b6a',
+  banco_horas:   'ba44785b-184d-4612-a57f-5f34b6e83b37',
   curriculo:     '5129428f-b760-4b3d-aab2-910a06df3cbf',
   solicitacoes:  '7cf89395-eab1-41d8-bd22-6e209ec7073f',
   envios:        'b701ee07-4324-40db-96e3-1e864b20b3b8',
@@ -237,6 +238,54 @@ module.exports = async function handler(req, res) {
 
   try {
     // Endpoint especial para ferias (filtra afastamentos por tipo Ferias)
+    if (db === 'banco_horas') {
+      var pages = await fetchAll(DBS.banco_horas);
+      // Agrupar por matrícula
+      var porMat = {};
+      pages.forEach(function(pg) {
+        var p = pg.properties;
+        var mat = prop(p, 'Matrícula', 'number');
+        var nome = prop(p, 'Nome', 'text');
+        var semana = prop(p, 'Semana', 'number');
+        var saldo = prop(p, 'Saldo de Horas', 'number');
+        var comp = prop(p, 'Comparação', 'select');
+        var dias_uteis = prop(p, 'Dias Úteis', 'number');
+        if (!mat) return;
+        if (!porMat[mat]) porMat[mat] = {matricula: mat, nome: nome, semanas: {}, comparacao: null, dias_uteis: null};
+        if (semana) porMat[mat].semanas[semana] = saldo;
+        if (comp) porMat[mat].comparacao = comp;
+        if (dias_uteis) porMat[mat].dias_uteis = dias_uteis;
+      });
+
+      var resultado = Object.values(porMat).map(function(r) {
+        var semanas = Object.keys(r.semanas).map(Number).sort(function(a,b){return a-b;});
+        var ultima_semana = semanas.length ? semanas[semanas.length-1] : 0;
+        var saldo_atual = ultima_semana ? r.semanas[ultima_semana] : null;
+        var saldo_ant = semanas.length > 1 ? r.semanas[semanas[semanas.length-2]] : null;
+        // Dias para zerar = ROUND(saldo / 8.0, 0)
+        var dias_zerar = saldo_atual !== null ? Math.round(saldo_atual / 8.0) : 0;
+        // Comparação
+        var comparacao = r.comparacao;
+        if (!comparacao && saldo_atual !== null && saldo_ant !== null) {
+          comparacao = saldo_atual > saldo_ant ? 'Aumentou' : saldo_atual < saldo_ant ? 'Diminuiu' : 'Inalterado';
+        }
+        // Últimas 5 semanas como array
+        var ult5 = semanas.slice(-5).map(function(s){return r.semanas[s];});
+        return {
+          matricula: r.matricula,
+          nome: r.nome,
+          saldo_atual: saldo_atual,
+          semanas: ult5,
+          ultima_semana: ultima_semana,
+          comparacao: comparacao,
+          dias_zerar: dias_zerar,
+        };
+      });
+
+      resultado.sort(function(a,b){return (b.saldo_atual||0)-(a.saldo_atual||0);});
+      return res.status(200).json({ banco_horas: resultado, timestamp: new Date().toISOString() });
+    }
+
     if (db === 'solicitacoes') {
       var [solPages, cargoPages] = await Promise.all([
         fetchAll(DBS.solicitacoes),
