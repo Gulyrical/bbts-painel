@@ -198,7 +198,7 @@ function parseAfastamentoFerias(pg) {
   return {
     id:          pg.id,
     nome:        nome,
-    data_inicio: prop(p, 'date:Data de Inícío:start', 'date'),
+    data_inicio: prop(p, 'date:Data de Inï¿½cï¿½o:start', 'date'),
     data_fim:    prop(p, 'date:Data de Fim:start', 'date'),
     qtd_dias:    prop(p, 'Qtd Dias', 'number'),
     dias_abono:  prop(p, 'Dias de Abono', 'number'),
@@ -238,7 +238,7 @@ module.exports = async function handler(req, res) {
     // Endpoint especial para ferias (filtra afastamentos por tipo Ferias)
     if (db === 'afastamentos_ferias') {
       var pages = await fetchAll(DBS.afastamentos);
-      var ferias = pages.map(parseAfastamentoFerias).filter(function(r){ return r.tipo === 'Férias'; });
+      var ferias = pages.map(parseAfastamentoFerias).filter(function(r){ return r.tipo === 'Fï¿½rias'; });
       return res.status(200).json({ ferias: ferias, timestamp: new Date().toISOString() });
     }
 
