@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBTS — Atestados</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#465EFF;--green:#2E7D5E;--green-lt:#E6F4EF;--red:#C0392B;--red-lt:#FDECEA;--amber:#E8A020;--amber-lt:#FEF3DC;--bg:#F5F6F8;--white:#fff;--border:#E5E7EB;--text:#111827;--text2:#6B7280;--radius:8px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+
+.header{background:var(--blue);color:#fff;padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.brand-mark{width:32px;height:32px;background:rgba(255,255,255,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.brand-name{font-size:14px;font-weight:600;letter-spacing:0.03em}
+.brand-sub{font-size:11px;opacity:0.65;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:10px}
+.btn-acao{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif}
+.btn-acao:hover{background:rgba(255,255,255,0.25)}
+.btn-acao.spin span{display:inline-block;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.upd{font-size:11px;color:rgba(255,255,255,0.55)}
+
+.main{max-width:1300px;margin:0 auto;padding:24px 28px}
+
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+.kpi-l{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+.kpi-v{font-size:28px;font-weight:500;line-height:1;color:var(--text)}
+.kpi-v.alerta{color:var(--red)}
+
+/* Alerta INSS */
+.alerta-box{background:var(--red-lt);border:1px solid #F5C6C6;border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;display:none}
+.alerta-box.visible{display:block}
+.alerta-titulo{font-size:13px;font-weight:600;color:var(--red);margin-bottom:10px}
+.alerta-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,0.7);border-radius:6px;margin-bottom:6px;font-size:12px}
+.alerta-item:last-child{margin-bottom:0}
+.alerta-nome{font-weight:500;color:var(--text);min-width:200px}
+.alerta-cid{font-family:monospace;color:var(--red);font-weight:600}
+.alerta-detalhe{color:var(--text2)}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:260px 1fr;gap:16px}
+
+/* Cards */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.card:last-child{margin-bottom:0}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--border);font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;background:#FAFAFA}
+
+/* Toolbar */
+.toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.toolbar input,.toolbar select{padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:'Inter',sans-serif;background:var(--white)}
+.toolbar input{flex:1;min-width:200px}
+.toolbar input:focus,.toolbar select:focus{outline:none;border-color:var(--blue)}
+
+/* Gráfico barras */
+.bar-list{padding:12px 16px}
+.bar-item{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-mes{font-size:11px;color:var(--text2);width:64px;text-align:right;flex-shrink:0}
+.bar-track{flex:1;background:#EEF0FF;border-radius:4px;height:16px;overflow:hidden}
+.bar-fill{height:100%;background:var(--blue);border-radius:4px;display:flex;align-items:center;padding-left:6px;transition:width 0.4s}
+.bar-num{font-size:10px;font-weight:500;color:#fff;white-space:nowrap}
+
+/* Tabela */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+table{width:100%;border-collapse:collapse}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);background:#FAFAFA;white-space:nowrap;cursor:pointer}
+thead th:hover{color:var(--blue)}
+tbody tr{border-bottom:1px solid var(--border)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#F0F4FF}
+tbody tr.alerta-row{background:#FFF5F5}
+tbody tr.alerta-row:hover{background:#FDECEA}
+tbody td{padding:10px 14px;font-size:13px}
+
+.badge-cid{display:inline-block;font-family:monospace;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:#EEF0FF;color:var(--blue)}
+.badge-cid.alerta{background:var(--red-lt);color:var(--red)}
+.badge-dias{font-size:12px;font-weight:600}
+.badge-inss{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--red-lt);color:var(--red)}
+
+.pag{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text2)}
+.pag button{padding:4px 12px;border:1px solid var(--border);border-radius:6px;background:var(--white);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif}
+.pag button:disabled{opacity:0.4;cursor:default}
+.empty{padding:40px;text-align:center;color:var(--text2);font-size:13px}
+.spinner{width:24px;height:24px;border:2px solid #EEF0FF;border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px}
+
+/* Painel individual */
+.perfil-box{display:none;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.perfil-box.visible{display:block}
+.perfil-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.perfil-nome{font-size:16px;font-weight:600}
+.perfil-close{background:none;border:none;cursor:pointer;font-size:18px;color:var(--text2);padding:4px}
+.perfil-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.perfil-stat{background:#FAFAFA;border:1px solid var(--border);border-radius:6px;padding:10px 14px;text-align:center}
+.perfil-stat-v{font-size:22px;font-weight:500}
+.perfil-stat-l{font-size:11px;color:var(--text2);margin-top:2px}
+.cid-lista{display:flex;flex-wrap:wrap;gap:8px}
+.cid-tag{padding:4px 12px;border-radius:6px;font-size:12px;font-family:monospace;font-weight:600;background:#EEF0FF;color:var(--blue)}
+.cid-tag.alerta{background:var(--red-lt);color:var(--red)}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="brand-mark">🏥</div>
+    <div>
+      <div class="brand-name">BBTS — Atestados</div>
+      <div class="brand-sub" id="sub">Carregando...</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="upd" id="upd">—</span>
+    <button class="btn-acao" id="btn" onclick="loadData()">
+      <span id="ri">↻</span> Atualizar
+    </button>
+    <a href="/" class="btn-acao">← Portal</a>
+  </div>
+</header>
+
+<main class="main">
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-l">Total de Atestados</div><div class="kpi-v" id="k-total">—</div></div>
+    <div class="kpi"><div class="kpi-l">Total de Dias</div><div class="kpi-v" id="k-dias">—</div></div>
+    <div class="kpi"><div class="kpi-l">Colaboradores</div><div class="kpi-v" id="k-colab">—</div></div>
+    <div class="kpi"><div class="kpi-l">⚠ Alertas INSS</div><div class="kpi-v alerta" id="k-inss">—</div></div>
+  </div>
+
+  <!-- Alerta INSS -->
+  <div class="alerta-box" id="alerta-box">
+    <div class="alerta-titulo">⚠ Atenção — Possível encaminhamento ao INSS (mesmo CID em menos de 60 dias)</div>
+    <div id="alerta-lista"></div>
+  </div>
+
+  <!-- Painel individual -->
+  <div class="perfil-box" id="perfil-box">
+    <div class="perfil-head">
+      <div class="perfil-nome" id="perfil-nome">—</div>
+      <button class="perfil-close" onclick="fecharPerfil()">✕</button>
+    </div>
+    <div class="perfil-stats">
+      <div class="perfil-stat"><div class="perfil-stat-v" id="p-total">—</div><div class="perfil-stat-l">Atestados</div></div>
+      <div class="perfil-stat"><div class="perfil-stat-v" id="p-dias">—</div><div class="perfil-stat-l">Total de Dias</div></div>
+      <div class="perfil-stat"><div class="perfil-stat-v" id="p-cids">—</div><div class="perfil-stat-l">CIDs diferentes</div></div>
+    </div>
+    <div class="card-head" style="margin-bottom:10px;border-radius:6px">CIDs registrados</div>
+    <div class="cid-lista" id="p-cid-lista"></div>
+    <div class="card-head" style="margin:16px 0 10px;border-radius:6px">Histórico de atestados</div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);border-bottom:1px solid var(--border)">Início</th>
+        <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);border-bottom:1px solid var(--border)">Fim</th>
+        <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);border-bottom:1px solid var(--border)">Dias</th>
+        <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);border-bottom:1px solid var(--border)">CID</th>
+        <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);border-bottom:1px solid var(--border)">Alerta</th>
+      </tr></thead>
+      <tbody id="p-historico"></tbody>
+    </table>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <input type="text" id="sq" placeholder="Buscar por nome ou CID..." oninput="applyFilter()">
+    <select id="f-mes" onchange="applyFilter()"><option value="">Todos os meses</option></select>
+    <select id="f-ano" onchange="applyFilter()"><option value="">Todos os anos</option></select>
+    <button class="btn-acao" style="color:var(--blue);background:var(--white);border-color:var(--border)" onclick="limpar()">✕ Limpar</button>
+  </div>
+
+  <div class="grid">
+    <!-- Esquerda: gráfico -->
+    <div>
+      <div class="card">
+        <div class="card-head">Atestados por mês</div>
+        <div class="bar-list" id="grafico"><div class="empty">Carregando...</div></div>
+      </div>
+    </div>
+
+    <!-- Direita: tabela -->
+    <div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th onclick="sortBy('nome')">Colaborador</th>
+            <th onclick="sortBy('inicio')">Início</th>
+            <th onclick="sortBy('fim')">Fim</th>
+            <th onclick="sortBy('dias')" style="text-align:center">Dias</th>
+            <th>CID</th>
+            <th style="text-align:center">INSS</th>
+          </tr></thead>
+          <tbody id="b-lista">
+            <tr><td colspan="6" class="empty"><div class="spinner"></div><br>Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pag">
+        <span id="pi">—</span>
+        <div style="display:flex;gap:6px">
+          <button onclick="changePage(-1)" id="pp">← Anterior</button>
+          <button onclick="changePage(1)" id="pn">Próxima →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const API = '/api/notion';
+const PER = 15;
+const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const MESES_C = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+let todos=[], filt=[], alertas=[], page=1, sortCol='inicio', sortDir=-1;
+
+function fmtD(d){if(!d)return'—';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function mesKey(d){if(!d)return'';var p=d.split('-');return p[0]+'-'+p[1];}
+function mesLabel(k){var p=k.split('-');return MESES[parseInt(p[1])-1]+'/'+p[0];}
+function mesCurto(k){var p=k.split('-');return MESES_C[parseInt(p[1])-1]+'/'+p[0].slice(2);}
+
+function calcAlertas(registros){
+  // Agrupar por colaborador
+  var porColab = {};
+  registros.forEach(function(r){
+    if(!porColab[r.nome]) porColab[r.nome] = [];
+    porColab[r.nome].push(r);
+  });
+
+  var alertas = [];
+  Object.keys(porColab).forEach(function(nome){
+    var ats = porColab[nome].filter(function(r){return r.inicio;}).sort(function(a,b){return a.inicio.localeCompare(b.inicio);});
+    // Para cada par de atestados com mesmo CID, verificar se < 60 dias
+    for(var i=0;i<ats.length;i++){
+      for(var j=i+1;j<ats.length;j++){
+        var ci = (ats[i].cid||'').toUpperCase().trim();
+        var cj = (ats[j].cid||'').toUpperCase().trim();
+        if(!ci || ci==='NÃO INFORMADO' || ci!==cj) continue;
+        var di = new Date(ats[i].inicio+'T12:00:00');
+        var dj = new Date(ats[j].inicio+'T12:00:00');
+        var diff = Math.round((dj-di)/(1000*60*60*24));
+        if(diff < 60){
+          alertas.push({nome:nome, cid:ci, diff:diff, d1:ats[i].inicio, d2:ats[j].inicio});
+          ats[i]._inss = true;
+          ats[j]._inss = true;
+        }
+      }
+    }
+  });
+  return alertas;
+}
+
+async function loadData(){
+  var btn=document.getElementById('btn');
+  btn.classList.add('spin');
+  try{
+    var res=await fetch(API+'?db=atestados');
+    var data=await res.json();
+    if(data.error)throw new Error(data.error);
+    todos=(data.atestados||[]);
+    alertas=calcAlertas(todos);
+
+    document.getElementById('sub').textContent=todos.length+' atestados';
+    document.getElementById('upd').textContent='Atualizado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+    preencherFiltros();
+    applyFilter();
+    renderAlertas();
+  }catch(e){
+    document.getElementById('b-lista').innerHTML='<tr><td colspan="6" style="padding:20px;color:red;text-align:center">Erro: '+e.message+'</td></tr>';
+  }
+  btn.classList.remove('spin');
+}
+
+function renderAlertas(){
+  var box=document.getElementById('alerta-box');
+  var lista=document.getElementById('alerta-lista');
+  // Deduplica alertas por colaborador+CID
+  var vistos={};
+  var uniq=alertas.filter(function(a){var k=a.nome+'|'+a.cid;if(vistos[k])return false;vistos[k]=true;return true;});
+  document.getElementById('k-inss').textContent=uniq.length;
+  if(!uniq.length){box.classList.remove('visible');return;}
+  box.classList.add('visible');
+  lista.innerHTML=uniq.map(function(a){
+    return'<div class="alerta-item">'+
+      '<span class="alerta-nome">'+a.nome+'</span>'+
+      '<span class="alerta-cid">CID: '+a.cid+'</span>'+
+      '<span class="alerta-detalhe">'+fmtD(a.d1)+' e '+fmtD(a.d2)+' ('+a.diff+' dias de diferença)</span>'+
+    '</div>';
+  }).join('');
+}
+
+function preencherFiltros(){
+  var meses=[...new Set(todos.filter(r=>r.inicio).map(r=>mesKey(r.inicio)))].sort();
+  var anos=[...new Set(todos.filter(r=>r.inicio).map(r=>r.inicio.split('-')[0]))].sort();
+  var sm=document.getElementById('f-mes');
+  sm.innerHTML='<option value="">Todos os meses</option>';
+  meses.forEach(function(k){sm.innerHTML+=`<option value="${k}">${mesLabel(k)}</option>`;});
+  var sa=document.getElementById('f-ano');
+  sa.innerHTML='<option value="">Todos os anos</option>';
+  anos.forEach(function(a){sa.innerHTML+=`<option value="${a}">${a}</option>`;});
+}
+
+function applyFilter(){
+  var q=document.getElementById('sq').value.toLowerCase();
+  var fm=document.getElementById('f-mes').value;
+  var fa=document.getElementById('f-ano').value;
+  filt=todos.filter(function(r){
+    if(q&&!(r.nome||'').toLowerCase().includes(q)&&!(r.cid||'').toLowerCase().includes(q))return false;
+    if(fm&&mesKey(r.inicio)!==fm)return false;
+    if(fa&&r.inicio&&r.inicio.split('-')[0]!==fa)return false;
+    return true;
+  });
+  page=1;render();
+}
+
+function limpar(){
+  document.getElementById('sq').value='';
+  document.getElementById('f-mes').value='';
+  document.getElementById('f-ano').value='';
+  fecharPerfil();
+  applyFilter();
+}
+
+function sortBy(col){
+  if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=col==='dias'?-1:1;}
+  render();
+}
+
+function changePage(d){page=Math.max(1,Math.min(Math.ceil(filt.length/PER),page+d));render();}
+
+function verColaborador(nome){
+  var ats=todos.filter(function(r){return r.nome===nome;}).sort(function(a,b){return (a.inicio||'').localeCompare(b.inicio||'');});
+  document.getElementById('perfil-nome').textContent=nome;
+  document.getElementById('p-total').textContent=ats.length;
+  document.getElementById('p-dias').textContent=ats.reduce(function(s,r){return s+(r.dias||0);},0);
+  var cids=[...new Set(ats.map(r=>(r.cid||'').toUpperCase().trim()).filter(function(c){return c&&c!=='NÃO INFORMADO';}))];
+  document.getElementById('p-cids').textContent=cids.length;
+  document.getElementById('p-cid-lista').innerHTML=cids.map(function(c){
+    var isAl=ats.some(function(r){return r._inss&&(r.cid||'').toUpperCase().trim()===c;});
+    return'<span class="cid-tag'+(isAl?' alerta':'')+'">'+c+(isAl?' ⚠':'')+'</span>';
+  }).join('');
+  document.getElementById('p-historico').innerHTML=ats.map(function(r){
+    var isAl=r._inss;
+    return'<tr style="border-bottom:1px solid var(--border)">'+(isAl?'<td style="padding:8px 12px;color:var(--red)">':'<td style="padding:8px 12px">')+fmtD(r.inicio)+'</td>'+
+      '<td style="padding:8px 12px">'+fmtD(r.fim)+'</td>'+
+      '<td style="padding:8px 12px;font-weight:600">'+(r.dias||'—')+'</td>'+
+      '<td style="padding:8px 12px"><span class="badge-cid'+(isAl?' alerta':'')+'">'+(r.cid||'NÃO INFORMADO')+'</span></td>'+
+      '<td style="padding:8px 12px">'+(isAl?'<span class="badge-inss">⚠ INSS</span>':'—')+'</td>'+
+    '</tr>';
+  }).join('');
+  document.getElementById('perfil-box').classList.add('visible');
+  document.getElementById('perfil-box').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function fecharPerfil(){
+  document.getElementById('perfil-box').classList.remove('visible');
+}
+
+function render(){
+  // KPIs
+  var tDias=filt.reduce(function(s,r){return s+(r.dias||0);},0);
+  var colab=new Set(filt.map(r=>r.nome)).size;
+  document.getElementById('k-total').textContent=filt.length;
+  document.getElementById('k-dias').textContent=tDias;
+  document.getElementById('k-colab').textContent=colab;
+
+  // Gráfico por mês
+  var porMes={};
+  filt.forEach(function(r){
+    if(!r.inicio)return;
+    var k=mesKey(r.inicio);
+    if(!porMes[k])porMes[k]=0;
+    porMes[k]++;
+  });
+  var mesesOrd=Object.keys(porMes).sort();
+  var maxC=Math.max(...mesesOrd.map(k=>porMes[k]),1);
+  document.getElementById('grafico').innerHTML=mesesOrd.map(function(k){
+    var pct=(porMes[k]/maxC*100).toFixed(1);
+    return'<div class="bar-item"><div class="bar-mes">'+mesCurto(k)+'</div>'+
+      '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%"><span class="bar-num">'+porMes[k]+'</span></div></div></div>';
+  }).join('')||'<div class="empty">Sem dados</div>';
+
+  // Lista ordenada
+  var lista=[...filt].sort(function(a,b){
+    var va=a[sortCol]||'';var vb=b[sortCol]||'';
+    if(sortCol==='dias'){va=a.dias||0;vb=b.dias||0;}
+    return va<vb?-sortDir:va>vb?sortDir:0;
+  });
+  var start=(page-1)*PER;
+  var slice=lista.slice(start,start+PER);
+  var total=lista.length;
+  document.getElementById('pi').textContent=total>0?(start+1)+'–'+Math.min(start+PER,total)+' de '+total+' registros':'0 resultados';
+  document.getElementById('pp').disabled=page<=1;
+  document.getElementById('pn').disabled=page>=Math.ceil(total/PER);
+
+  var lHtml='';
+  slice.forEach(function(r){
+    var isAl=r._inss;
+    lHtml+=`<tr class="${isAl?'alerta-row':''}" style="cursor:pointer" onclick="verColaborador('${r.nome.replace(/'/g,"\\'")}')">
+      <td style="font-weight:500">${r.nome}</td>
+      <td>${fmtD(r.inicio)}</td>
+      <td>${fmtD(r.fim)}</td>
+      <td style="text-align:center;font-weight:600">${r.dias||'—'}</td>
+      <td><span class="badge-cid${isAl?' alerta':''}">${r.cid||'NÃO INFORMADO'}</span></td>
+      <td style="text-align:center">${isAl?'<span class="badge-inss">⚠ INSS</span>':'—'}</td>
+    </tr>`;
+  });
+  document.getElementById('b-lista').innerHTML=lHtml||'<tr><td colspan="6" class="empty">Nenhum atestado encontrado</td></tr>';
+}
+
+loadData();
+</script>
+</body>
+</html>
