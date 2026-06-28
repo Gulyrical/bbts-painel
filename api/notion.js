@@ -74,7 +74,7 @@ function parsePessoa(pg) {
     nome:          prop(p, 'Nome Completo', 'title') || prop(p, 'Nome', 'title'),
     cpf:           prop(p, 'CPF', 'text'),
     rg:            prop(p, 'RG', 'text'),
-    orgao_rg:      prop(p, 'ÃrgÃ£o Emissor RG', 'text'),
+    orgao_rg:      prop(p, 'Órgão Emissor RG', 'text'),
     estado_rg:     prop(p, 'Estado Emissor RG', 'text'),
     nascimento:    prop(p, 'Data de Nascimento', 'date'),
     sexo:          prop(p, 'Sexo', 'select'),
@@ -82,7 +82,7 @@ function parsePessoa(pg) {
     nacionalidade: prop(p, 'Nacionalidade', 'text'),
     telefone:      telefone,
     logradouro:    prop(p, 'Logradouro', 'text'),
-    numero:        prop(p, 'NÃºmero', 'text'),
+    numero:        prop(p, 'Número', 'text'),
     complemento:   prop(p, 'Complemento', 'text'),
     bairro:        prop(p, 'Bairro', 'text'),
     cidade:        prop(p, 'Cidade', 'text'),
@@ -91,14 +91,14 @@ function parsePessoa(pg) {
     email_pessoal: prop(p, 'Email Pessoal', 'email'),
     email_corp:    prop(p, 'Email Corporativo', 'email'),
     banco:         prop(p, 'Banco', 'text'),
-    agencia:       prop(p, 'AgÃªncia', 'text'),
-    conta:         prop(p, 'Conta BancÃ¡ria', 'text'),
+    agencia:       prop(p, 'Agência', 'text'),
+    conta:         prop(p, 'Conta Bancária', 'text'),
     tipo_conta:    prop(p, 'Tipo de Conta', 'text'),
-    nome_mae:      prop(p, 'Nome da MÃ£e', 'text'),
+    nome_mae:      prop(p, 'Nome da Mãe', 'text'),
     nome_pai:      prop(p, 'Nome do Pai', 'text'),
     jornada:       prop(p, 'Jornada de Trabalho', 'text'),
     tipo_contrato: prop(p, 'Tipo de Contrato', 'text'),
-    grau_instrucao: prop(p, 'Grau de InstruÃ§Ã£o', 'text'),
+    grau_instrucao: prop(p, 'Grau de Instrução', 'text'),
     pis:           prop(p, 'PIS', 'text'),
     ctps:          prop(p, 'CTPS', 'text'),
   };
@@ -108,15 +108,15 @@ function parseVinculo(pg) {
   var p = pg.properties;
   return {
     id:            pg.id,
-    matricula:     prop(p, 'MatrÃ­cula', 'title'),
+    matricula:     prop(p, 'Matrícula', 'title'),
     status:        prop(p, 'Status', 'select'),
     uor:           prop(p, 'UOR', 'text'),
-    data_admissao: prop(p, 'Data de AdmissÃ£o', 'date'),
+    data_admissao: prop(p, 'Data de Admissão', 'date'),
     data_deslig:   prop(p, 'Data de Desligamento', 'date'),
-    ocorrencia:    prop(p, 'OcorrÃªncia', 'text'),
+    ocorrencia:    prop(p, 'Ocorrência', 'text'),
     gestor:        prop(p, 'Gestor', 'text'),
-    ultimo_dia:    prop(p, 'Ãltimo Dia de Trabalho', 'date'),
-    data_solic:    prop(p, 'Data de SolicitaÃ§Ã£o', 'date'),
+    ultimo_dia:    prop(p, 'Último Dia de Trabalho', 'date'),
+    data_solic:    prop(p, 'Data de Solicitação', 'date'),
     pessoa_id:     getRelId(p, 'Pessoa'),
     cargo_id:      getRelId(p, 'Cargo'),
   };
@@ -126,9 +126,9 @@ function parseCargo(pg) {
   var p = pg.properties;
   return {
     id:      pg.id,
-    codigo:  prop(p, 'CÃ³digo SGPS', 'title'),
-    cargo:   prop(p, 'DescriÃ§Ã£o do Posto', 'text'),
-    salario: prop(p, 'SalÃ¡rio', 'number'),
+    codigo:  prop(p, 'Código SGPS', 'title'),
+    cargo:   prop(p, 'Descrição do Posto', 'text'),
+    salario: prop(p, 'Salário', 'number'),
     nivel:   prop(p, 'Senioridade', 'select'),
   };
 }
@@ -137,12 +137,12 @@ function parseEquipamento(pg) {
   var p = pg.properties;
   return {
     id:             pg.id,
-    patrimonio:     prop(p, 'PatrimÃ´nio', 'title'),
+    patrimonio:     prop(p, 'Patrimônio', 'title'),
     marca:          prop(p, 'Marca', 'text'),
     tipo:           prop(p, 'Tipo de Equipamento', 'select'),
-    situacao:       prop(p, 'SituaÃ§Ã£o DevoluÃ§Ã£o', 'select'),
-    responsavel:    prop(p, 'ResponsÃ¡vel Recebimento', 'text'),
-    data_devolucao: prop(p, 'Data de DevoluÃ§Ã£o', 'date'),
+    situacao:       prop(p, 'Situação Devolução', 'select'),
+    responsavel:    prop(p, 'Responsável Recebimento', 'text'),
+    data_devolucao: prop(p, 'Data de Devolução', 'date'),
     pessoa_id:      getRelId(p, 'Pessoa'),
   };
 }
@@ -153,7 +153,7 @@ function parseAfastamento(pg) {
     id:        pg.id,
     tipo:      prop(p, 'Tipo de Afastamento', 'select') || prop(p, 'Tipo', 'select'),
     dias:      prop(p, 'Qtd Dias', 'number') || prop(p, 'Dias', 'number'),
-    data_ini:  prop(p, 'Data InÃ­cio', 'date') || prop(p, 'Data de InÃ­cio', 'date'),
+    data_ini:  prop(p, 'Data Início', 'date') || prop(p, 'Data de Início', 'date'),
     data_fim:  prop(p, 'Data Fim', 'date') || prop(p, 'Data de Fim', 'date'),
     pessoa_id: getRelId(p, 'Pessoa'),
   };
@@ -164,8 +164,8 @@ function parseCurriculo(pg) {
   return {
     id:          pg.id,
     tipo:        prop(p, 'Tipo', 'select'),
-    descricao:   prop(p, 'DescriÃ§Ã£o', 'title') || prop(p, 'Curso', 'title'),
-    instituicao: prop(p, 'InstituiÃ§Ã£o', 'text'),
+    descricao:   prop(p, 'Descrição', 'title') || prop(p, 'Curso', 'title'),
+    instituicao: prop(p, 'Instituição', 'text'),
     ano:         prop(p, 'Ano', 'number'),
     pessoa_id:   getRelId(p, 'Pessoa'),
   };
@@ -175,17 +175,17 @@ function parseSolicitacao(pg) {
   var p = pg.properties;
   return {
     id:               pg.id,
-    numero_sps:       prop(p, 'NÃºmero SPS', 'title'),
+    numero_sps:       prop(p, 'Número SPS', 'title'),
     fiscal:           prop(p, 'Fiscal do Contrato', 'text'),
     gerente:          prop(p, 'Gerente Demandante', 'text'),
     status:           prop(p, 'Status', 'select'),
     data_email:       prop(p, 'date:Data E-mail Recebido:start', 'date'),
-    data_curriculos:  prop(p, 'date:Data CurrÃ­culos Enviados:start', 'date'),
+    data_curriculos:  prop(p, 'date:Data Currículos Enviados:start', 'date'),
     data_entrevista:  prop(p, 'date:Data Pedido Entrevista:start', 'date'),
     data_escolhido:   prop(p, 'date:Data Candidato Escolhido:start', 'date'),
-    data_autorizacao: prop(p, 'date:Data AutorizaÃ§Ã£o:start', 'date'),
-    data_admissao:    prop(p, 'date:Data AdmissÃ£o:start', 'date'),
-    total_curriculos: prop(p, 'Total CurrÃ­culos Enviados', 'rollup_n'),
+    data_autorizacao: prop(p, 'date:Data Autorização:start', 'date'),
+    data_admissao:    prop(p, 'date:Data Admissão:start', 'date'),
+    total_curriculos: prop(p, 'Total Currículos Enviados', 'rollup_n'),
   };
 }
 
@@ -198,7 +198,7 @@ function parseAfastamentoFerias(pg) {
   return {
     id:          pg.id,
     nome:        nome,
-    data_inicio: prop(p, 'Data de Início', 'date'),
+    data_inicio: prop(p, 'Data de In�cio', 'date'),
     data_fim:    prop(p, 'Data de Fim', 'date'),
     qtd_dias:    prop(p, 'Qtd Dias', 'number'),
     dias_abono:  prop(p, 'Dias de Abono', 'number'),
@@ -211,7 +211,7 @@ function parseEnvio(pg) {
     id:         pg.id,
     nome:       prop(p, 'Envio', 'title'),
     data_envio: prop(p, 'Data de Envio', 'date'),
-    quantidade: prop(p, 'Quantidade de CurrÃ­culos', 'number'),
+    quantidade: prop(p, 'Quantidade de Currículos', 'number'),
   };
 }
 
@@ -230,7 +230,7 @@ module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 's-maxage=60');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (!NOTION_TOKEN) return res.status(500).json({ error: 'NOTION_TOKEN nÃ£o configurado' });
+  if (!NOTION_TOKEN) return res.status(500).json({ error: 'NOTION_TOKEN não configurado' });
 
   var db = req.query && req.query.db;
 
@@ -238,7 +238,7 @@ module.exports = async function handler(req, res) {
     // Endpoint especial para ferias (filtra afastamentos por tipo Ferias)
     if (db === 'afastamentos_ferias') {
       var pages = await fetchAll(DBS.afastamentos);
-      var ferias = pages.map(parseAfastamentoFerias).filter(function(r){ return r.tipo === 'Férias'; });
+      var ferias = pages.map(parseAfastamentoFerias).filter(function(r){ return r.tipo === 'F�rias'; });
       return res.status(200).json({ ferias: ferias, timestamp: new Date().toISOString() });
     }
 
