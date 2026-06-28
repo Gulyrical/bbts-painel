@@ -272,11 +272,9 @@ async function loadData() {
 
     var ativos = rows.filter(r => r.status === 'Ativo').length;
     var deslig = rows.filter(r => r.status === 'Desligado').length;
-    var emails = rows.filter(r => r.email_pessoal).length;
     document.getElementById('k-total').textContent  = rows.length;
     document.getElementById('k-ativos').textContent = ativos;
     document.getElementById('k-deslig').textContent = deslig;
-    document.getElementById('k-email').textContent  = emails;
     document.getElementById('sub').textContent = rows.length + ' colaboradores';
     document.getElementById('upd').textContent = 'Atualizado às ' +
       new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
