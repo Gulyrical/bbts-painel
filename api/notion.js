@@ -266,25 +266,35 @@ module.exports = async function handler(req, res) {
 
       if (action === 'atualizar_sps') {
         var pid = body.page_id;
+        var erros = [];
 
-        // Monta propriedades usando nomes corretos da API do Notion
-        var props2 = {};
-        if (dados.status) props2['Status'] = { select: { name: dados.status } };
-        if (dados.gerente !== undefined) props2['Gerente Demandante'] = { rich_text: dados.gerente ? [{ text: { content: dados.gerente } }] : [] };
-        if (dados.fiscal !== undefined) props2['Fiscal do Contrato'] = { rich_text: dados.fiscal ? [{ text: { content: dados.fiscal } }] : [] };
-        if (dados.observacoes !== undefined) props2['Observações'] = { rich_text: dados.observacoes ? [{ text: { content: dados.observacoes } }] : [] };
+        // Salva Status separado
+        if (dados.status) {
+          var rStatus = await fetch('https://api.notion.com/v1/pages/' + pid, {
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ properties: { 'Status': { select: { name: dados.status } } } })
+          });
+          var dStatus = await rStatus.json();
+          if (dStatus.object === 'error') erros.push('Status: ' + dStatus.message);
+        }
 
-        // Salva primeiro o status e campos de texto
-        var r2 = await fetch('https://api.notion.com/v1/pages/' + pid, {
-          method: 'PATCH',
-          headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
-          body: JSON.stringify({ properties: props2 })
-        });
-        var d2 = await r2.json();
-        if (d2.object === 'error') return res.status(400).json({ error: 'Status: ' + d2.message });
+        // Salva campos de texto separado
+        var propsTexto = {};
+        if (dados.gerente !== undefined) propsTexto['Gerente Demandante'] = { rich_text: dados.gerente ? [{ text: { content: dados.gerente } }] : [] };
+        if (dados.fiscal !== undefined) propsTexto['Fiscal do Contrato'] = { rich_text: dados.fiscal ? [{ text: { content: dados.fiscal } }] : [] };
+        if (dados.observacoes !== undefined) propsTexto['Observações'] = { rich_text: dados.observacoes ? [{ text: { content: dados.observacoes } }] : [] };
+        if (Object.keys(propsTexto).length > 0) {
+          var rTexto = await fetch('https://api.notion.com/v1/pages/' + pid, {
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ properties: propsTexto })
+          });
+          var dTexto = await rTexto.json();
+          if (dTexto.object === 'error') erros.push('Texto: ' + dTexto.message);
+        }
 
-        // Salva as datas em chamadas separadas (API do Notion exige nome exato da propriedade)
-        var errosDatas = [];
+        // Salva cada data individualmente
         var datas = [
           ['date:Data Currículos Enviados:start', dados.data_curriculos],
           ['date:Data Pedido Entrevista:start', dados.data_entrevista],
@@ -293,21 +303,19 @@ module.exports = async function handler(req, res) {
           ['date:Data Admissão:start', dados.data_admissao],
         ];
         for (var di = 0; di < datas.length; di++) {
-          var nomeCampo = datas[di][0];
-          var valorData = datas[di][1];
-          if (!valorData) continue;
-          var propData = {};
-          propData[nomeCampo] = { date: { start: valorData } };
+          if (!datas[di][1]) continue;
+          var pd = {};
+          pd[datas[di][0]] = { date: { start: datas[di][1] } };
           var rd = await fetch('https://api.notion.com/v1/pages/' + pid, {
             method: 'PATCH',
             headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
-            body: JSON.stringify({ properties: propData })
+            body: JSON.stringify({ properties: pd })
           });
           var dd = await rd.json();
-          if (dd.object === 'error') errosDatas.push(nomeCampo + ': ' + dd.message);
+          if (dd.object === 'error') erros.push(datas[di][0] + ': ' + dd.message);
         }
 
-        if (errosDatas.length > 0) return res.status(400).json({ error: errosDatas.join(' | ') });
+        if (erros.length > 0) return res.status(400).json({ error: erros.join(' | ') });
         return res.status(200).json({ ok: true });
       }
 
