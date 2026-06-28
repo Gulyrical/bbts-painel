@@ -198,7 +198,7 @@ function parseAfastamentoFerias(pg) {
   return {
     id:          pg.id,
     nome:        nome,
-    data_inicio: prop(p, 'date:Data de In�c�o:start', 'date'),
+    data_inicio: prop(p, 'date:Data de In�cio:start', 'date'),
     data_fim:    prop(p, 'date:Data de Fim:start', 'date'),
     qtd_dias:    prop(p, 'Qtd Dias', 'number'),
     dias_abono:  prop(p, 'Dias de Abono', 'number'),
