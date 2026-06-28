@@ -370,17 +370,28 @@ module.exports = async function handler(req, res) {
         .map(function(pg) {
           var p = pg.properties;
           var titulo = prop(p, 'ID Afastamento', 'title') || '';
+          // Formatos possíveis:
+          // "ATESTADO MÉDICO - NOME - DATA" -> nome = partes[1]
+          // "NOME - DATA_INICIO - DATA_FIM" -> nome = partes[0]  
+          // "TIPO - NOME - DATA" -> nome = partes[1]
           var partes = titulo.split(' - ');
-          // Remove first part (tipo) and last part (data), join the rest as nome
-          var nome = partes.length >= 3 ? partes.slice(1, partes.length - 1).join(' - ') :
-                     partes.length === 2 ? partes[0] : titulo;
+          var nome = titulo; // fallback
+          if (partes.length >= 3) {
+            // Checar se primeira parte é um tipo conhecido
+            var tiposConhecidos = ['ATESTADO', 'ATESTADO MÉDICO', 'FÉRIAS', 'LICENÇA', 'ACIDENTE', 'OUTROS'];
+            var primeiraParteUpper = partes[0].toUpperCase().trim();
+            var ehTipo = tiposConhecidos.some(function(t){ return primeiraParteUpper.startsWith(t); });
+            nome = ehTipo ? partes.slice(1, partes.length - 1).join(' - ') : partes.slice(0, partes.length - 2).join(' - ');
+          } else if (partes.length === 2) {
+            nome = partes[0];
+          }
           return {
             id:          pg.id,
             nome:        nome,
             tipo:        prop(p, 'Tipo de Afastamento', 'select'),
             cid:         prop(p, 'CID', 'text'),
-            data_inicio: prop(p, 'date:Data de Início:start', 'date'),
-            data_fim:    prop(p, 'date:Data de Fim:start', 'date'),
+            data_inicio: prop(p, 'Data de Início', 'date'),
+            data_fim:    prop(p, 'Data de Fim', 'date'),
             dias:        prop(p, 'Qtd Dias', 'number'),
             observacao:  prop(p, 'Observação', 'text'),
           };
