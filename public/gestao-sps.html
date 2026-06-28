@@ -91,6 +91,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
     </div>
   </div>
   <div class="header-right">
+    <button class="btn-acao" id="btn-atualizar-dados" onclick="todasSPS=[];carregarSPS()"><span id="ri-att">↻</span> Atualizar</button>
     <a href="/sps.html" class="btn-acao">📊 Ver Painel</a>
     <a href="/" class="btn-acao">← Portal</a>
   </div>
@@ -103,7 +104,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
   </div>
 
   <!-- ABA NOVA -->
-  <div id="aba-nova">
+  <div id="aba-nova" style="display:none">
     <div class="form-section">
       <div class="form-titulo">Dados da Solicitação</div>
       <div class="form-grid">
@@ -136,7 +137,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
   </div>
 
   <!-- ABA ATUALIZAR -->
-  <div id="aba-atualizar" style="display:none">
+  <div id="aba-atualizar">
     <div class="busca-wrap">
       <input type="text" class="busca-input" id="campo-busca" placeholder="Filtrar por número, gerente ou fiscal...">
       <button class="btn-primary" id="btn-buscar">Buscar</button>
@@ -224,6 +225,7 @@ document.getElementById('btn-entrar').addEventListener('click', function() {
   var v = document.getElementById('campo-senha').value;
   if (v === SENHA_CORRETA) {
     document.getElementById('tela-senha').style.display = 'none';
+    carregarSPS();
   } else {
     document.getElementById('msg-erro').style.display = 'block';
     document.getElementById('campo-senha').value = '';
@@ -246,7 +248,7 @@ document.getElementById('tab-btn-atualizar').addEventListener('click', function(
   document.getElementById('tab-btn-nova').classList.remove('active');
   document.getElementById('aba-atualizar').style.display = 'block';
   document.getElementById('aba-nova').style.display = 'none';
-  if (todasSPS.length === 0) carregarSPS();
+  // já carregado no login
 });
 
 // Toast
@@ -319,9 +321,10 @@ function renderLista(lista) {
     return;
   }
   var html = lista.map(function(s) {
+    var cargo = s.cargo_codigo ? (s.cargo_codigo + (s.cargo_desc ? ' — ' + s.cargo_desc : '')) : '—';
     return '<div class="sps-list-item" data-id="' + s.id + '">' +
       '<span class="sps-num">' + (s.numero_sps||'—') + '</span>' +
-      '<span class="sps-info">' + (s.gerente||'—') + ' · ' + (s.fiscal||'—') + '</span>' +
+      '<span class="sps-info">📌 ' + cargo + ' · 👤 ' + (s.gerente||'—') + '</span>' +
       '<span class="sps-badge">' + (s.status||'—') + '</span>' +
     '</div>';
   }).join('');
