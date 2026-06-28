@@ -240,7 +240,7 @@ module.exports = async function handler(req, res) {
   // ── POST: Criar ou atualizar SPS ────────────────────────────────────────
   if (req.method === 'POST') {
     try {
-      var body = req.body;
+      var body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
       var action = body.action;
       var dados = body.dados;
 
@@ -283,7 +283,7 @@ module.exports = async function handler(req, res) {
           body: JSON.stringify({ properties: props2 })
         });
         var d2 = await r2.json();
-        if (d2.object === 'error') return res.status(400).json({ error: d2.message });
+        if (d2.object === 'error') return res.status(400).json({ error: d2.message, props_enviados: Object.keys(props2) });
         return res.status(200).json({ ok: true });
       }
 
