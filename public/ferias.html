@@ -254,14 +254,28 @@ function render(){
   document.getElementById('k-abono').textContent=tAbono;
   document.getElementById('k-colab').textContent=colab;
 
-  // Agrupar por mês
+  // Agrupar por mês — distribuindo dias reais por mês
   var porMes={};
   filt.forEach(function(r){
     if(!r.inicio)return;
-    var k=mesKey(r.inicio);
-    if(!porMes[k])porMes[k]={count:0,dias:0};
-    porMes[k].count++;
-    porMes[k].dias+=r.dias||0;
+    // Contar colaborador no mês de início
+    var ki=mesKey(r.inicio);
+    if(!porMes[ki])porMes[ki]={count:0,dias:0};
+    porMes[ki].count++;
+
+    // Distribuir dias pelos meses do período
+    if(!r.fim){
+      porMes[ki].dias+=r.dias||0;
+      return;
+    }
+    var di=new Date(r.inicio+'T12:00:00');
+    var df=new Date(r.fim+'T12:00:00');
+    // Para cada dia do período, soma no mês correspondente
+    for(var d=new Date(di);d<=df;d.setDate(d.getDate()+1)){
+      var km=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+      if(!porMes[km])porMes[km]={count:0,dias:0};
+      porMes[km].dias+=1;
+    }
   });
   var mesesOrd=Object.keys(porMes).sort();
   var maxC=Math.max(...mesesOrd.map(k=>porMes[k].count),1);
