@@ -271,11 +271,12 @@ module.exports = async function handler(req, res) {
         if (dados.gerente !== undefined) props2['Gerente Demandante'] = { rich_text: dados.gerente ? [{ text: { content: dados.gerente } }] : [] };
         if (dados.fiscal !== undefined) props2['Fiscal do Contrato'] = { rich_text: dados.fiscal ? [{ text: { content: dados.fiscal } }] : [] };
         if (dados.observacoes !== undefined) props2['Observações'] = { rich_text: dados.observacoes ? [{ text: { content: dados.observacoes } }] : [] };
-        if (dados.data_curriculos !== undefined) props2['date:Data Currículos Enviados:start'] = { date: dados.data_curriculos ? { start: dados.data_curriculos } : null };
-        if (dados.data_entrevista !== undefined) props2['date:Data Pedido Entrevista:start'] = { date: dados.data_entrevista ? { start: dados.data_entrevista } : null };
-        if (dados.data_escolhido !== undefined) props2['date:Data Candidato Escolhido:start'] = { date: dados.data_escolhido ? { start: dados.data_escolhido } : null };
-        if (dados.data_autorizacao !== undefined) props2['date:Data Autorização:start'] = { date: dados.data_autorizacao ? { start: dados.data_autorizacao } : null };
-        if (dados.data_admissao !== undefined) props2['date:Data Admissão:start'] = { date: dados.data_admissao ? { start: dados.data_admissao } : null };
+        // Só envia datas se estiverem preenchidas — evita sobrescrever com null
+        if (dados.data_curriculos) props2['date:Data Currículos Enviados:start'] = { date: { start: dados.data_curriculos } };
+        if (dados.data_entrevista) props2['date:Data Pedido Entrevista:start'] = { date: { start: dados.data_entrevista } };
+        if (dados.data_escolhido) props2['date:Data Candidato Escolhido:start'] = { date: { start: dados.data_escolhido } };
+        if (dados.data_autorizacao) props2['date:Data Autorização:start'] = { date: { start: dados.data_autorizacao } };
+        if (dados.data_admissao) props2['date:Data Admissão:start'] = { date: { start: dados.data_admissao } };
 
         var r2 = await fetch('https://api.notion.com/v1/pages/' + pid, {
           method: 'PATCH',
