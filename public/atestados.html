@@ -338,16 +338,14 @@ function verColaborador(nome){
   var cids=[...new Set(ats.map(r=>(r.cid||'').toUpperCase().trim()).filter(function(c){return c&&c!=='NÃO INFORMADO';}))];
   document.getElementById('p-cids').textContent=cids.length;
   document.getElementById('p-cid-lista').innerHTML=cids.map(function(c){
-    var isAl=ats.some(function(r){return r._inss&&(r.cid||'').toUpperCase().trim()===c;});
-    return'<span class="cid-tag'+(isAl?' alerta':'')+'">'+c+(isAl?' ⚠':'')+'</span>';
+    return'<span class="cid-tag">'+c+'</span>';
   }).join('');
   document.getElementById('p-historico').innerHTML=ats.map(function(r){
-    var isAl=r._inss;
-    return'<tr style="border-bottom:1px solid var(--border)">'+(isAl?'<td style="padding:8px 12px;color:var(--red)">':'<td style="padding:8px 12px">')+fmtD(r.inicio)+'</td>'+
+    return'<tr style="border-bottom:1px solid var(--border)">'+
+      '<td style="padding:8px 12px">'+fmtD(r.inicio)+'</td>'+
       '<td style="padding:8px 12px">'+fmtD(r.fim)+'</td>'+
       '<td style="padding:8px 12px;font-weight:600">'+(r.dias||'—')+'</td>'+
-      '<td style="padding:8px 12px"><span class="badge-cid'+(isAl?' alerta':'')+'">'+(r.cid||'NÃO INFORMADO')+'</span></td>'+
-      '<td style="padding:8px 12px">'+(isAl?'<span class="badge-inss">⚠ INSS</span>':'—')+'</td>'+
+      '<td style="padding:8px 12px"><span class="badge-cid">'+(r.cid||'NÃO INFORMADO')+'</span></td>'+
     '</tr>';
   }).join('');
   document.getElementById('perfil-box').classList.add('visible');
@@ -402,10 +400,26 @@ function render(){
       <td>${fmtD(r.inicio)}</td>
       <td>${fmtD(r.fim)}</td>
       <td style="text-align:center;font-weight:600">${r.dias||'—'}</td>
-      <td><span class="badge-cid${isAl?' alerta':''}">${r.cid||'NÃO INFORMADO'}</span></td>
+      <td><span class="badge-cid">${r.cid||'NÃO INFORMADO'}</span></td>
     </tr>`;
   });
   document.getElementById('b-lista').innerHTML=lHtml||'<tr><td colspan="6" class="empty">Nenhum atestado encontrado</td></tr>';
+}
+
+loadData();
+</script>
+</body>
+</html>    var lHtml='';
+  slice.forEach(function(r){
+    lHtml+=`<tr onclick="verColaborador('${r.nome.replace(/'/g,"\'")}')" style="cursor:pointer">
+      <td style="font-weight:500">${r.nome}</td>
+      <td>${fmtD(r.inicio)}</td>
+      <td>${fmtD(r.fim)}</td>
+      <td style="text-align:center;font-weight:600">${r.dias||'—'}</td>
+      <td><span class="badge-cid">${r.cid||'NÃO INFORMADO'}</span></td>
+    </tr>`;
+  });
+    document.getElementById('b-lista').innerHTML=lHtml||'<tr><td colspan="6" class="empty">Nenhum atestado encontrado</td></tr>';
 }
 
 loadData();
