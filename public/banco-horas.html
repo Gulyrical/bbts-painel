@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBTS — Banco de Horas</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#465EFF;--green:#2E7D5E;--green-lt:#E6F4EF;--red:#C0392B;--red-lt:#FDECEA;--amber:#E8A020;--amber-lt:#FEF3DC;--gray:#6B7280;--gray-lt:#F3F4F6;--bg:#F5F6F8;--white:#fff;--border:#E5E7EB;--text:#111827;--text2:#6B7280;--radius:8px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+
+.header{background:var(--blue);color:#fff;padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.brand-mark{width:32px;height:32px;background:rgba(255,255,255,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.brand-name{font-size:14px;font-weight:600;letter-spacing:0.03em}
+.brand-sub{font-size:11px;opacity:0.65;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:10px}
+.btn-acao{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif}
+.btn-acao:hover{background:rgba(255,255,255,0.25)}
+.btn-acao.spin span{display:inline-block;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.upd{font-size:11px;color:rgba(255,255,255,0.55)}
+
+.main{max-width:1300px;margin:0 auto;padding:24px 28px}
+
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+.kpi-l{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+.kpi-v{font-size:28px;font-weight:500;line-height:1;color:var(--text)}
+
+/* Toolbar */
+.toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.toolbar input,.toolbar select{padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:'Inter',sans-serif;background:var(--white)}
+.toolbar input{flex:1;min-width:200px}
+.toolbar input:focus,.toolbar select:focus{outline:none;border-color:var(--blue)}
+.toggle-filtro{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);cursor:pointer;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--white)}
+.toggle-filtro input{cursor:pointer}
+
+/* Tabela */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+table{width:100%;border-collapse:collapse}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);background:#FAFAFA;white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{color:var(--blue)}
+thead th.sort-active{color:var(--blue)}
+thead th.right{text-align:right}
+tbody tr{border-bottom:1px solid var(--border)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#F0F4FF}
+tbody td{padding:10px 14px;font-size:13px}
+tbody td.right{text-align:right}
+
+/* Saldo */
+.saldo{font-weight:600;font-size:14px}
+.saldo.alto{color:var(--red)}
+.saldo.medio{color:var(--amber)}
+.saldo.ok{color:var(--green)}
+
+/* Comparação badge */
+.comp{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.comp.aum{background:var(--red-lt);color:var(--red)}
+.comp.dim{background:var(--green-lt);color:var(--green)}
+.comp.ina{background:var(--gray-lt);color:var(--gray)}
+
+/* Mini sparkline */
+.spark{display:flex;align-items:flex-end;gap:2px;height:28px}
+.spark-bar{width:10px;border-radius:2px 2px 0 0;background:var(--blue);opacity:0.6;min-height:2px;transition:opacity 0.15s}
+.spark-bar.last{opacity:1}
+.spark-bar.up{background:var(--red)}
+.spark-bar.down{background:var(--green)}
+
+/* Dias para zerar */
+.dias-zerar{font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:#EEF0FF;color:var(--blue)}
+
+.pag{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text2)}
+.pag button{padding:4px 12px;border:1px solid var(--border);border-radius:6px;background:var(--white);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif}
+.pag button:disabled{opacity:0.4;cursor:default}
+.empty{padding:40px;text-align:center;color:var(--text2);font-size:13px}
+.spinner{width:24px;height:24px;border:2px solid #EEF0FF;border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="brand-mark">⏱</div>
+    <div>
+      <div class="brand-name">BBTS — Banco de Horas</div>
+      <div class="brand-sub" id="sub">Carregando...</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="upd" id="upd">—</span>
+    <button class="btn-acao" id="btn" onclick="loadData()">
+      <span id="ri">↻</span> Atualizar
+    </button>
+    <a href="/" class="btn-acao">← Portal</a>
+  </div>
+</header>
+
+<main class="main">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-l">Colaboradores</div><div class="kpi-v" id="k-total">—</div></div>
+    <div class="kpi"><div class="kpi-l">Acima de 20h</div><div class="kpi-v" id="k-acima" style="color:var(--red)">—</div></div>
+    <div class="kpi"><div class="kpi-l">Maior Saldo</div><div class="kpi-v" id="k-maior">—</div></div>
+    <div class="kpi"><div class="kpi-l">Semana Atual</div><div class="kpi-v" id="k-semana">—</div></div>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" id="sq" placeholder="Buscar por nome ou matrícula..." oninput="applyFilter()">
+    <select id="f-comp" onchange="applyFilter()">
+      <option value="">Todos</option>
+      <option value="Aumentou">↑ Aumentou</option>
+      <option value="Diminuiu">↓ Diminuiu</option>
+      <option value="Inalterado">= Inalterado</option>
+      <option value="Igual">= Igual</option>
+    </select>
+    <label class="toggle-filtro">
+      <input type="checkbox" id="f-acima" onchange="applyFilter()" checked>
+      Apenas acima de 20h
+    </label>
+    <button class="btn-acao" style="color:var(--blue);background:var(--white);border-color:var(--border)" onclick="limpar()">✕ Limpar</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortBy('matricula')">Matrícula <span id="s-matricula"></span></th>
+          <th onclick="sortBy('nome')">Nome <span id="s-nome"></span></th>
+          <th class="right" onclick="sortBy('saldo')">Saldo Atual <span id="s-saldo"></span></th>
+          <th style="text-align:center">Últimas 5 Semanas</th>
+          <th style="text-align:center">Tendência</th>
+          <th class="right" onclick="sortBy('dias_zerar')">Dias p/ Zerar <span id="s-dias_zerar"></span></th>
+        </tr>
+      </thead>
+      <tbody id="b-lista">
+        <tr><td colspan="6" class="empty"><div class="spinner"></div><br>Carregando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pag">
+    <span id="pi">—</span>
+    <div style="display:flex;gap:6px">
+      <button onclick="changePage(-1)" id="pp">← Anterior</button>
+      <button onclick="changePage(1)" id="pn">Próxima →</button>
+    </div>
+  </div>
+</main>
+
+<script>
+const API = '/api/notion';
+const PER = 20;
+let todos=[], filt=[], page=1, sortCol='saldo', sortDir=-1;
+let ultimaSemana = 0;
+
+function fmtH(v){
+  if(v===null||v===undefined)return'—';
+  var h=Math.floor(Math.abs(v));
+  var m=Math.round((Math.abs(v)-h)*60);
+  var s=(v<0?'-':'')+(h+'h')+(m>0?(m<10?'0'+m:m)+'min':'');
+  return s;
+}
+
+function compTag(c){
+  if(!c)return'—';
+  if(c==='Aumentou')return'<span class="comp aum">↑ Aumentou</span>';
+  if(c==='Diminuiu')return'<span class="comp dim">↓ Diminuiu</span>';
+  return'<span class="comp ina">= Inalterado</span>';
+}
+
+function saldoClass(v){
+  if(v>=40)return'alto';
+  if(v>=20)return'medio';
+  return'ok';
+}
+
+function sparkHTML(semanas){
+  // últimas 5 semanas com dados
+  var vals = semanas.filter(s=>s!==null).slice(-5);
+  if(!vals.length)return'—';
+  var max=Math.max(...vals.map(Math.abs),1);
+  var last=vals[vals.length-1];
+  var prev=vals.length>1?vals[vals.length-2]:last;
+  var trend=last>prev?'up':last<prev?'down':'';
+  var bars=vals.map(function(v,i){
+    var h=Math.max(Math.round((Math.abs(v)/max)*28),2);
+    var cls=(i===vals.length-1?'last '+trend:'');
+    return`<div class="spark-bar ${cls}" style="height:${h}px" title="${fmtH(v)}"></div>`;
+  }).join('');
+  return`<div class="spark">${bars}</div>`;
+}
+
+async function loadData(){
+  var btn=document.getElementById('btn');
+  btn.classList.add('spin');
+  try{
+    var res=await fetch(API+'?db=banco_horas');
+    var data=await res.json();
+    if(data.error)throw new Error(data.error);
+
+    todos=data.banco_horas||[];
+    ultimaSemana=todos.length>0?Math.max(...todos.map(r=>r.ultima_semana||0)):0;
+
+    document.getElementById('sub').textContent=todos.length+' colaboradores · Semana '+ultimaSemana;
+    document.getElementById('upd').textContent='Atualizado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('k-semana').textContent='S'+String(ultimaSemana).padStart(2,'0');
+
+    applyFilter();
+  }catch(e){
+    document.getElementById('b-lista').innerHTML='<tr><td colspan="6" style="padding:20px;color:red;text-align:center">Erro: '+e.message+'</td></tr>';
+    document.getElementById('sub').textContent='Erro ao carregar';
+  }
+  btn.classList.remove('spin');
+}
+
+function applyFilter(){
+  var q=document.getElementById('sq').value.toLowerCase();
+  var fc=document.getElementById('f-comp').value;
+  var fa=document.getElementById('f-acima').checked;
+
+  filt=todos.filter(function(r){
+    if(q&&!(r.nome||'').toLowerCase().includes(q)&&!String(r.matricula||'').includes(q))return false;
+    if(fc&&r.comparacao!==fc)return false;
+    if(fa&&(r.saldo_atual||0)<=20)return false;
+    return true;
+  });
+  page=1;render();
+}
+
+function limpar(){
+  document.getElementById('sq').value='';
+  document.getElementById('f-comp').value='';
+  document.getElementById('f-acima').checked=true;
+  applyFilter();
+}
+
+function sortBy(col){
+  if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=col==='saldo'||col==='dias_zerar'?-1:1;}
+  ['matricula','nome','saldo','dias_zerar'].forEach(function(c){
+    var el=document.getElementById('s-'+c);
+    if(el)el.textContent=c===sortCol?(sortDir===1?' ↑':' ↓'):'';
+  });
+  render();
+}
+
+function changePage(d){page=Math.max(1,Math.min(Math.ceil(filt.length/PER),page+d));render();}
+
+function render(){
+  // KPIs
+  var acima=todos.filter(r=>(r.saldo_atual||0)>20).length;
+  var maior=todos.length?Math.max(...todos.map(r=>r.saldo_atual||0)):0;
+  document.getElementById('k-total').textContent=todos.length;
+  document.getElementById('k-acima').textContent=acima;
+  document.getElementById('k-maior').textContent=fmtH(maior);
+
+  // Sort
+  var lista=[...filt].sort(function(a,b){
+    var va,vb;
+    if(sortCol==='saldo'){va=a.saldo_atual||0;vb=b.saldo_atual||0;}
+    else if(sortCol==='dias_zerar'){va=a.dias_zerar||0;vb=b.dias_zerar||0;}
+    else if(sortCol==='matricula'){va=a.matricula||0;vb=b.matricula||0;}
+    else{va=(a.nome||'').toLowerCase();vb=(b.nome||'').toLowerCase();}
+    return va<vb?-sortDir:va>vb?sortDir:0;
+  });
+
+  var start=(page-1)*PER;
+  var slice=lista.slice(start,start+PER);
+  var total=lista.length;
+  document.getElementById('pi').textContent=total>0?(start+1)+'–'+Math.min(start+PER,total)+' de '+total+' colaboradores':'0 resultados';
+  document.getElementById('pp').disabled=page<=1;
+  document.getElementById('pn').disabled=page>=Math.ceil(total/PER);
+
+  var lHtml='';
+  slice.forEach(function(r){
+    var sc=saldoClass(r.saldo_atual||0);
+    lHtml+=`<tr>
+      <td style="font-family:monospace;color:var(--text2)">${r.matricula||'—'}</td>
+      <td style="font-weight:500">${r.nome||'—'}</td>
+      <td class="right"><span class="saldo ${sc}">${fmtH(r.saldo_atual)}</span></td>
+      <td style="text-align:center">${sparkHTML(r.semanas||[])}</td>
+      <td style="text-align:center">${compTag(r.comparacao)}</td>
+      <td class="right"><span class="dias-zerar">${r.dias_zerar||0}d</span></td>
+    </tr>`;
+  });
+  document.getElementById('b-lista').innerHTML=lHtml||'<tr><td colspan="6" class="empty">Nenhum colaborador encontrado</td></tr>';
+}
+
+loadData();
+</script>
+</body>
+</html>
