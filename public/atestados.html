@@ -125,13 +125,7 @@ tbody td{padding:10px 14px;font-size:13px}
     <div class="kpi"><div class="kpi-l">Total de Atestados</div><div class="kpi-v" id="k-total">—</div></div>
     <div class="kpi"><div class="kpi-l">Total de Dias</div><div class="kpi-v" id="k-dias">—</div></div>
     <div class="kpi"><div class="kpi-l">Colaboradores</div><div class="kpi-v" id="k-colab">—</div></div>
-    <div class="kpi"><div class="kpi-l">⚠ Alertas INSS</div><div class="kpi-v alerta" id="k-inss">—</div></div>
-  </div>
-
-  <!-- Alerta INSS -->
-  <div class="alerta-box" id="alerta-box">
-    <div class="alerta-titulo">⚠ Atenção — Possível encaminhamento ao INSS (mesmo CID em menos de 60 dias)</div>
-    <div id="alerta-lista"></div>
+    
   </div>
 
   <!-- Painel individual -->
@@ -187,7 +181,6 @@ tbody td{padding:10px 14px;font-size:13px}
             <th onclick="sortBy('fim')">Fim</th>
             <th onclick="sortBy('dias')" style="text-align:center">Dias</th>
             <th>CID</th>
-            <th style="text-align:center">INSS</th>
           </tr></thead>
           <tbody id="b-lista">
             <tr><td colspan="6" class="empty"><div class="spinner"></div><br>Carregando...</td></tr>
@@ -256,7 +249,17 @@ async function loadData(){
     var res=await fetch(API+'?db=atestados');
     var data=await res.json();
     if(data.error)throw new Error(data.error);
-    todos=(data.atestados||[]);
+    todos=(data.atestados||[]).map(function(r){
+      return {
+        id: r.id,
+        nome: r.nome,
+        cid: r.cid,
+        inicio: r.data_inicio,
+        fim: r.data_fim,
+        dias: r.dias,
+        observacao: r.observacao,
+      };
+    });
     alertas=calcAlertas(todos);
 
     document.getElementById('sub').textContent=todos.length+' atestados';
@@ -264,7 +267,6 @@ async function loadData(){
 
     preencherFiltros();
     applyFilter();
-    renderAlertas();
   }catch(e){
     document.getElementById('b-lista').innerHTML='<tr><td colspan="6" style="padding:20px;color:red;text-align:center">Erro: '+e.message+'</td></tr>';
   }
@@ -395,14 +397,12 @@ function render(){
 
   var lHtml='';
   slice.forEach(function(r){
-    var isAl=r._inss;
-    lHtml+=`<tr class="${isAl?'alerta-row':''}" style="cursor:pointer" onclick="verColaborador('${r.nome.replace(/'/g,"\\'")}')">
+    lHtml+=`<tr style="cursor:pointer" onclick="verColaborador('${r.nome.replace(/'/g,"\\'")}')" style="cursor:pointer">
       <td style="font-weight:500">${r.nome}</td>
       <td>${fmtD(r.inicio)}</td>
       <td>${fmtD(r.fim)}</td>
       <td style="text-align:center;font-weight:600">${r.dias||'—'}</td>
       <td><span class="badge-cid${isAl?' alerta':''}">${r.cid||'NÃO INFORMADO'}</span></td>
-      <td style="text-align:center">${isAl?'<span class="badge-inss">⚠ INSS</span>':'—'}</td>
     </tr>`;
   });
   document.getElementById('b-lista').innerHTML=lHtml||'<tr><td colspan="6" class="empty">Nenhum atestado encontrado</td></tr>';
