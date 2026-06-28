@@ -365,26 +365,25 @@ module.exports = async function handler(req, res) {
     }
 
     if (db === 'atestados') {
-      var pages = await fetchAll(DBS.afastamentos);
-      var atestados = pages
+      // Buscar atestados e pessoas em paralelo
+      var [atesPages, pessoaPages] = await Promise.all([
+        fetchAll(DBS.afastamentos),
+        fetchAll(DBS.pessoas),
+      ]);
+
+      // Mapa page_id -> nome da pessoa
+      var pessoaMap = {};
+      pessoaPages.forEach(function(pg) {
+        var nome = prop(pg.properties, 'Nome', 'title');
+        if (nome) pessoaMap[pg.id] = nome;
+      });
+
+      var atestados = atesPages
         .map(function(pg) {
           var p = pg.properties;
-          var titulo = prop(p, 'ID Afastamento', 'title') || '';
-          // Formatos possíveis:
-          // "ATESTADO MÉDICO - NOME - DATA" -> nome = partes[1]
-          // "NOME - DATA_INICIO - DATA_FIM" -> nome = partes[0]  
-          // "TIPO - NOME - DATA" -> nome = partes[1]
-          var partes = titulo.split(' - ');
-          var nome = titulo; // fallback
-          if (partes.length >= 3) {
-            // Checar se primeira parte é um tipo conhecido
-            var tiposConhecidos = ['ATESTADO', 'ATESTADO MÉDICO', 'FÉRIAS', 'LICENÇA', 'ACIDENTE', 'OUTROS'];
-            var primeiraParteUpper = partes[0].toUpperCase().trim();
-            var ehTipo = tiposConhecidos.some(function(t){ return primeiraParteUpper.startsWith(t); });
-            nome = ehTipo ? partes.slice(1, partes.length - 1).join(' - ') : partes.slice(0, partes.length - 2).join(' - ');
-          } else if (partes.length === 2) {
-            nome = partes[0];
-          }
+          // Pega o nome via relação Pessoa
+          var pessoaIds = prop(p, 'Pessoa', 'relation') || [];
+          var nome = pessoaIds.length > 0 ? (pessoaMap[pessoaIds[0]] || '—') : '—';
           return {
             id:          pg.id,
             nome:        nome,
