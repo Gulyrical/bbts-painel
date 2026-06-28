@@ -40,6 +40,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </style>
 </head>
 <body>
+
 <header class="header">
   <div class="header-left">
     <div class="logo">BI</div>
@@ -50,12 +51,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
   <div class="header-right" id="data-hora">—</div>
 </header>
+
 <main class="main">
   <div class="hero">
-    <div class="hero-title"> Portal Digi/BBTS</div>
+    <div class="hero-title">Bem-vindo ao Portal BBTS</div>
     <div class="hero-sub">Selecione um painel para acessar os dados</div>
   </div>
+
   <div class="grid">
+
     <a href="/colaboradores.html" class="card">
       <div class="card-icon blue">👥</div>
       <div>
@@ -64,6 +68,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div class="card-footer">Acessar painel →</div>
     </a>
+
     <a href="/sps.html" class="card">
       <div class="card-icon green">📋</div>
       <div>
@@ -72,6 +77,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div class="card-footer">Acessar painel →</div>
     </a>
+    <a href="/ferias.html" class="card">
+      <div class="card-icon" style="background:#E6F4EF">🏖️</div>
+      <div>
+        <div class="card-title">Férias</div>
+        <div class="card-desc">Levantamento de férias por colaborador, período e distribuição de dias por mês.</div>
+      </div>
+      <div class="card-footer">Acessar painel →</div>
+    </a>
+
     <div class="card em-breve">
       <div class="card-icon amber">💻</div>
       <div>
@@ -80,6 +94,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div class="card-footer">Em desenvolvimento</div>
     </div>
+
     <div class="card em-breve">
       <div class="card-icon red">🏥</div>
       <div>
@@ -88,11 +103,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div class="card-footer">Em desenvolvimento</div>
     </div>
+
   </div>
 </main>
+
 <footer class="footer">
   Portal BBTS · Dados sincronizados com <span>Notion</span> em tempo real
 </footer>
+
 <script>
 function atualizarHora(){
   var agora=new Date();
