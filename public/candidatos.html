@@ -298,38 +298,28 @@ document.getElementById('btn-salvar').addEventListener('click', async function()
   try {
     var curriculoUrl = null;
 
-    // 1. Upload do currículo se tiver
+    // 1. Upload do currículo para Cloudinary direto do navegador
     if (arquivoSelecionado) {
       btn.innerHTML = '<span class="spin-icon"></span>Enviando currículo...';
       document.getElementById('progress-wrap').classList.add('visible');
-      document.getElementById('progress-bar').style.width = '30%';
-      document.getElementById('progress-text').textContent = 'Enviando para o Google Drive...';
+      document.getElementById('progress-bar').style.width = '20%';
+      document.getElementById('progress-text').textContent = 'Enviando para o servidor...';
 
-      // Converter para base64
-      var base64 = await new Promise(function(resolve, reject) {
-        var reader = new FileReader();
-        reader.onload = function() { resolve(reader.result.split(',')[1]); };
-        reader.onerror = reject;
-        reader.readAsDataURL(arquivoSelecionado);
-      });
+      var formData = new FormData();
+      formData.append('file', arquivoSelecionado);
+      formData.append('upload_preset', 'bbts_curriculos');
+      formData.append('folder', 'curriculos_bbts');
+      formData.append('resource_type', 'raw');
 
       document.getElementById('progress-bar').style.width = '60%';
 
-      var uploadRes = await fetch(API, {
+      var uploadRes = await fetch('https://api.cloudinary.com/v1_1/dlgtb8xsl/raw/upload', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          action: 'upload_curriculo',
-          dados: {
-            file_base64: base64,
-            file_name: nome.replace(/\s+/g, '_') + '_curriculo.pdf',
-            mime_type: 'application/pdf'
-          }
-        })
+        body: formData
       });
       var uploadData = await uploadRes.json();
-      if (uploadData.error) throw new Error('Upload: ' + uploadData.error);
-      curriculoUrl = uploadData.url;
+      if (uploadData.error) throw new Error('Upload: ' + uploadData.error.message);
+      curriculoUrl = uploadData.secure_url;
 
       document.getElementById('progress-bar').style.width = '100%';
       document.getElementById('progress-text').textContent = 'Currículo enviado!';
