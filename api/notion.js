@@ -593,15 +593,27 @@ module.exports = async function handler(req, res) {
     }
 
     if (db === 'sps_abertas') {
-      var pages = await fetchAll(DBS.solicitacoes);
-      var abertas = pages.map(function(pg) {
+      var [spsPages, cargoPages2] = await Promise.all([
+        fetchAll(DBS.solicitacoes),
+        fetchAll(DBS.cargos),
+      ]);
+      var cargoMap2 = {};
+      cargoPages2.forEach(function(pg) {
+        var codigo = prop(pg.properties, 'Código SGPS', 'title');
+        var desc = prop(pg.properties, 'Descrição do Posto', 'text');
+        cargoMap2[pg.id] = { codigo: codigo, descricao: desc };
+      });
+      var abertas = spsPages.map(function(pg) {
         var p = pg.properties;
+        var cargoRel = getRelId(p, 'Cargo');
+        var cargo = cargoRel && cargoMap2[cargoRel] ? cargoMap2[cargoRel] : null;
         return {
           id: pg.id,
           numero_sps: prop(p, 'Número SPS', 'title'),
           gerente: prop(p, 'Gerente Demandante', 'text'),
           status: prop(p, 'Status', 'select'),
-          cargo_rel: getRelId(p, 'Cargo'),
+          cargo_codigo: cargo ? cargo.codigo : null,
+          cargo_desc: cargo ? cargo.descricao : null,
         };
       }).filter(function(s) {
         return !['Contratado','Cancelado'].includes(s.status);
