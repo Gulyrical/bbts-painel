@@ -610,7 +610,7 @@ function renderCandidatos(lista) {
           (c.sps_count > 0 ? '🔗 ' + c.sps_count + ' SPS' : '') +
         '</div>' +
       '</div>' +
-      (c.curriculo_url ? '<a href="' + c.curriculo_url.replace('res.cloudinary.com', 'res.cloudinary.com').replace('/raw/upload/', '/raw/upload/fl_attachment/') + '" class="cand-link">📄 Baixar CV</a>' : '') +
+      (c.curriculo_url ? '<a href="' + c.curriculo_url + '" class="cand-link">📄 Baixar CV</a>' : '') +
     '</div>';
   }).join('');
 }
@@ -682,19 +682,30 @@ document.getElementById('btn-cadastrar').addEventListener('click', async functio
   var btn = this; btn.disabled=true;
   try {
     var curriculoUrl = null;
+    var fileUploadId = null;
     if (arquivoSelecionado) {
       btn.innerHTML = '<span class="spin-icon"></span>Enviando currículo...';
       document.getElementById('progress-wrap').classList.add('visible');
       document.getElementById('progress-bar').style.width = '40%';
       document.getElementById('progress-text').textContent = 'Enviando para o servidor...';
-      var fd = new FormData();
-      fd.append('file', arquivoSelecionado);
-      fd.append('upload_preset', 'bbts_curriculos');
-      fd.append('folder', 'curriculos_bbts');
-      var up = await fetch('https://api.cloudinary.com/v1_1/dlgtb8xsl/raw/upload', {method:'POST', body:fd});
-      var ud = await up.json();
-      if (ud.error) throw new Error('Upload: ' + ud.error.message);
-      curriculoUrl = ud.secure_url;
+      // Converter para base64 e enviar para Notion via servidor
+      var base64 = await new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function() { resolve(reader.result.split(',')[1]); };
+        reader.onerror = reject;
+        reader.readAsDataURL(arquivoSelecionado);
+      });
+      var upRes = await fetch(API, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ action: 'upload_curriculo', dados: {
+          file_base64: base64,
+          file_name: nome.replace(/\s+/g, '_') + '_curriculo.pdf',
+        }})
+      });
+      var upData = await upRes.json();
+      if (upData.error) throw new Error(upData.error);
+      fileUploadId = upData.file_upload_id;
       document.getElementById('progress-bar').style.width = '100%';
       document.getElementById('progress-text').textContent = 'Currículo enviado!';
     }
@@ -705,7 +716,7 @@ document.getElementById('btn-cadastrar').addEventListener('click', async functio
         nome: nome,
         telefone: document.getElementById('c-telefone').value.trim(),
         cargo_id: document.getElementById('c-cargo').value || null,
-        curriculo_url: curriculoUrl,
+        file_upload_id: fileUploadId || null,
         sps_ids: Object.keys(spsCandidato),
       }})
     });
