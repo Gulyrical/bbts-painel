@@ -691,8 +691,8 @@ document.getElementById('btn-cadastrar').addEventListener('click', async functio
       fd.append('file', arquivoSelecionado);
       fd.append('upload_preset', 'bbts_curriculos');
       fd.append('folder', 'curriculos_bbts');
-      fd.append('resource_type', 'raw');
-      var up = await fetch('https://api.cloudinary.com/v1_1/dlgtb8xsl/raw/upload', {method:'POST', body:fd});
+      fd.append('resource_type', 'auto');
+      var up = await fetch('https://api.cloudinary.com/v1_1/dlgtb8xsl/auto/upload', {method:'POST', body:fd});
       var ud = await up.json();
       if (ud.error) throw new Error('Upload: ' + ud.error.message);
       curriculoUrl = ud.secure_url;
