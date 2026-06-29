@@ -350,6 +350,7 @@ module.exports = async function handler(req, res) {
         if (dados.fiscal) props['Fiscal do Contrato'] = { rich_text: [{ text: { content: dados.fiscal } }] };
         if (dados.observacoes) props['Observações'] = { rich_text: [{ text: { content: dados.observacoes } }] };
         if (dados.data_email) props['date:Data E-mail Recebido:start'] = { date: { start: dados.data_email } };
+        if (dados.cargo_id) props['Cargo'] = { relation: [{ id: dados.cargo_id }] };
 
         var r = await fetch('https://api.notion.com/v1/pages', {
           method: 'POST',
