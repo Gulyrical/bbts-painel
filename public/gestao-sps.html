@@ -108,6 +108,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .spin-icon{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px}
 
 .nota{font-size:11px;color:var(--text2);padding:8px 12px;background:#FAFAFA;border-radius:6px;border:1px solid var(--border);margin-top:10px}
+.cand-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:6px;border:1px solid var(--border);margin-bottom:6px;background:var(--white)}
+.cand-nome{font-weight:500;font-size:14px;flex:1}
+.cand-info{font-size:12px;color:var(--text2);margin-top:2px}
+.cand-link{font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;background:#EEF0FF;color:var(--blue);text-decoration:none;white-space:nowrap}
+.cand-link:hover{background:#D8DCFF}
 </style>
 </head>
 <body>
@@ -143,6 +148,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
     <div class="tab" id="tab-btn-nova">➕ Nova SPS</div>
     <div class="tab active" id="tab-btn-atualizar">✏️ Atualizar SPS</div>
     <div class="tab" id="tab-btn-candidatos">👤 Candidatos</div>
+  <div class="tab" id="tab-btn-ver-cand">📋 Ver Candidatos</div>
   </div>
 
   <!-- ── ABA: NOVA SPS ── -->
@@ -314,9 +320,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
       <button class="btn-primary" id="btn-cadastrar">Cadastrar Candidato</button>
     </div>
   </div>
+  <!-- ── ABA: VER CANDIDATOS ── -->
+  <div id="aba-ver-cand" style="display:none">
+    <div class="busca-wrap">
+      <input type="text" class="busca-input" id="cand-busca" placeholder="Buscar por nome, telefone ou cargo...">
+    </div>
+    <div class="form-section">
+      <div class="form-titulo">Candidatos Cadastrados <span id="count-cand" style="font-weight:400;color:var(--text2);text-transform:none;letter-spacing:0"></span></div>
+      <div id="lista-cand" style="max-height:500px;overflow-y:auto">
+        <div style="text-align:center;padding:20px;color:var(--text2)">Carregando...</div>
+      </div>
+    </div>
+  </div>
 </main>
 
-<div class="toast" id="toast-msg"></div>
+<div class="toast"  id="toast-msg"></div>
 
 <script>
 var SENHA = 'digisystem';
@@ -351,7 +369,7 @@ function toast(msg, tipo) {
 
 // ── Abas ──
 function setTab(tab) {
-  ['nova','atualizar','candidatos'].forEach(function(t) {
+  ['nova','atualizar','candidatos','ver-cand'].forEach(function(t) {
     document.getElementById('tab-btn-' + t).classList.toggle('active', t === tab);
     document.getElementById('aba-' + t).style.display = t === tab ? 'block' : 'none';
   });
@@ -359,6 +377,7 @@ function setTab(tab) {
 document.getElementById('tab-btn-nova').addEventListener('click', function(){ setTab('nova'); });
 document.getElementById('tab-btn-atualizar').addEventListener('click', function(){ setTab('atualizar'); });
 document.getElementById('tab-btn-candidatos').addEventListener('click', function(){ setTab('candidatos'); });
+document.getElementById('tab-btn-ver-cand').addEventListener('click', function(){ setTab('ver-cand'); carregarCandidatos(); });
 
 // ── Carregar dados ──
 async function carregarDados() {
@@ -557,6 +576,52 @@ document.getElementById('btn-salvar').addEventListener('click', async function()
     if (sps) { sps.status = document.getElementById('a-status').value; sps.gerente = document.getElementById('a-gerente').value; }
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
   btn.disabled = false; btn.innerHTML = 'Salvar Alterações';
+});
+
+// ── Ver Candidatos ──
+var todosCandidatos = [];
+async function carregarCandidatos() {
+  if (todosCandidatos.length > 0) { renderCandidatos(todosCandidatos); return; }
+  document.getElementById('lista-cand').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">Carregando...</div>';
+  try {
+    var res = await fetch(API + '?db=candidatos');
+    var d = await res.json();
+    todosCandidatos = d.candidatos || [];
+    renderCandidatos(todosCandidatos);
+  } catch(e) {
+    document.getElementById('lista-cand').innerHTML = '<div style="color:var(--red);padding:12px">Erro: ' + e.message + '</div>';
+  }
+}
+
+function renderCandidatos(lista) {
+  document.getElementById('count-cand').textContent = '(' + lista.length + ')';
+  if (!lista.length) {
+    document.getElementById('lista-cand').innerHTML = '<div style="color:var(--text2);padding:20px;text-align:center">Nenhum candidato encontrado</div>';
+    return;
+  }
+  document.getElementById('lista-cand').innerHTML = lista.map(function(c) {
+    return '<div class="cand-item">' +
+      '<div style="flex:1">' +
+        '<div class="cand-nome">' + c.nome + '</div>' +
+        '<div class="cand-info">' +
+          (c.telefone ? '📱 ' + c.telefone + ' · ' : '') +
+          (c.cargo ? '📌 ' + c.cargo + ' · ' : '') +
+          (c.sps_count > 0 ? '🔗 ' + c.sps_count + ' SPS' : '') +
+        '</div>' +
+      '</div>' +
+      (c.curriculo_url ? '<a href="' + c.curriculo_url + '" target="_blank" class="cand-link">📄 Currículo</a>' : '') +
+    '</div>';
+  }).join('');
+}
+
+document.getElementById('cand-busca').addEventListener('input', function() {
+  var q = this.value.toLowerCase();
+  var f = q ? todosCandidatos.filter(function(c) {
+    return c.nome.toLowerCase().includes(q) ||
+           (c.telefone||'').includes(q) ||
+           (c.cargo||'').toLowerCase().includes(q);
+  }) : todosCandidatos;
+  renderCandidatos(f);
 });
 
 // ── Upload currículo ──
