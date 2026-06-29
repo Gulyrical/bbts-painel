@@ -244,6 +244,103 @@ module.exports = async function handler(req, res) {
       var action = body.action;
       var dados = body.dados;
 
+      if (action === 'upload_curriculo') {
+        // Upload PDF para Google Drive e retorna link
+        var GOOGLE_CLIENT_EMAIL = process.env.GOOGLE_CLIENT_EMAIL;
+        var GOOGLE_PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
+        var FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID;
+
+        // Gerar JWT para autenticação Google
+        var now = Math.floor(Date.now() / 1000);
+        var header = Buffer.from(JSON.stringify({alg:'RS256',typ:'JWT'})).toString('base64url');
+        var claim = Buffer.from(JSON.stringify({
+          iss: GOOGLE_CLIENT_EMAIL,
+          scope: 'https://www.googleapis.com/auth/drive.file',
+          aud: 'https://oauth2.googleapis.com/token',
+          exp: now + 3600,
+          iat: now
+        })).toString('base64url');
+
+        var crypto = require('crypto');
+        var sign = crypto.createSign('RSA-SHA256');
+        sign.update(header + '.' + claim);
+        var sig = sign.sign(GOOGLE_PRIVATE_KEY, 'base64url');
+        var jwt = header + '.' + claim + '.' + sig;
+
+        // Trocar JWT por access_token
+        var tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: 'grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=' + jwt
+        });
+        var tokenData = await tokenRes.json();
+        if (!tokenData.access_token) return res.status(400).json({ error: 'Erro autenticação Google: ' + JSON.stringify(tokenData) });
+
+        // Upload do arquivo
+        var fileBase64 = dados.file_base64;
+        var fileName = dados.file_name;
+        var mimeType = dados.mime_type || 'application/pdf';
+        var fileBuffer = Buffer.from(fileBase64, 'base64');
+
+        var boundary = 'boundary_bbts_curriculo';
+        var metaPart = '--' + boundary + '\r\nContent-Type: application/json\r\n\r\n' +
+          JSON.stringify({name: fileName, parents: [FOLDER_ID]}) + '\r\n';
+        var filePart = '--' + boundary + '\r\nContent-Type: ' + mimeType + '\r\n\r\n';
+        var endPart = '\r\n--' + boundary + '--';
+
+        var bodyParts = Buffer.concat([
+          Buffer.from(metaPart),
+          Buffer.from(filePart),
+          fileBuffer,
+          Buffer.from(endPart)
+        ]);
+
+        var uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + tokenData.access_token,
+            'Content-Type': 'multipart/related; boundary=' + boundary,
+            'Content-Length': bodyParts.length
+          },
+          body: bodyParts
+        });
+        var uploadData = await uploadRes.json();
+        if (!uploadData.id) return res.status(400).json({ error: 'Erro upload Drive: ' + JSON.stringify(uploadData) });
+
+        // Tornar arquivo público
+        await fetch('https://www.googleapis.com/drive/v3/files/' + uploadData.id + '/permissions', {
+          method: 'POST',
+          headers: {'Authorization': 'Bearer ' + tokenData.access_token, 'Content-Type': 'application/json'},
+          body: JSON.stringify({role: 'reader', type: 'anyone'})
+        });
+
+        var fileUrl = 'https://drive.google.com/file/d/' + uploadData.id + '/view';
+        return res.status(200).json({ ok: true, url: fileUrl, file_id: uploadData.id });
+      }
+
+      if (action === 'criar_candidato') {
+        // Criar candidato no Notion
+        var props = {
+          'Nome do Candidato': { title: [{ text: { content: dados.nome } }] },
+          'Status': { select: { name: 'Enviado' } },
+        };
+        if (dados.telefone) props['Telefone'] = { phone_number: dados.telefone };
+        if (dados.curriculo_url) props['Observações'] = { rich_text: [{ text: { content: 'Currículo: ' + dados.curriculo_url } }] };
+        if (dados.cargo_id) props['Cargo Pretendido'] = { relation: [{ id: dados.cargo_id }] };
+        if (dados.sps_ids && dados.sps_ids.length > 0) {
+          props['Solicitação'] = { relation: dados.sps_ids.map(function(id) { return { id: id }; }) };
+        }
+
+        var r = await fetch('https://api.notion.com/v1/pages', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ parent: { database_id: 'd289f1f6-e5c4-49c4-b1f4-62613e168a4d' }, properties: props })
+        });
+        var d = await r.json();
+        if (d.object === 'error') return res.status(400).json({ error: d.message });
+        return res.status(200).json({ ok: true, id: d.id });
+      }
+
       if (action === 'criar_sps') {
         var props = {
           'Número SPS': { title: [{ text: { content: dados.numero_sps } }] },
@@ -445,6 +542,40 @@ module.exports = async function handler(req, res) {
         return s;
       });
       return res.status(200).json({ solicitacoes: solicitacoes, timestamp: new Date().toISOString() });
+    }
+
+    if (db === 'cargos_lista') {
+      var pages = await fetchAll(DBS.cargos);
+      var cargos = pages.map(function(pg) {
+        var p = pg.properties;
+        return {
+          id: pg.id,
+          codigo: prop(p, 'Código SGPS', 'title'),
+          descricao: prop(p, 'Descrição do Posto', 'text'),
+          senioridade: prop(p, 'Senioridade', 'select'),
+        };
+      }).filter(function(c) { return c.codigo; })
+        .sort(function(a,b) { return (a.codigo||'').localeCompare(b.codigo||''); });
+      return res.status(200).json({ cargos: cargos, timestamp: new Date().toISOString() });
+    }
+
+    if (db === 'sps_abertas') {
+      var pages = await fetchAll(DBS.solicitacoes);
+      var abertas = pages.map(function(pg) {
+        var p = pg.properties;
+        return {
+          id: pg.id,
+          numero_sps: prop(p, 'Número SPS', 'title'),
+          gerente: prop(p, 'Gerente Demandante', 'text'),
+          status: prop(p, 'Status', 'select'),
+          cargo_rel: getRelId(p, 'Cargo'),
+        };
+      }).filter(function(s) {
+        return !['Contratado','Cancelado'].includes(s.status);
+      }).sort(function(a,b) {
+        return (b.numero_sps||'').localeCompare(a.numero_sps||'');
+      });
+      return res.status(200).json({ sps_abertas: abertas, timestamp: new Date().toISOString() });
     }
 
     if (db === 'atestados') {
