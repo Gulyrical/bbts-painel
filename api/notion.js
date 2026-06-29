@@ -245,90 +245,58 @@ module.exports = async function handler(req, res) {
       var dados = body.dados;
 
       if (action === 'upload_curriculo') {
-        // Upload PDF para Google Drive e retorna link
-        var GOOGLE_CLIENT_EMAIL = process.env.GOOGLE_CLIENT_EMAIL;
-        var GOOGLE_PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
-        var FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID;
-
-        // Gerar JWT para autenticação Google
-        var now = Math.floor(Date.now() / 1000);
-        var header = Buffer.from(JSON.stringify({alg:'RS256',typ:'JWT'})).toString('base64url');
-        var claim = Buffer.from(JSON.stringify({
-          iss: GOOGLE_CLIENT_EMAIL,
-          scope: 'https://www.googleapis.com/auth/drive.file',
-          aud: 'https://oauth2.googleapis.com/token',
-          exp: now + 3600,
-          iat: now
-        })).toString('base64url');
-
-        var crypto = require('crypto');
-        var sign = crypto.createSign('RSA-SHA256');
-        sign.update(header + '.' + claim);
-        var sig = sign.sign(GOOGLE_PRIVATE_KEY, 'base64url');
-        var jwt = header + '.' + claim + '.' + sig;
-
-        // Trocar JWT por access_token
-        var tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-          body: 'grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=' + jwt
-        });
-        var tokenData = await tokenRes.json();
-        if (!tokenData.access_token) return res.status(400).json({ error: 'Erro autenticação Google: ' + JSON.stringify(tokenData) });
-
-        // Upload do arquivo
+        // Upload PDF direto para o Notion usando File Upload API (maio 2025)
         var fileBase64 = dados.file_base64;
         var fileName = dados.file_name;
-        var mimeType = dados.mime_type || 'application/pdf';
+        var mimeType = 'application/pdf';
         var fileBuffer = Buffer.from(fileBase64, 'base64');
 
-        var boundary = 'boundary_bbts_curriculo';
-        var metaPart = '--' + boundary + '\r\nContent-Type: application/json\r\n\r\n' +
-          JSON.stringify({name: fileName, parents: [FOLDER_ID]}) + '\r\n';
-        var filePart = '--' + boundary + '\r\nContent-Type: ' + mimeType + '\r\n\r\n';
-        var endPart = '\r\n--' + boundary + '--';
-
-        var bodyParts = Buffer.concat([
-          Buffer.from(metaPart),
-          Buffer.from(filePart),
-          fileBuffer,
-          Buffer.from(endPart)
-        ]);
-
-        var uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        // Passo 1: Criar o file upload no Notion
+        var createRes = await fetch('https://api.notion.com/v1/file_uploads', {
           method: 'POST',
           headers: {
-            'Authorization': 'Bearer ' + tokenData.access_token,
-            'Content-Type': 'multipart/related; boundary=' + boundary,
-            'Content-Length': bodyParts.length
+            'Authorization': 'Bearer ' + NOTION_TOKEN,
+            'Notion-Version': '2022-06-28',
+            'Content-Type': 'application/json'
           },
-          body: bodyParts
+          body: JSON.stringify({ mode: 'single_part', filename: fileName })
         });
-        var uploadData = await uploadRes.json();
-        if (!uploadData.id) return res.status(400).json({ error: 'Erro upload Drive: ' + JSON.stringify(uploadData) });
+        var createData = await createRes.json();
+        if (createData.object === 'error') return res.status(400).json({ error: 'Criar upload: ' + createData.message });
 
-        // Tornar arquivo público
-        await fetch('https://www.googleapis.com/drive/v3/files/' + uploadData.id + '/permissions', {
+        var uploadId = createData.id;
+        var uploadUrl = createData.upload_url;
+
+        // Passo 2: Enviar o arquivo
+        var sendRes = await fetch(uploadUrl, {
           method: 'POST',
-          headers: {'Authorization': 'Bearer ' + tokenData.access_token, 'Content-Type': 'application/json'},
-          body: JSON.stringify({role: 'reader', type: 'anyone'})
+          headers: {
+            'Authorization': 'Bearer ' + NOTION_TOKEN,
+            'Notion-Version': '2022-06-28',
+            'Content-Type': mimeType,
+            'Content-Disposition': 'attachment; filename="' + fileName + '"'
+          },
+          body: fileBuffer
         });
+        var sendData = await sendRes.json();
+        if (sendData.object === 'error') return res.status(400).json({ error: 'Enviar arquivo: ' + sendData.message });
+        if (sendData.status !== 'uploaded') return res.status(400).json({ error: 'Upload não concluído: ' + sendData.status });
 
-        var fileUrl = 'https://drive.google.com/file/d/' + uploadData.id + '/view';
-        return res.status(200).json({ ok: true, url: fileUrl, file_id: uploadData.id });
+        return res.status(200).json({ ok: true, file_upload_id: uploadId });
       }
 
       if (action === 'criar_candidato') {
-        // Criar candidato no Notion
         var props = {
           'Nome do Candidato': { title: [{ text: { content: dados.nome } }] },
-          'Status': { select: { name: 'Enviado' } },
         };
         if (dados.telefone) props['Telefone'] = { phone_number: dados.telefone };
-        if (dados.curriculo_url) props['Observações'] = { rich_text: [{ text: { content: 'Currículo: ' + dados.curriculo_url } }] };
         if (dados.cargo_id) props['Cargo Pretendido'] = { relation: [{ id: dados.cargo_id }] };
         if (dados.sps_ids && dados.sps_ids.length > 0) {
           props['Solicitação'] = { relation: dados.sps_ids.map(function(id) { return { id: id }; }) };
+        }
+        // Anexar currículo via file_upload_id se disponível
+        if (dados.file_upload_id) {
+          props['Currículo'] = { files: [{ type: 'file_upload', file_upload: { id: dados.file_upload_id } }] };
         }
 
         var r = await fetch('https://api.notion.com/v1/pages', {
@@ -559,10 +527,14 @@ module.exports = async function handler(req, res) {
       var candidatos = candPages.map(function(pg) {
         var p = pg.properties;
         var nome = prop(p, 'Nome do Candidato', 'title') || '—';
-        var obs = prop(p, 'Observações', 'text') || '';
+        // Buscar URL do currículo no campo Files
         var curriculoUrl = null;
-        var match = obs.match(/Currículo: (https?:\/\/\S+)/);
-        if (match) curriculoUrl = match[1];
+        var filesField = p['Currículo'];
+        if (filesField && filesField.files && filesField.files.length > 0) {
+          var f0 = filesField.files[0];
+          if (f0.type === 'file' && f0.file) curriculoUrl = f0.file.url;
+          else if (f0.type === 'external' && f0.external) curriculoUrl = f0.external.url;
+        }
         var cargoRel = getRelId(p, 'Cargo Pretendido');
         var spsRel = prop(p, 'Solicitação', 'relation') || [];
         return {
