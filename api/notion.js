@@ -267,22 +267,27 @@ module.exports = async function handler(req, res) {
         var uploadId = createData.id;
         var uploadUrl = createData.upload_url;
 
-        // Passo 2: Enviar o arquivo via multipart/form-data
-        var FormData = require('form-data');
-        var fd2 = new FormData();
-        fd2.append('file', fileBuffer, {
-          filename: fileName,
-          contentType: mimeType,
-          knownLength: fileBuffer.length
-        });
+        // Passo 2: Enviar o arquivo via multipart/form-data manual
+        var boundary = '----NotionFileBoundary' + Date.now();
+        var CRLF = '\r\n';
+        var bodyParts = Buffer.concat([
+          Buffer.from('--' + boundary + CRLF),
+          Buffer.from('Content-Disposition: form-data; name="file"; filename="' + fileName + '"' + CRLF),
+          Buffer.from('Content-Type: application/pdf' + CRLF),
+          Buffer.from(CRLF),
+          fileBuffer,
+          Buffer.from(CRLF + '--' + boundary + '--' + CRLF)
+        ]);
 
         var sendRes = await fetch(uploadUrl, {
           method: 'POST',
-          headers: Object.assign({
+          headers: {
             'Authorization': 'Bearer ' + NOTION_TOKEN,
             'Notion-Version': '2022-06-28',
-          }, fd2.getHeaders()),
-          body: fd2
+            'Content-Type': 'multipart/form-data; boundary=' + boundary,
+            'Content-Length': String(bodyParts.length)
+          },
+          body: bodyParts
         });
         var sendData = await sendRes.json();
         if (sendData.object === 'error') return res.status(400).json({ error: 'Enviar arquivo: ' + sendData.message });
