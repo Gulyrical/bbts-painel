@@ -545,6 +545,38 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ solicitacoes: solicitacoes, timestamp: new Date().toISOString() });
     }
 
+    if (db === 'candidatos') {
+      var [candPages, cargoPages] = await Promise.all([
+        fetchAll('d289f1f6-e5c4-49c4-b1f4-62613e168a4d'),
+        fetchAll(DBS.cargos),
+      ]);
+      var cargoMap = {};
+      cargoPages.forEach(function(pg) {
+        var codigo = prop(pg.properties, 'Código SGPS', 'title');
+        var desc = prop(pg.properties, 'Descrição do Posto', 'text');
+        cargoMap[pg.id] = codigo + (desc ? ' — ' + desc : '');
+      });
+      var candidatos = candPages.map(function(pg) {
+        var p = pg.properties;
+        var nome = prop(p, 'Nome do Candidato', 'title') || '—';
+        var obs = prop(p, 'Observações', 'text') || '';
+        var curriculoUrl = null;
+        var match = obs.match(/Currículo: (https?:\/\/\S+)/);
+        if (match) curriculoUrl = match[1];
+        var cargoRel = getRelId(p, 'Cargo Pretendido');
+        var spsRel = prop(p, 'Solicitação', 'relation') || [];
+        return {
+          id: pg.id,
+          nome: nome,
+          telefone: prop(p, 'Telefone', 'phone_number'),
+          cargo: cargoRel ? cargoMap[cargoRel] : null,
+          curriculo_url: curriculoUrl,
+          sps_count: spsRel.length,
+        };
+      }).sort(function(a,b){ return a.nome.localeCompare(b.nome); });
+      return res.status(200).json({ candidatos: candidatos, timestamp: new Date().toISOString() });
+    }
+
     if (db === 'cargos_lista') {
       var pages = await fetchAll(DBS.cargos);
       var cargos = pages.map(function(pg) {
