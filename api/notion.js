@@ -1,4 +1,3 @@
-const { Client } = require('@notionhq/client');
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
 
 const DBS = {
@@ -267,20 +266,49 @@ module.exports = async function handler(req, res) {
 
       if (action === 'atualizar_sps') {
         var pid = body.page_id;
-        var notion = new Client({ auth: NOTION_TOKEN });
-        var props = {};
 
-        if (dados.status) props['Status'] = { select: { name: dados.status } };
-        if (dados.gerente !== undefined) props['Gerente Demandante'] = { rich_text: dados.gerente ? [{ text: { content: dados.gerente } }] : [] };
-        if (dados.fiscal !== undefined) props['Fiscal do Contrato'] = { rich_text: dados.fiscal ? [{ text: { content: dados.fiscal } }] : [] };
-        if (dados.observacoes !== undefined) props['Observações'] = { rich_text: dados.observacoes ? [{ text: { content: dados.observacoes } }] : [] };
-        if (dados.data_curriculos) props['date:Data Currículos Enviados:start'] = { date: { start: dados.data_curriculos } };
-        if (dados.data_entrevista) props['date:Data Pedido Entrevista:start'] = { date: { start: dados.data_entrevista } };
-        if (dados.data_escolhido) props['date:Data Candidato Escolhido:start'] = { date: { start: dados.data_escolhido } };
-        if (dados.data_autorizacao) props['date:Data Autorização:start'] = { date: { start: dados.data_autorizacao } };
-        if (dados.data_admissao) props['date:Data Admissão:start'] = { date: { start: dados.data_admissao } };
+        // Salva Status sozinho primeiro
+        if (dados.status) {
+          var rS = await fetch('https://api.notion.com/v1/pages/' + pid, {
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ properties: { 'Status': { select: { name: dados.status } } } })
+          });
+          var dS = await rS.json();
+          if (dS.object === 'error') return res.status(400).json({ error: 'Status: ' + dS.message });
+        }
 
-        await notion.pages.update({ page_id: pid, properties: props });
+        // Salva texto
+        var pt = {};
+        if (dados.gerente !== undefined) pt['Gerente Demandante'] = { rich_text: dados.gerente ? [{ text: { content: dados.gerente } }] : [] };
+        if (dados.fiscal !== undefined) pt['Fiscal do Contrato'] = { rich_text: dados.fiscal ? [{ text: { content: dados.fiscal } }] : [] };
+        if (dados.observacoes !== undefined) pt['Observações'] = { rich_text: dados.observacoes ? [{ text: { content: dados.observacoes } }] : [] };
+        if (Object.keys(pt).length > 0) {
+          await fetch('https://api.notion.com/v1/pages/' + pid, {
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ properties: pt })
+          });
+        }
+
+        // Salva datas individualmente
+        var datas = [
+          ['date:Data Currículos Enviados:start', dados.data_curriculos],
+          ['date:Data Pedido Entrevista:start', dados.data_entrevista],
+          ['date:Data Candidato Escolhido:start', dados.data_escolhido],
+          ['date:Data Autorização:start', dados.data_autorizacao],
+          ['date:Data Admissão:start', dados.data_admissao],
+        ];
+        for (var i = 0; i < datas.length; i++) {
+          if (!datas[i][1]) continue;
+          var pd = {}; pd[datas[i][0]] = { date: { start: datas[i][1] } };
+          await fetch('https://api.notion.com/v1/pages/' + pid, {
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ properties: pd })
+          });
+        }
+
         return res.status(200).json({ ok: true });
       }
       return res.status(400).json({ error: 'action inválida' });
