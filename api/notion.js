@@ -267,20 +267,26 @@ module.exports = async function handler(req, res) {
         var uploadId = createData.id;
         var uploadUrl = createData.upload_url;
 
-        // Passo 2: Enviar o arquivo
+        // Passo 2: Enviar o arquivo via multipart/form-data
+        var FormData = require('form-data');
+        var fd2 = new FormData();
+        fd2.append('file', fileBuffer, {
+          filename: fileName,
+          contentType: mimeType,
+          knownLength: fileBuffer.length
+        });
+
         var sendRes = await fetch(uploadUrl, {
           method: 'POST',
-          headers: {
+          headers: Object.assign({
             'Authorization': 'Bearer ' + NOTION_TOKEN,
             'Notion-Version': '2022-06-28',
-            'Content-Type': mimeType,
-            'Content-Disposition': 'attachment; filename="' + fileName + '"'
-          },
-          body: fileBuffer
+          }, fd2.getHeaders()),
+          body: fd2
         });
         var sendData = await sendRes.json();
         if (sendData.object === 'error') return res.status(400).json({ error: 'Enviar arquivo: ' + sendData.message });
-        if (sendData.status !== 'uploaded') return res.status(400).json({ error: 'Upload não concluído: ' + sendData.status });
+        if (sendData.status !== 'uploaded') return res.status(400).json({ error: 'Upload não concluído: ' + JSON.stringify(sendData) });
 
         return res.status(200).json({ ok: true, file_upload_id: uploadId });
       }
