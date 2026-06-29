@@ -610,7 +610,7 @@ function renderCandidatos(lista) {
           (c.sps_count > 0 ? '🔗 ' + c.sps_count + ' SPS' : '') +
         '</div>' +
       '</div>' +
-      (c.curriculo_url ? '<a href="' + c.curriculo_url + '" download target="_blank" class="cand-link">📄 Baixar CV</a>' : '') +
+      (c.curriculo_url ? '<a href="' + c.curriculo_url + '" target="_blank" class="cand-link">📄 Ver CV</a>' : '') +
     '</div>';
   }).join('');
 }
@@ -691,11 +691,11 @@ document.getElementById('btn-cadastrar').addEventListener('click', async functio
       fd.append('file', arquivoSelecionado);
       fd.append('upload_preset', 'bbts_curriculos');
       fd.append('folder', 'curriculos_bbts');
-      fd.append('resource_type', 'auto');
-      var up = await fetch('https://api.cloudinary.com/v1_1/dlgtb8xsl/auto/upload', {method:'POST', body:fd});
+      var up = await fetch('https://api.cloudinary.com/v1_1/dlgtb8xsl/image/upload', {method:'POST', body:fd});
       var ud = await up.json();
       if (ud.error) throw new Error('Upload: ' + ud.error.message);
-      curriculoUrl = ud.secure_url;
+      // Gerar URL de visualização inline do PDF
+      curriculoUrl = ud.secure_url.replace('/image/upload/', '/image/upload/fl_inline/');
       document.getElementById('progress-bar').style.width = '100%';
       document.getElementById('progress-text').textContent = 'Currículo enviado!';
     }
