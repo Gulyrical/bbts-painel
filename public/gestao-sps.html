@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BBTS — Gestão SPS</title>
+<title>BBTS — Gestão de Contratações</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--blue:#465EFF;--green:#2E7D5E;--green-lt:#E6F4EF;--red:#C0392B;--red-lt:#FDECEA;--bg:#F5F6F8;--white:#fff;--border:#E5E7EB;--text:#111827;--text2:#6B7280;--radius:8px}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+
+/* SENHA */
 .senha-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100}
 .senha-box{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:40px;width:340px;text-align:center}
 .senha-logo{font-size:32px;margin-bottom:12px}
@@ -17,8 +19,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .senha-input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-family:'Inter',sans-serif;text-align:center;letter-spacing:0.1em;margin-bottom:12px}
 .senha-input:focus{outline:none;border-color:var(--blue)}
 .senha-btn{width:100%;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
-.senha-btn:hover{background:#3548e0}
 .senha-erro{color:var(--red);font-size:12px;margin-top:8px;display:none}
+
+/* HEADER */
 .header{background:var(--blue);color:#fff;padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .brand-mark{width:32px;height:32px;background:rgba(255,255,255,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px}
 .brand-name{font-size:14px;font-weight:600}
@@ -26,11 +29,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .header-right{display:flex;align-items:center;gap:10px}
 .btn-acao{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif}
 .btn-acao:hover{background:rgba(255,255,255,0.25)}
-.main{max-width:900px;margin:0 auto;padding:24px 28px}
+
+/* MAIN */
+.main{max-width:960px;margin:0 auto;padding:24px 28px}
+
+/* ABAS */
 .tabs{display:flex;gap:2px;background:#E5E7EB;border-radius:8px;padding:3px;margin-bottom:24px;width:fit-content}
 .tab{padding:7px 20px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);transition:all 0.15s}
 .tab.active{background:var(--white);color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
 .tab:hover:not(.active){color:var(--text)}
+
+/* FORM */
 .form-section{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
 .form-titulo{font-size:11px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -39,16 +48,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .form-label{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em}
 .form-input,.form-select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:'Inter',sans-serif;background:var(--white);color:var(--text)}
 .form-input:focus,.form-select:focus{outline:none;border-color:var(--blue)}
+
+/* ETAPAS */
 .etapa-row{display:grid;grid-template-columns:1fr 180px;gap:12px;align-items:center;padding:12px;border-radius:6px;border:1px solid var(--border);background:#FAFAFA;margin-bottom:8px}
 .etapa-row:last-child{margin-bottom:0}
 .etapa-row.ativa{background:#EEF0FF;border-color:var(--blue)}
 .etapa-row.concluida{background:var(--green-lt);border-color:#A7D4C0}
 .etapa-nome{font-size:13px;font-weight:500}
 .etapa-desc{font-size:11px;color:var(--text2);margin-top:2px}
-.btn-primary{padding:10px 24px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
-.btn-primary:hover{background:#3548e0}
-.btn-primary:disabled{opacity:0.5;cursor:not-allowed}
-.btn-secondary{padding:10px 20px;background:var(--white);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif}
+
+/* LISTA SPS */
 .busca-wrap{display:flex;gap:8px;margin-bottom:16px}
 .busca-input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:'Inter',sans-serif}
 .busca-input:focus{outline:none;border-color:var(--blue)}
@@ -59,26 +68,58 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .sps-list-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:6px;border:1px solid var(--border);margin-bottom:6px;cursor:pointer;background:var(--white);transition:all 0.12s}
 .sps-list-item:hover{border-color:var(--blue);background:#F0F4FF}
 .sps-num{font-family:monospace;font-size:13px;font-weight:600;color:var(--blue);min-width:110px}
-.sps-info{font-size:12px;color:var(--text2);flex:1;padding:0 12px}
+.sps-info{font-size:12px;color:var(--text2);flex:1;padding:0 12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .sps-badge{font-size:11px;font-weight:500;padding:2px 10px;border-radius:20px;background:#EEF0FF;color:var(--blue);white-space:nowrap}
+
+/* UPLOAD */
+.upload-area{border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;transition:all 0.15s;background:#FAFAFA}
+.upload-area:hover,.upload-area.drag{border-color:var(--blue);background:#EEF0FF}
+.upload-icon{font-size:28px;margin-bottom:6px}
+.upload-text{font-size:13px;color:var(--text2)}
+.upload-text strong{color:var(--blue)}
+.file-info{display:none;align-items:center;gap:10px;padding:10px 14px;background:var(--green-lt);border:1px solid #A7D4C0;border-radius:var(--radius);margin-top:10px}
+.file-info.visible{display:flex}
+.file-nome{font-size:13px;font-weight:500;color:var(--green);flex:1}
+.progress-wrap{display:none;margin-top:10px}
+.progress-wrap.visible{display:block}
+.progress-bar-bg{background:#EEF0FF;border-radius:4px;height:6px;overflow:hidden}
+.progress-bar{height:100%;background:var(--blue);border-radius:4px;transition:width 0.3s;width:0%}
+.progress-text{font-size:11px;color:var(--text2);margin-top:4px;text-align:center}
+
+/* CHIPS SPS */
+.sps-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:32px}
+.sps-chip{display:flex;align-items:center;gap:6px;padding:4px 10px;background:#EEF0FF;border:1px solid var(--blue);border-radius:20px;font-size:12px;font-weight:500;color:var(--blue)}
+.sps-chip button{background:none;border:none;cursor:pointer;color:var(--blue);font-size:14px;line-height:1;padding:0}
+
+/* BOTÕES */
+.btn-primary{padding:10px 24px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-primary:hover{background:#3548e0}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed}
+.btn-secondary{padding:10px 20px;background:var(--white);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-secondary:hover{background:#F9FAFB}
+.acoes{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
+
+/* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:200;transform:translateY(100px);opacity:0;transition:all 0.3s}
 .toast.visible{transform:translateY(0);opacity:1}
 .toast.success{background:var(--green)}
 .toast.error{background:var(--red)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin-icon{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px}
+
+.nota{font-size:11px;color:var(--text2);padding:8px 12px;background:#FAFAFA;border-radius:6px;border:1px solid var(--border);margin-top:10px}
 </style>
 </head>
 <body>
 
 <div class="senha-screen" id="tela-senha">
   <div class="senha-box">
-    <div class="senha-logo">🔐</div>
-    <div class="senha-titulo">Gestão de SPS</div>
+    <div class="senha-logo">📋</div>
+    <div class="senha-titulo">Gestão de Contratações</div>
     <div class="senha-sub">Digite a senha para acessar</div>
     <input type="password" class="senha-input" id="campo-senha" placeholder="••••••••">
     <button class="senha-btn" id="btn-entrar">Entrar</button>
-    <div class="senha-erro" id="msg-erro">Senha incorreta. Tente novamente.</div>
+    <div class="senha-erro" id="msg-erro">Senha incorreta.</div>
   </div>
 </div>
 
@@ -86,24 +127,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
   <div style="display:flex;align-items:center;gap:12px">
     <div class="brand-mark">📋</div>
     <div>
-      <div class="brand-name">BBTS — Gestão de SPS</div>
-      <div class="brand-sub">Criar e atualizar solicitações de posto</div>
+      <div class="brand-name">BBTS — Gestão de Contratações</div>
+      <div class="brand-sub">SPS e candidatos</div>
     </div>
   </div>
   <div class="header-right">
-    <button class="btn-acao" id="btn-atualizar-dados" onclick="todasSPS=[];carregarSPS()"><span id="ri-att">↻</span> Atualizar</button>
-    <a href="/sps.html" class="btn-acao">📊 Ver Painel</a>
+    <button class="btn-acao" onclick="recarregarTudo()">↻ Atualizar</button>
+    <a href="/sps.html" class="btn-acao">📊 Painel SPS</a>
     <a href="/" class="btn-acao">← Portal</a>
   </div>
 </header>
 
 <main class="main">
   <div class="tabs">
-    <div class="tab active" id="tab-btn-nova">➕ Nova SPS</div>
-    <div class="tab" id="tab-btn-atualizar">✏️ Atualizar SPS</div>
+    <div class="tab" id="tab-btn-nova">➕ Nova SPS</div>
+    <div class="tab active" id="tab-btn-atualizar">✏️ Atualizar SPS</div>
+    <div class="tab" id="tab-btn-candidatos">👤 Candidatos</div>
   </div>
 
-  <!-- ABA NOVA -->
+  <!-- ── ABA: NOVA SPS ── -->
   <div id="aba-nova" style="display:none">
     <div class="form-section">
       <div class="form-titulo">Dados da Solicitação</div>
@@ -125,24 +167,29 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
           <input type="text" class="form-input" id="n-fiscal" placeholder="Nome do fiscal">
         </div>
         <div class="form-group full">
+          <label class="form-label">Cargo</label>
+          <select class="form-select" id="n-cargo">
+            <option value="">Selecione o cargo...</option>
+          </select>
+        </div>
+        <div class="form-group full">
           <label class="form-label">Observações</label>
-          <input type="text" class="form-input" id="n-obs" placeholder="Observações gerais">
+          <input type="text" class="form-input" id="n-obs" placeholder="Observações">
         </div>
       </div>
     </div>
-    <div style="display:flex;gap:10px;justify-content:flex-end">
+    <div class="acoes">
       <button class="btn-secondary" id="btn-limpar-nova">Limpar</button>
       <button class="btn-primary" id="btn-criar">Criar SPS</button>
     </div>
   </div>
 
-  <!-- ABA ATUALIZAR -->
+  <!-- ── ABA: ATUALIZAR SPS ── -->
   <div id="aba-atualizar">
     <div class="busca-wrap">
-      <input type="text" class="busca-input" id="campo-busca" placeholder="Filtrar por número, gerente ou fiscal...">
+      <input type="text" class="busca-input" id="campo-busca" placeholder="Filtrar por número, cargo ou gerente...">
       <button class="btn-primary" id="btn-buscar">Buscar</button>
     </div>
-
     <div class="form-section" style="margin-bottom:16px">
       <div class="form-titulo">SPS Cadastradas <span id="count-sps" style="font-weight:400;color:var(--text2);text-transform:none;letter-spacing:0"></span></div>
       <div id="lista-sps" style="max-height:300px;overflow-y:auto">
@@ -174,25 +221,26 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
       <div class="form-section">
         <div class="form-titulo">Cronograma de Datas</div>
         <div class="etapa-row" id="et-curriculos">
-          <div><div class="etapa-nome">📄 Currículos Enviados</div><div class="etapa-desc">Data do envio dos currículos ao fiscal</div></div>
+          <div><div class="etapa-nome">📄 Currículos Enviados</div><div class="etapa-desc">Data do envio ao fiscal</div></div>
           <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-curriculos"></div>
         </div>
         <div class="etapa-row" id="et-entrevista">
-          <div><div class="etapa-nome">🎯 Pedido de Entrevista</div><div class="etapa-desc">Data da solicitação de entrevista</div></div>
+          <div><div class="etapa-nome">🎯 Pedido de Entrevista</div><div class="etapa-desc">Data da solicitação</div></div>
           <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-entrevista"></div>
         </div>
         <div class="etapa-row" id="et-escolhido">
-          <div><div class="etapa-nome">✅ Candidato Escolhido</div><div class="etapa-desc">Data da seleção do candidato</div></div>
+          <div><div class="etapa-nome">✅ Candidato Escolhido</div><div class="etapa-desc">Data da seleção</div></div>
           <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-escolhido"></div>
         </div>
         <div class="etapa-row" id="et-autorizacao">
-          <div><div class="etapa-nome">📝 Autorização</div><div class="etapa-desc">Data do recebimento da autorização</div></div>
+          <div><div class="etapa-nome">📝 Autorização</div><div class="etapa-desc">Data do recebimento</div></div>
           <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-autorizacao"></div>
         </div>
         <div class="etapa-row" id="et-admissao">
-          <div><div class="etapa-nome">🎉 Admissão</div><div class="etapa-desc">Data de admissão do colaborador</div></div>
+          <div><div class="etapa-nome">🎉 Admissão</div><div class="etapa-desc">Data de admissão</div></div>
           <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-admissao"></div>
         </div>
+        <div class="nota">💡 Para apagar uma data, faça diretamente no Notion. Datas em branco aqui não alteram o que já está salvo.</div>
       </div>
 
       <div class="form-section">
@@ -204,10 +252,66 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
         </div>
       </div>
 
-      <div style="display:flex;gap:10px;justify-content:flex-end">
+      <div class="acoes">
         <button class="btn-secondary" id="btn-cancelar">Cancelar</button>
         <button class="btn-primary" id="btn-salvar">Salvar Alterações</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ── ABA: CANDIDATOS ── -->
+  <div id="aba-candidatos" style="display:none">
+    <div class="form-section">
+      <div class="form-titulo">Dados do Candidato</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nome Completo *</label>
+          <input type="text" class="form-input" id="c-nome" placeholder="Nome do candidato">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <input type="tel" class="form-input" id="c-telefone" placeholder="(61) 99999-9999">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Cargo Pretendido</label>
+          <select class="form-select" id="c-cargo">
+            <option value="">Selecione o cargo...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-titulo">Currículo (PDF)</div>
+      <div class="upload-area" id="upload-area">
+        <div class="upload-icon">📄</div>
+        <div class="upload-text"><strong>Clique para selecionar</strong> ou arraste o PDF aqui<br><span style="font-size:11px">Máximo 10MB</span></div>
+        <input type="file" id="arquivo-input" accept=".pdf,application/pdf" style="display:none">
+      </div>
+      <div class="file-info" id="file-info">
+        <span class="file-nome" id="file-nome">—</span>
+        <button style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:16px" id="btn-remover">✕</button>
+      </div>
+      <div class="progress-wrap" id="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar" id="progress-bar"></div></div>
+        <div class="progress-text" id="progress-text">Enviando...</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-titulo">Vincular à SPS</div>
+      <div class="form-group">
+        <label class="form-label">Selecionar SPS (pode escolher mais de uma)</label>
+        <select class="form-select" id="c-sps-select" onchange="adicionarSPS()">
+          <option value="">Selecione uma SPS aberta...</option>
+        </select>
+      </div>
+      <div class="sps-chips" id="sps-chips"></div>
+    </div>
+
+    <div class="acoes">
+      <button class="btn-secondary" id="btn-limpar-cand">Limpar</button>
+      <button class="btn-primary" id="btn-cadastrar">Cadastrar Candidato</button>
     </div>
   </div>
 </main>
@@ -215,154 +319,147 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 <div class="toast" id="toast-msg"></div>
 
 <script>
-var SENHA_CORRETA = 'digisystem';
+var SENHA = 'digisystem';
 var API = '/api/notion';
 var spsId = null;
 var todasSPS = [];
+var cargosLista = [];
+var spsCandidato = {};
+var arquivoSelecionado = null;
 
-// Senha
+// ── Senha ──
 document.getElementById('btn-entrar').addEventListener('click', function() {
-  var v = document.getElementById('campo-senha').value;
-  if (v === SENHA_CORRETA) {
+  if (document.getElementById('campo-senha').value === SENHA) {
     document.getElementById('tela-senha').style.display = 'none';
-    carregarSPS();
+    carregarDados();
   } else {
     document.getElementById('msg-erro').style.display = 'block';
     document.getElementById('campo-senha').value = '';
-    document.getElementById('campo-senha').focus();
   }
 });
 document.getElementById('campo-senha').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') document.getElementById('btn-entrar').click();
 });
 
-// Abas
-document.getElementById('tab-btn-nova').addEventListener('click', function() {
-  document.getElementById('tab-btn-nova').classList.add('active');
-  document.getElementById('tab-btn-atualizar').classList.remove('active');
-  document.getElementById('aba-nova').style.display = 'block';
-  document.getElementById('aba-atualizar').style.display = 'none';
-});
-document.getElementById('tab-btn-atualizar').addEventListener('click', function() {
-  document.getElementById('tab-btn-atualizar').classList.add('active');
-  document.getElementById('tab-btn-nova').classList.remove('active');
-  document.getElementById('aba-atualizar').style.display = 'block';
-  document.getElementById('aba-nova').style.display = 'none';
-  // já carregado no login
-});
-
-// Toast
+// ── Toast ──
 function toast(msg, tipo) {
   var t = document.getElementById('toast-msg');
   t.textContent = msg;
-  t.className = 'toast visible ' + (tipo || '');
-  setTimeout(function() { t.className = 'toast'; }, 3500);
+  t.className = 'toast visible ' + (tipo||'');
+  setTimeout(function(){ t.className = 'toast'; }, 3500);
 }
 
-// Limpar nova
-document.getElementById('btn-limpar-nova').addEventListener('click', function() {
-  ['n-numero','n-email','n-gerente','n-fiscal','n-obs'].forEach(function(id) {
-    document.getElementById(id).value = '';
+// ── Abas ──
+function setTab(tab) {
+  ['nova','atualizar','candidatos'].forEach(function(t) {
+    document.getElementById('tab-btn-' + t).classList.toggle('active', t === tab);
+    document.getElementById('aba-' + t).style.display = t === tab ? 'block' : 'none';
   });
-});
+}
+document.getElementById('tab-btn-nova').addEventListener('click', function(){ setTab('nova'); });
+document.getElementById('tab-btn-atualizar').addEventListener('click', function(){ setTab('atualizar'); });
+document.getElementById('tab-btn-candidatos').addEventListener('click', function(){ setTab('candidatos'); });
 
-// Criar SPS
-document.getElementById('btn-criar').addEventListener('click', async function() {
-  var numero = document.getElementById('n-numero').value.trim();
-  var email = document.getElementById('n-email').value;
-  if (!numero || !email) { toast('Preencha o número e a data do e-mail!', 'error'); return; }
-  var btn = this;
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin-icon"></span>Criando...';
+// ── Carregar dados ──
+async function carregarDados() {
   try {
-    var res = await fetch(API, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        action: 'criar_sps',
-        dados: {
-          numero_sps: numero,
-          data_email: email,
-          gerente: document.getElementById('n-gerente').value.trim(),
-          fiscal: document.getElementById('n-fiscal').value.trim(),
-          observacoes: document.getElementById('n-obs').value.trim(),
-        }
-      })
-    });
-    var d = await res.json();
-    if (d.error) throw new Error(d.error);
-    toast('SPS ' + numero + ' criada com sucesso!', 'success');
-    document.getElementById('btn-limpar-nova').click();
-    todasSPS = []; // reset cache
-  } catch(e) { toast('Erro: ' + e.message, 'error'); }
-  btn.disabled = false;
-  btn.innerHTML = 'Criar SPS';
-});
+    var [resSPS, resCargos] = await Promise.all([
+      fetch(API + '?db=solicitacoes'),
+      fetch(API + '?db=cargos_lista')
+    ]);
+    var dSPS = await resSPS.json();
+    var dCargos = await resCargos.json();
 
-// Carregar lista de SPS
-async function carregarSPS() {
-  document.getElementById('lista-sps').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">Carregando...</div>';
-  try {
-    var res = await fetch(API + '?db=solicitacoes');
-    var d = await res.json();
-    todasSPS = (d.solicitacoes || []).sort(function(a,b) {
+    todasSPS = (dSPS.solicitacoes || []).sort(function(a,b){
       return (b.numero_sps||'').localeCompare(a.numero_sps||'');
     });
-    renderLista(todasSPS);
+    cargosLista = dCargos.cargos || [];
+
+    renderListaSPS(todasSPS);
+    preencherCargos();
+    preencherSPSCandidato();
   } catch(e) {
-    document.getElementById('lista-sps').innerHTML = '<div style="color:var(--red);padding:12px">Erro ao carregar</div>';
+    toast('Erro ao carregar dados: ' + e.message, 'error');
   }
 }
 
-function renderLista(lista) {
+function recarregarTudo() {
+  spsId = null;
+  document.getElementById('form-editar').style.display = 'none';
+  document.getElementById('sps-selecionada').classList.remove('visible');
+  todasSPS = [];
+  carregarDados();
+}
+
+// ── Cargos ──
+function preencherCargos() {
+  var opts = '<option value="">Selecione o cargo...</option>' +
+    cargosLista.map(function(c){
+      return '<option value="' + c.id + '">' + c.codigo + (c.descricao ? ' — ' + c.descricao : '') + '</option>';
+    }).join('');
+  document.getElementById('n-cargo').innerHTML = opts;
+  document.getElementById('c-cargo').innerHTML = opts;
+}
+
+// ── SPS para candidatos ──
+function preencherSPSCandidato() {
+  var abertas = todasSPS.filter(function(s){ return !['Contratado','Cancelado'].includes(s.status); });
+  document.getElementById('c-sps-select').innerHTML =
+    '<option value="">Selecione uma SPS aberta...</option>' +
+    abertas.map(function(s){
+      return '<option value="' + s.id + '" data-num="' + (s.numero_sps||'') + '" data-ger="' + (s.gerente||'') + '">' +
+        s.numero_sps + (s.gerente ? ' — ' + s.gerente : '') + ' [' + s.status + ']</option>';
+    }).join('');
+}
+
+// ── Lista SPS ──
+function renderListaSPS(lista) {
   document.getElementById('count-sps').textContent = '(' + lista.length + ')';
   if (!lista.length) {
     document.getElementById('lista-sps').innerHTML = '<div style="color:var(--text2);padding:12px;text-align:center">Nenhuma SPS encontrada</div>';
     return;
   }
-  var html = lista.map(function(s) {
-    var cargo = s.cargo_codigo ? (s.cargo_codigo + (s.cargo_desc ? ' — ' + s.cargo_desc : '')) : '—';
+  document.getElementById('lista-sps').innerHTML = lista.map(function(s) {
+    var cargo = s.cargo_codigo ? s.cargo_codigo + (s.cargo_desc ? ' — ' + s.cargo_desc : '') : '—';
     return '<div class="sps-list-item" data-id="' + s.id + '">' +
       '<span class="sps-num">' + (s.numero_sps||'—') + '</span>' +
       '<span class="sps-info">📌 ' + cargo + ' · 👤 ' + (s.gerente||'—') + '</span>' +
       '<span class="sps-badge">' + (s.status||'—') + '</span>' +
     '</div>';
   }).join('');
-  document.getElementById('lista-sps').innerHTML = html;
   document.querySelectorAll('.sps-list-item').forEach(function(el) {
     el.addEventListener('click', function() {
-      var id = this.getAttribute('data-id');
-      var sps = todasSPS.find(function(s) { return s.id === id; });
+      var sps = todasSPS.find(function(s){ return s.id === this.getAttribute('data-id'); }.bind(this));
       if (sps) preencherForm(sps);
     });
   });
 }
 
-// Filtro
 document.getElementById('campo-busca').addEventListener('input', function() {
   var q = this.value.toLowerCase();
-  var filtrado = q ? todasSPS.filter(function(s) {
+  var f = q ? todasSPS.filter(function(s){
     return (s.numero_sps||'').toLowerCase().includes(q) ||
            (s.gerente||'').toLowerCase().includes(q) ||
-           (s.fiscal||'').toLowerCase().includes(q);
+           (s.cargo_codigo||'').toLowerCase().includes(q) ||
+           (s.cargo_desc||'').toLowerCase().includes(q);
   }) : todasSPS;
-  renderLista(filtrado);
+  renderListaSPS(f);
 });
 
 document.getElementById('btn-buscar').addEventListener('click', function() {
   var q = document.getElementById('campo-busca').value.trim().toLowerCase();
   if (!q) return;
-  var sps = todasSPS.find(function(s) {
-    return (s.numero_sps||'').toLowerCase() === q;
-  });
+  var sps = todasSPS.find(function(s){ return (s.numero_sps||'').toLowerCase() === q; });
   if (sps) preencherForm(sps);
-  else toast('SPS não encontrada: ' + q, 'error');
+  else toast('SPS não encontrada', 'error');
 });
 
+// ── Preencher formulário edição ──
 function preencherForm(sps) {
   spsId = sps.id;
   document.getElementById('card-numero').textContent = sps.numero_sps || '—';
-  document.getElementById('card-info').textContent = 'Gerente: ' + (sps.gerente||'—') + ' · Fiscal: ' + (sps.fiscal||'—') + ' · Status: ' + (sps.status||'—');
+  document.getElementById('card-info').textContent =
+    'Cargo: ' + (sps.cargo_codigo||'—') + ' · Gerente: ' + (sps.gerente||'—') + ' · Status: ' + (sps.status||'—');
   document.getElementById('sps-selecionada').classList.add('visible');
   document.getElementById('a-status').value = sps.status || 'Aguardando Currículos';
   document.getElementById('a-gerente').value = sps.gerente || '';
@@ -390,7 +487,6 @@ function atualizarEtapas() {
     else if (idx === mapa[id]) el.classList.add('ativa');
   });
 }
-
 document.getElementById('a-status').addEventListener('change', atualizarEtapas);
 
 document.getElementById('btn-cancelar').addEventListener('click', function() {
@@ -399,50 +495,165 @@ document.getElementById('btn-cancelar').addEventListener('click', function() {
   document.getElementById('sps-selecionada').classList.remove('visible');
 });
 
-// Salvar
-document.getElementById('btn-salvar').addEventListener('click', async function() {
-  if (!spsId) return;
-  var btn = this;
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin-icon"></span>Salvando...';
+// ── Nova SPS ──
+document.getElementById('btn-limpar-nova').addEventListener('click', function() {
+  ['n-numero','n-email','n-gerente','n-fiscal','n-obs'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('n-cargo').value = '';
+});
+
+document.getElementById('btn-criar').addEventListener('click', async function() {
+  var numero = document.getElementById('n-numero').value.trim();
+  var email = document.getElementById('n-email').value;
+  if (!numero || !email) { toast('Preencha o número e a data do e-mail!', 'error'); return; }
+  var btn = this; btn.disabled = true; btn.innerHTML = '<span class="spin-icon"></span>Criando...';
   try {
     var res = await fetch(API, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        action: 'atualizar_sps',
-        page_id: spsId,
-        dados: {
-          status: document.getElementById('a-status').value,
-          gerente: document.getElementById('a-gerente').value.trim(),
-          fiscal: document.getElementById('a-fiscal').value.trim(),
-          observacoes: document.getElementById('a-obs').value.trim(),
-          data_curriculos: document.getElementById('a-curriculos').value || null,
-          data_entrevista: document.getElementById('a-entrevista').value || null,
-          data_escolhido: document.getElementById('a-escolhido').value || null,
-          data_autorizacao: document.getElementById('a-autorizacao').value || null,
-          data_admissao: document.getElementById('a-admissao').value || null,
-        }
-      })
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ action: 'criar_sps', dados: {
+        numero_sps: numero, data_email: email,
+        gerente: document.getElementById('n-gerente').value.trim(),
+        fiscal: document.getElementById('n-fiscal').value.trim(),
+        cargo_id: document.getElementById('n-cargo').value || null,
+        observacoes: document.getElementById('n-obs').value.trim(),
+      }})
+    });
+    var d = await res.json();
+    if (d.error) throw new Error(d.error);
+    toast('SPS ' + numero + ' criada com sucesso!', 'success');
+    document.getElementById('btn-limpar-nova').click();
+    todasSPS = []; carregarDados();
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+  btn.disabled = false; btn.innerHTML = 'Criar SPS';
+});
+
+// ── Salvar SPS ──
+document.getElementById('btn-salvar').addEventListener('click', async function() {
+  if (!spsId) return;
+  var btn = this; btn.disabled = true; btn.innerHTML = '<span class="spin-icon"></span>Salvando...';
+  try {
+    var res = await fetch(API, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ action: 'atualizar_sps', page_id: spsId, dados: {
+        status: document.getElementById('a-status').value,
+        gerente: document.getElementById('a-gerente').value.trim(),
+        fiscal: document.getElementById('a-fiscal').value.trim(),
+        observacoes: document.getElementById('a-obs').value.trim(),
+        data_curriculos: document.getElementById('a-curriculos').value || null,
+        data_entrevista: document.getElementById('a-entrevista').value || null,
+        data_escolhido: document.getElementById('a-escolhido').value || null,
+        data_autorizacao: document.getElementById('a-autorizacao').value || null,
+        data_admissao: document.getElementById('a-admissao').value || null,
+      }})
     });
     var d = await res.json();
     if (d.error) throw new Error(d.error);
     toast('SPS atualizada com sucesso!', 'success');
-    // Atualizar card
     document.getElementById('card-info').textContent =
       'Gerente: ' + document.getElementById('a-gerente').value +
       ' · Fiscal: ' + document.getElementById('a-fiscal').value +
       ' · Status: ' + document.getElementById('a-status').value;
-    // Atualizar cache local
-    var sps = todasSPS.find(function(s) { return s.id === spsId; });
-    if (sps) {
-      sps.status = document.getElementById('a-status').value;
-      sps.gerente = document.getElementById('a-gerente').value;
-      sps.fiscal = document.getElementById('a-fiscal').value;
-    }
+    // Atualiza cache
+    var sps = todasSPS.find(function(s){ return s.id === spsId; });
+    if (sps) { sps.status = document.getElementById('a-status').value; sps.gerente = document.getElementById('a-gerente').value; }
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
-  btn.disabled = false;
-  btn.innerHTML = 'Salvar Alterações';
+  btn.disabled = false; btn.innerHTML = 'Salvar Alterações';
+});
+
+// ── Upload currículo ──
+var uploadArea = document.getElementById('upload-area');
+var fileInput = document.getElementById('arquivo-input');
+uploadArea.addEventListener('click', function(){ fileInput.click(); });
+uploadArea.addEventListener('dragover', function(e){ e.preventDefault(); uploadArea.classList.add('drag'); });
+uploadArea.addEventListener('dragleave', function(){ uploadArea.classList.remove('drag'); });
+uploadArea.addEventListener('drop', function(e){
+  e.preventDefault(); uploadArea.classList.remove('drag');
+  if (e.dataTransfer.files[0]) selecionarArquivo(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', function(){ if (this.files[0]) selecionarArquivo(this.files[0]); });
+
+function selecionarArquivo(f) {
+  if (f.size > 10*1024*1024) { toast('Máximo 10MB!', 'error'); return; }
+  if (!f.type.includes('pdf') && !f.name.toLowerCase().endsWith('.pdf')) { toast('Apenas PDF!', 'error'); return; }
+  arquivoSelecionado = f;
+  document.getElementById('file-nome').textContent = f.name + ' (' + (f.size/1024).toFixed(0) + ' KB)';
+  document.getElementById('file-info').classList.add('visible');
+}
+document.getElementById('btn-remover').addEventListener('click', function(){
+  arquivoSelecionado = null; fileInput.value = '';
+  document.getElementById('file-info').classList.remove('visible');
+});
+
+// ── Chips SPS candidato ──
+function adicionarSPS() {
+  var sel = document.getElementById('c-sps-select');
+  var id = sel.value; if (!id || spsCandidato[id]) { sel.value=''; return; }
+  var opt = sel.options[sel.selectedIndex];
+  spsCandidato[id] = { id:id, num:opt.getAttribute('data-num'), ger:opt.getAttribute('data-ger') };
+  sel.value = ''; renderChips();
+}
+function removerSPSCand(id) { delete spsCandidato[id]; renderChips(); }
+function renderChips() {
+  document.getElementById('sps-chips').innerHTML = Object.values(spsCandidato).map(function(s){
+    return '<div class="sps-chip">' + s.num + (s.ger?' — '+s.ger:'') +
+      '<button onclick="removerSPSCand(\'' + s.id + '\')">✕</button></div>';
+  }).join('');
+}
+
+// ── Limpar candidato ──
+document.getElementById('btn-limpar-cand').addEventListener('click', function(){
+  document.getElementById('c-nome').value='';
+  document.getElementById('c-telefone').value='';
+  document.getElementById('c-cargo').value='';
+  arquivoSelecionado=null; fileInput.value='';
+  document.getElementById('file-info').classList.remove('visible');
+  spsCandidato={}; renderChips();
+});
+
+// ── Cadastrar candidato ──
+document.getElementById('btn-cadastrar').addEventListener('click', async function(){
+  var nome = document.getElementById('c-nome').value.trim();
+  if (!nome) { toast('Preencha o nome do candidato!', 'error'); return; }
+  var btn = this; btn.disabled=true;
+  try {
+    var curriculoUrl = null;
+    if (arquivoSelecionado) {
+      btn.innerHTML = '<span class="spin-icon"></span>Enviando currículo...';
+      document.getElementById('progress-wrap').classList.add('visible');
+      document.getElementById('progress-bar').style.width = '40%';
+      document.getElementById('progress-text').textContent = 'Enviando para o servidor...';
+      var fd = new FormData();
+      fd.append('file', arquivoSelecionado);
+      fd.append('upload_preset', 'bbts_curriculos');
+      fd.append('folder', 'curriculos_bbts');
+      fd.append('resource_type', 'raw');
+      var up = await fetch('https://api.cloudinary.com/v1_1/dlgtb8xsl/raw/upload', {method:'POST', body:fd});
+      var ud = await up.json();
+      if (ud.error) throw new Error('Upload: ' + ud.error.message);
+      curriculoUrl = ud.secure_url;
+      document.getElementById('progress-bar').style.width = '100%';
+      document.getElementById('progress-text').textContent = 'Currículo enviado!';
+    }
+    btn.innerHTML = '<span class="spin-icon"></span>Cadastrando...';
+    var res = await fetch(API, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'criar_candidato', dados:{
+        nome: nome,
+        telefone: document.getElementById('c-telefone').value.trim(),
+        cargo_id: document.getElementById('c-cargo').value || null,
+        curriculo_url: curriculoUrl,
+        sps_ids: Object.keys(spsCandidato),
+      }})
+    });
+    var d = await res.json();
+    if (d.error) throw new Error(d.error);
+    toast('Candidato ' + nome + ' cadastrado!', 'success');
+    document.getElementById('btn-limpar-cand').click();
+    document.getElementById('progress-wrap').classList.remove('visible');
+  } catch(e) {
+    toast('Erro: ' + e.message, 'error');
+    document.getElementById('progress-wrap').classList.remove('visible');
+  }
+  btn.disabled=false; btn.innerHTML='Cadastrar Candidato';
 });
 </script>
 </body>
