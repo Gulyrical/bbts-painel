@@ -426,8 +426,9 @@ function preencherSPSCandidato() {
   document.getElementById('c-sps-select').innerHTML =
     '<option value="">Selecione uma SPS aberta...</option>' +
     abertas.map(function(s){
+      var cargo = s.cargo_codigo ? s.cargo_codigo + (s.cargo_desc ? ' — ' + s.cargo_desc : '') : '—';
       return '<option value="' + s.id + '" data-num="' + (s.numero_sps||'') + '" data-ger="' + (s.gerente||'') + '">' +
-        s.numero_sps + (s.gerente ? ' — ' + s.gerente : '') + ' [' + s.status + ']</option>';
+        (s.numero_sps||'') + ' · ' + cargo + ' · ' + (s.gerente||'—') + '</option>';
     }).join('');
 }
 
@@ -609,7 +610,7 @@ function renderCandidatos(lista) {
           (c.sps_count > 0 ? '🔗 ' + c.sps_count + ' SPS' : '') +
         '</div>' +
       '</div>' +
-      (c.curriculo_url ? '<a href="https://docs.google.com/viewer?url=' + encodeURIComponent(c.curriculo_url) + '" target="_blank" class="cand-link">📄 Ver CV</a>' : '') +
+      (c.curriculo_url ? '<a href="' + c.curriculo_url + '" download target="_blank" class="cand-link">📄 Baixar CV</a>' : '') +
     '</div>';
   }).join('');
 }
