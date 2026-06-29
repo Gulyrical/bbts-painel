@@ -609,7 +609,7 @@ function renderCandidatos(lista) {
           (c.sps_count > 0 ? '🔗 ' + c.sps_count + ' SPS' : '') +
         '</div>' +
       '</div>' +
-      (c.curriculo_url ? '<a href="' + c.curriculo_url + '" target="_blank" class="cand-link">📄 Currículo</a>' : '') +
+      (c.curriculo_url ? '<a href="' + c.curriculo_url.replace('/upload/', '/upload/fl_attachment/') + '" target="_blank" class="cand-link">📄 Baixar CV</a>' : '') +
     '</div>';
   }).join('');
 }
