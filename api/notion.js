@@ -13,6 +13,7 @@ const DBS = {
   candidatos:    'd289f1f6-e5c4-49c4-b1f4-62613e168a4d',
   vagas:         'fd6d7e56-f4a5-493f-8da6-b7fade3ecee3',
   eventos_sps:   '7284912d-8edb-4692-918b-0cda0463ed0a',
+  devolucao_equipamentos: 'e73416a5-93c5-46be-8020-626c8327d88e',
 };
 
 async function queryDB(dbId, cursor) {
@@ -57,6 +58,7 @@ function prop(props, name, type) {
     case 'phone_number': return p.phone_number || null;
     case 'rollup_n': return p.rollup ? p.rollup.number : null;
     case 'relation': return p.relation ? p.relation.map(function(r) { return r.id; }) : [];
+    case 'checkbox': return p.checkbox === true;
     default: return null;
   }
 }
@@ -152,6 +154,29 @@ function parseEquipamento(pg) {
     data_entrega:      prop(p, 'date:Data de Entrega:start', 'date'),
     data_devolucao:    prop(p, 'date:Data de Devolução:start', 'date'),
     pessoa_id:         getRelId(p, 'Pessoa'),
+  };
+}
+
+function parseDevolucao(pg) {
+  var p = pg.properties;
+  return {
+    id:                      pg.id,
+    nome:                    prop(p, 'Nome', 'title'),
+    patrimonio:              prop(p, 'Número de Patrimônio', 'text'),
+    marca:                   prop(p, 'Marca', 'text'),
+    ocorrencia:              prop(p, 'Ocorrência', 'select'),
+    situacao:                prop(p, 'Situação', 'select'),
+    gestor:                  prop(p, 'Gestor', 'text'),
+    responsavel_recebimento: prop(p, 'Responsável Recebimento', 'text'),
+    justificativa:           prop(p, 'Justificativa', 'select'),
+    observacao:              prop(p, 'Observação', 'text'),
+    data_solicitacao:        prop(p, 'Data Solicitação', 'date'),
+    confirmacao_data:        prop(p, 'Confirmação - Data', 'date'),
+    confirmacao_canal:       prop(p, 'Confirmação - Canal', 'select'),
+    confirmacao_pendente:    prop(p, 'Confirmação Pendente', 'checkbox'),
+    ultimo_dia_trabalhado:   prop(p, 'Último dia Trabalhado', 'date'),
+    data_atualizacao:        prop(p, 'Data Última Atualização', 'date'),
+    pessoa_id:               getRelId(p, 'Pessoa'),
   };
 }
 
@@ -710,6 +735,13 @@ async function realHandler(req, res) {
       });
 
       return res.status(200).json({ equipamentos: equipamentos, timestamp: new Date().toISOString() });
+    }
+
+    if (db === 'devolucao_equipamentos') {
+      var devPages = await fetchAll(DBS.devolucao_equipamentos);
+      var devolucoes = devPages.map(parseDevolucao)
+        .sort(function(a,b) { return (a.nome||'').localeCompare(b.nome||''); });
+      return res.status(200).json({ devolucoes: devolucoes, timestamp: new Date().toISOString() });
     }
 
     if (db === 'sps_abertas') {
