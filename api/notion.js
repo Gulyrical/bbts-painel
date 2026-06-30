@@ -13,7 +13,7 @@ const DBS = {
   candidatos:    'd289f1f6-e5c4-49c4-b1f4-62613e168a4d',
   vagas:         'fd6d7e56-f4a5-493f-8da6-b7fade3ecee3',
   eventos_sps:   '7284912d-8edb-4692-918b-0cda0463ed0a',
-  devolucao_equipamentos: 'e73416a5-93c5-46be-8020-626c8327d88e',
+  devolucao_equipamentos: '689416e5-0e15-46ed-a098-500c1f003d4e',
 };
 
 async function queryDB(dbId, cursor) {
