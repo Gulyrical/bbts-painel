@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBTS — Reenquadramentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#465EFF;
+  --bg:#F5F6F8;
+  --white:#fff;
+  --border:#E5E7EB;
+  --text:#111827;
+  --text2:#6B7280;
+  --green:#10B981;
+  --red:#EF4444;
+  --radius:8px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.header{background:var(--blue);height:52px;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.header-left{display:flex;align-items:center;gap:10px}
+.logo{width:28px;height:28px;background:rgba(255,255,255,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.brand{font-size:14px;font-weight:600;color:#fff}
+.back{font-size:12px;color:rgba(255,255,255,0.65);text-decoration:none}
+.back:hover{color:#fff}
+.main{max-width:1100px;margin:0 auto;padding:24px 20px}
+.page-title{margin-bottom:20px}
+.page-title h1{font-size:18px;font-weight:600}
+.page-title p{font-size:13px;color:var(--text2);margin-top:2px}
+.stats{display:flex;gap:12px;margin-bottom:24px}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;flex:1}
+.stat .num{font-size:22px;font-weight:700;line-height:1}
+.stat .lbl{font-size:11px;color:var(--text2);margin-top:3px;text-transform:uppercase;letter-spacing:0.04em}
+.stat.blue .num{color:var(--blue)}
+.stat.green .num{color:var(--green)}
+.stat.red .num{color:var(--red)}
+.filters{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+.search{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);width:240px;outline:none;background:var(--white)}
+.search:focus{border-color:var(--blue)}
+.fbtn{padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--white);font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+.fbtn:hover,.fbtn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{border-bottom:1px solid var(--border)}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap}
+tbody tr{border-bottom:1px solid #F3F4F6;transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#F9FAFB}
+td{padding:10px 14px;vertical-align:middle}
+td.nome{font-weight:500}
+td.cargo{color:var(--text2);font-size:12px}
+td.sgps{font-size:12px;white-space:nowrap}
+.sgps-code{font-weight:600;color:var(--blue)}
+.sgps-desc{color:var(--text2);margin-left:4px}
+.sgps-niv{color:var(--text2);margin-left:3px;font-size:11px}
+.loading{text-align:center;padding:60px;color:var(--text2);font-size:13px}
+.arrow{color:#D1D5DB;margin:0 6px;font-size:11px}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.badge.ok{background:#D1FAE5;color:#065F46}
+.badge.rep{background:#FEE2E2;color:#991B1B}
+.empty{text-align:center;padding:40px;color:var(--text2);font-size:13px}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <div class="logo">B</div>
+    <span class="brand">BBTS · RH</span>
+  </div>
+  <a href="/" class="back">← Voltar</a>
+</header>
+
+<div class="main">
+  <div class="page-title">
+    <h1>Reenquadramentos</h1>
+    <p>Contratações DIGI 2025 — DGCO 3288/04-2026</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat blue"><div class="num">54</div><div class="lbl">Total</div></div>
+    <div class="stat green"><div class="num">52</div><div class="lbl">Autorizados</div></div>
+    <div class="stat red"><div class="num">2</div><div class="lbl">Não Autorizados</div></div>
+  </div>
+
+  <div class="filters">
+    <input class="search" id="busca" type="text" placeholder="Buscar colaborador ou cargo...">
+    <button class="fbtn active" data-f="">Todos</button>
+    <button class="fbtn" data-f="Concluído">Autorizados</button>
+    <button class="fbtn" data-f="Reprovado">Não Autorizados</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Colaborador</th>
+          <th>De</th>
+          <th></th>
+          <th>Para</th>
+          <th>Data</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"><tr><td colspan="6" class="loading">Carregando cargos...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const API = '/api/notion';
+
+// Mapa SGPS (código) -> {descricao, senioridade}, preenchido via fetch
+let p = {};
+
+// [nome, de, para, data, status]
+const dados = [
+  ["LILIAN GRACIELLE LOLA DE ANDRADE LEJMI","4101","4101","abr/25","Concluído"],
+  ["RENAN FILIP COSTA BALIEIRO","4101","4129","abr/25","Concluído"],
+  ["HELIO SANTOS MATOS E SILVA NETO","4102","4142","abr/25","Concluído"],
+  ["FABIO HENRIQUE FREITAS DE OLIVEIRA","4142","4142","abr/25","Concluído"],
+  ["ANDRE CARLOS DOS SANTOS RIBEIRO","4102","4145","abr/25","Concluído"],
+  ["LEANDRO PEREIRA SOARES","4105","4105","mai/25","Concluído"],
+  ["RAPHAEL EGIDIO DA SILVA REZENDE","4105","4105","mai/25","Concluído"],
+  ["SAMARA CARVALHO COSTA SOARES","4105","4105","mai/25","Concluído"],
+  ["SERGIO MARQUES DE ANDRADE","4105","4105","mai/25","Concluído"],
+  ["SHEILA ALVES MIZIARA","4105","4105","mai/25","Concluído"],
+  ["MARLON HENRIQUE RODRIGUES DO NASCIMENTO","4118","4141","mai/25","Concluído"],
+  ["RAMON JOAQUIM ALVES DALAPICOLA","4104","4104","mai/25","Concluído"],
+  ["TIAGO LEANDRO DA SILVA LIMA","4118","4147","jun/25","Concluído"],
+  ["RAFAEL DA SILVA DANTAS","4132","4132","jun/25","Concluído"],
+  ["CASSIANO LUCAS VIEIRA","4142","4142","jun/25","Concluído"],
+  ["CAMILA GONÇALVES BRITO","4108","4108","jun/25","Concluído"],
+  ["BENTO LEITE ARAUJO","4101","4101","jun/25","Concluído"],
+  ["DANIEL CARRIJO DE JESUS","4102","4102","jun/25","Concluído"],
+  ["MARIANO FARIA SANTOS","4132","4132","jun/25","Concluído"],
+  ["ANGELICA VANONI ARAUJO DE ALMEIDA","4108","4108","jul/25","Concluído"],
+  ["BRUNO LOPES DE LIMA","4118","4118","jul/25","Concluído"],
+  ["MAGNO DOS SANTOS BRITO","4142","4142","jul/25","Concluído"],
+  ["JOAO PEDRO MONTELES DE SOUZA","4105","4105","jul/25","Concluído"],
+  ["DIOGO LEMOS ARAUJO","4108","4108","jul/25","Concluído"],
+  ["WENDEL LUIZ DA ROCHA","4118","4118","ago/25","Concluído"],
+  ["WILLIAM TAVARES DO NASCIMENTO","—","—","—","Reprovado"],
+  ["VANESSA MOURA MELO","4140","4140","ago/25","Concluído"],
+  ["JULIO CESAR LEANDRO","—","—","—","Reprovado"],
+  ["RIVALDO JOSE NASCIMENTO DOS SANTOS","4104","4104","ago/25","Concluído"],
+  ["BRUNO HENRIQUE PARREIRA BARBOSA","4112","4112","ago/25","Concluído"],
+  ["ISABELA BATISTA NASCIMENTO SILVA","4102","4102","set/25","Concluído"],
+  ["JADY ZARZUR CUNHA","4118","4118","set/25","Concluído"],
+  ["KADSON VINICIUS ADAILCE ROQUE RIBEIRO","4132","4132","set/25","Concluído"],
+  ["PAULO ROBERTO DA SILVA","4148","4148","set/25","Concluído"],
+  ["FLAVIO DE MESQUITA RODRIGUES","4145","4145","out/25","Concluído"],
+  ["ANDERSON DAVID DE MOURA JUNIOR","4114","4114","out/25","Concluído"],
+  ["GUSTAVO MARTINS","4127","4127","out/25","Concluído"],
+  ["ELAINE DE SA XAVIER","4121","4121","out/25","Concluído"],
+  ["YVES GUILHERME LOPO RIBEIRO LIMA","4145","4125","nov/25","Concluído"],
+  ["ROBERT WILLIAM RODRIGUES NASCIMENTO","4108","4108","nov/25","Concluído"],
+  ["VICTOR ROCHA DOS SANTOS","4142","4142","nov/25","Concluído"],
+  ["RAFAEL LEITE VASCONCELOS","4106","4106","nov/25","Concluído"],
+  ["GUILHERME RODRIGUES CORDEIRO","4127","4127","dez/25","Concluído"],
+  ["LUCAS GABRIEL DE JESUS","4126","4126","dez/25","Concluído"],
+  ["ALLAN MICHELL SOARES DE ALMEIDA","4102","4102","dez/25","Concluído"],
+  ["HERMES MARUYAMA CACHOEIRA","4142","4143","jan/26","Concluído"],
+  ["ARTHUR OLIVEIRA TAVARES","4118","4127","jan/26","Concluído"],
+  ["DAVI HERVAL FONSECA RIBEIRO","4102","4141","fev/26","Concluído"],
+  ["GUILHERME HENRIQUE RAMOS DA SILVA","4102","4141","fev/26","Concluído"],
+  ["ALEXANDER ANDRE DE SOUZA VIEIRA","4142","4143","mar/26","Concluído"],
+  ["EDSON SHIGERU NAKATA","4102","4106","mar/26","Concluído"],
+  ["LILIAN GRACIELLE LOLA DE ANDRADE LEJMI","4101","4101","abr/26","Concluído"],
+];
+
+function sgpsCell(cod) {
+  if (cod === '—') return '<span style="color:var(--text2)">—</span>';
+  const info = p[cod];
+  if (!info) return `<span class="sgps-code">${cod}</span>`;
+  const niv = info.senioridade ? `<span class="sgps-niv">(${info.senioridade})</span>` : '';
+  return `<span class="sgps-code">${info.codigo}</span><span class="sgps-desc">${info.descricao}</span>${niv}`;
+}
+
+let filtroAtivo = '';
+
+document.querySelectorAll('.fbtn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.fbtn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    filtroAtivo = b.dataset.f;
+    render();
+  });
+});
+
+function render() {
+  const busca = document.getElementById('busca').value.toLowerCase();
+  const tbody = document.getElementById('tbody');
+  const filtrados = dados.filter(r => {
+    const [nome, de, para, data, status] = r;
+    const matchStatus = !filtroAtivo || status === filtroAtivo;
+    const descDe = de !== '—' && p[de] ? p[de].descricao.toLowerCase() : '';
+    const descPara = para !== '—' && p[para] ? p[para].descricao.toLowerCase() : '';
+    const matchBusca = !busca || nome.toLowerCase().includes(busca) || descDe.includes(busca) || descPara.includes(busca) || de.includes(busca) || para.includes(busca);
+    return matchStatus && matchBusca;
+  });
+
+  if (!filtrados.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum resultado encontrado.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtrados.map(r => {
+    const [nome, de, para, data, status] = r;
+    const badge = status === 'Concluído'
+      ? '<span class="badge ok">Autorizado</span>'
+      : '<span class="badge rep">Não autorizado</span>';
+    return `<tr>
+      <td class="nome">${nome}</td>
+      <td class="sgps">${sgpsCell(de)}</td>
+      <td style="text-align:center"><span class="arrow">→</span></td>
+      <td class="sgps">${sgpsCell(para)}</td>
+      <td style="color:var(--text2);white-space:nowrap">${data}</td>
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
+}
+
+document.getElementById('busca').addEventListener('input', render);
+
+async function init() {
+  try {
+    const r = await fetch(API + '?db=cargos_lista').then(r => r.json());
+    (r.cargos || []).forEach(c => {
+      if (!c.codigo) return;
+      p[c.codigo] = { codigo: c.codigo, descricao: c.descricao, senioridade: c.senioridade };
+    });
+  } catch (e) {
+    console.error('Erro ao carregar cargos:', e);
+  }
+  render();
+}
+
+init();
+</script>
+</body>
+</html>
