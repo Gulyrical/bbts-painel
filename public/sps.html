@@ -258,17 +258,34 @@ function campo(label,val){
   return '<div class="campo"><div class="campo-l">'+label+'</div><div class="campo-v">'+(v?v:'<span class="campo-e">Em branco</span>')+'</div></div>';
 }
 
+function cargoFull(r){
+  if(!r.cargo_codigo) return null;
+  var s = r.cargo_codigo + (r.cargo_desc ? ' — ' + r.cargo_desc : '');
+  if (r.cargo_nivel) s += ' (' + r.cargo_nivel + ')';
+  return s;
+}
+
 async function loadData(){
   var btn=document.getElementById('btn');
   btn.classList.add('spin');
   try{
-    var res=await fetch(API+'?db=solicitacoes');
+    var [res,resCargos]=await Promise.all([
+      fetch(API+'?db=solicitacoes'),
+      fetch(API+'?db=cargos_lista')
+    ]);
     var data=await res.json();
+    var dataCargos=await resCargos.json();
     if(data.error)throw new Error(data.error);
+
+    var cargoMap={};
+    (dataCargos.cargos||[]).forEach(function(c){ cargoMap[c.id]=c; });
+
     rows=(data.solicitacoes||[]).map(function(s){
       return {
         id:s.id, numero_sps:s.numero_sps, fiscal:s.fiscal, gerente:s.gerente,
-        status:s.status, cargo_codigo:s.cargo_codigo||null, cargo_desc:s.cargo_desc||null, data_email:s.data_email, data_curriculos:s.data_curriculos,
+        status:s.status, cargo_codigo:s.cargo_codigo||null, cargo_desc:s.cargo_desc||null,
+        cargo_nivel:(s.cargo_rel&&cargoMap[s.cargo_rel])?cargoMap[s.cargo_rel].senioridade:null,
+        data_email:s.data_email, data_curriculos:s.data_curriculos,
         data_entrevista:s.data_entrevista, data_escolhido:s.data_escolhido,
         data_autorizacao:s.data_autorizacao, data_admissao:s.data_admissao,
         total_curriculos:s.total_curriculos,
@@ -318,6 +335,7 @@ function render(){
     var n=duLiq(r);
     var s=semaforo(n,r.status);
     var diasHTML=(n!==null&&n>0)?'<span class="dias-badge '+s+'">'+n+' dias úteis</span>':'';
+    var cargoStr=cargoFull(r);
     return '<div class="card-sps '+s+'" onclick="openModal('+(start+i)+')">' +
       '<div class="card-top">' +
         '<div style="display:flex;align-items:center;gap:12px">' +
@@ -330,7 +348,7 @@ function render(){
           statusBadge(r.status) +
         '</div>' +
       '</div>' +
-      (r.cargo_codigo?'<div style="font-size:12px;color:var(--text2);margin-bottom:6px;padding:0 4px">📌 '+r.cargo_codigo+(r.cargo_desc?' — '+r.cargo_desc:'')+'</div>':'')+
+      (cargoStr?'<div style="font-size:12px;color:var(--text2);margin-bottom:6px;padding:0 4px">📌 '+cargoStr+'</div>':'')+
       '<div class="trilho-wrap">'+trilhoHTML(r.status)+'</div>' +
       '<div class="card-bottom">' +
         '<div class="card-info">👤 Fiscal: <strong>'+(r.fiscal||'—')+'</strong></div>' +
@@ -348,11 +366,14 @@ function openModal(idx){
   var n=duLiq(r);
   document.getElementById('m-titulo').textContent=r.numero_sps||'SPS';
   document.getElementById('m-sub').textContent='Fiscal: '+(r.fiscal||'—')+' · '+(r.status||'—');
+  var cargoStr=cargoFull(r);
   document.getElementById('mb').innerHTML=
     '<div style="margin-bottom:16px">'+trilhoHTML(r.status)+'</div>'+
     '<div class="secao">Identificação</div>'+
     '<div class="g3">'+campo('Número SPS',r.numero_sps)+campo('Status',statusBadge(r.status))+campo('Currículos enviados',r.total_curriculos)+'</div>'+
     '<div class="g2" style="margin-top:8px">'+campo('Fiscal do Contrato',r.fiscal)+campo('Gerente Demandante',r.gerente)+'</div>'+
+    '<div class="secao">Cargo</div>'+
+    '<div class="g2">'+campo('Cargo',cargoStr)+campo('Senioridade',r.cargo_nivel)+'</div>'+
     '<div class="secao">Cronograma</div>'+
     '<div class="g3">'+campo('E-mail recebido',fmtD(r.data_email))+campo('Currículos enviados',fmtD(r.data_curriculos))+campo('Pedido de entrevista',fmtD(r.data_entrevista))+'</div>'+
     '<div class="g3" style="margin-top:8px">'+campo('Candidato escolhido',fmtD(r.data_escolhido))+campo('Autorização',fmtD(r.data_autorizacao))+campo('Admissão',fmtD(r.data_admissao))+'</div>'+
