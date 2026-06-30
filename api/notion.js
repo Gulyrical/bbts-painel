@@ -570,6 +570,8 @@ module.exports = async function handler(req, res) {
           codigo: prop(p, 'Código SGPS', 'title'),
           descricao: prop(p, 'Descrição do Posto', 'text'),
           senioridade: prop(p, 'Senioridade', 'select'),
+          salario: prop(p, 'Salário', 'number'),
+          valor_custo: prop(p, 'Valor de Custo', 'number'),
         };
       }).filter(function(c) { return c.codigo; })
         .sort(function(a,b) { return (a.codigo||'').localeCompare(b.codigo||''); });
