@@ -11,6 +11,7 @@ const DBS = {
   solicitacoes:  '7cf89395-eab1-41d8-bd22-6e209ec7073f',
   envios:        'b701ee07-4324-40db-96e3-1e864b20b3b8',
   candidatos:    'd289f1f6-e5c4-49c4-b1f4-62613e168a4d',
+  vagas:         'fd6d7e56-f4a5-493f-8da6-b7fade3ecee3',
 };
 
 async function queryDB(dbId, cursor) {
@@ -576,6 +577,24 @@ module.exports = async function handler(req, res) {
       }).filter(function(c) { return c.codigo; })
         .sort(function(a,b) { return (a.codigo||'').localeCompare(b.codigo||''); });
       return res.status(200).json({ cargos: cargos, timestamp: new Date().toISOString() });
+    }
+
+    if (db === 'vagas_lista') {
+      var pages = await fetchAll(DBS.vagas);
+      var vagas = pages.map(function(pg) {
+        var p = pg.properties;
+        return {
+          id: pg.id,
+          codigo: prop(p, 'Posto SGPS', 'title'),
+          descricao: prop(p, 'Descrição do Posto', 'text'),
+          senioridade: prop(p, 'Senioridade', 'select'),
+          salario: prop(p, 'Salário', 'number'),
+          valor_custo: prop(p, 'Valor de Custo', 'number'),
+          qtde_contratual: prop(p, 'Qtde Contratual', 'number'),
+        };
+      }).filter(function(v) { return v.codigo; })
+        .sort(function(a,b) { return (a.codigo||'').localeCompare(b.codigo||''); });
+      return res.status(200).json({ vagas: vagas, timestamp: new Date().toISOString() });
     }
 
     if (db === 'sps_abertas') {
