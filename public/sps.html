@@ -71,6 +71,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .t-label{font-size:9px;color:#9CA3AF;text-align:center;margin-top:4px;line-height:1.3;max-width:52px}
 .t-item.done .t-label{color:var(--green)}
 .t-item.current .t-label{color:var(--blue);font-weight:500}
+.t-date{font-size:9px;color:#9CA3AF;text-align:center;margin-top:1px;font-variant-numeric:tabular-nums}
+.t-item.done .t-date{color:#6B7280}
+.t-gap{position:absolute;top:-2px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:600;color:var(--blue);background:var(--white);padding:0 5px;white-space:nowrap;z-index:2}
 
 .card-bottom{display:flex;align-items:center;gap:16px;margin-top:10px;flex-wrap:wrap}
 .card-info{font-size:11px;color:var(--text2)}
@@ -242,17 +245,16 @@ function trilhoHTML(r){
     var cls=i<idx?'done':i===idx?'current':'';
     var dataEtapa=datasPorEtapa[i];
     var dataHTML='';
-    var diasHTML='';
+    var gapHTML='';
     if(dataEtapa){
       dataHTML='<div class="t-date">'+fmtD(dataEtapa)+'</div>';
       if(dataAnterior){
         var dias=calcDU(dataAnterior,dataEtapa);
-        if(dias>0) diasHTML='<div class="t-gap">'+dias+'d</div>';
+        if(dias>0) gapHTML='<div class="t-gap">'+dias+'d</div>';
       }
       dataAnterior=dataEtapa;
     }
-    if(i>0) h+=diasHTML?('<div class="t-gap-wrap">'+diasHTML+'</div>'):'<div class="t-gap-wrap"></div>';
-    h+='<div class="t-item '+cls+'"><div class="t-dot"></div><div class="t-label">'+e.l.replace('\n','<br>')+'</div>'+dataHTML+'</div>';
+    h+='<div class="t-item '+cls+'">'+gapHTML+'<div class="t-dot"></div><div class="t-label">'+e.l.replace('\n','<br>')+'</div>'+dataHTML+'</div>';
   });
   return h+'</div>';
 }
@@ -377,13 +379,7 @@ function render(){
       '</div>' +
       (cargoStr?'<div style="font-size:12px;color:var(--text2);margin-bottom:6px;padding:0 4px">📌 '+cargoStr+'</div>':'')+
       '<div class="trilho-wrap">'+trilhoHTML(r)+'</div>' +
-      '<div class="card-bottom">' +
-        '<div class="card-info">👤 Fiscal: <strong>'+(r.fiscal||'—')+'</strong></div>' +
-        '<div class="card-info">📅 E-mail: <strong>'+fmtD(r.data_email)+'</strong></div>' +
-        (r.data_curriculos?'<div class="card-info">📄 Currículos: <strong>'+fmtD(r.data_curriculos)+'</strong></div>':'')+
-        (r.data_admissao?'<div class="card-info">✅ Admissão: <strong>'+fmtD(r.data_admissao)+'</strong></div>':'')+
-        (r.total_curriculos?'<div class="card-info">👤 Currículos enviados: <strong>'+r.total_curriculos+'</strong></div>':'')+
-      '</div>' +
+      (r.total_curriculos?'<div class="card-bottom"><div class="card-info">👤 Currículos enviados: <strong>'+r.total_curriculos+'</strong></div></div>':'')+
     '</div>';
   }).join('');
 }
