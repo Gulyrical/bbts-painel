@@ -204,7 +204,7 @@ function calcDU(s,e,pausas=[]){
 }
 
 function duLiq(r){
-  if(!r.data_email)return null;
+  if(!r||!r.data_email)return null;
   var pausas=[];
   if(r.data_curriculos&&r.data_entrevista)pausas.push({i:r.data_curriculos,f:r.data_entrevista});
   if(r.data_escolhido&&r.data_autorizacao)pausas.push({i:r.data_escolhido,f:r.data_autorizacao});
@@ -222,6 +222,7 @@ function semaforo(n,status){
 function fmtD(d){if(!d)return '—';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
 
 function trilhoHTML(r){
+  if(!r) r = {};
   var status=r.status;
   var idx=EI[status]??0;
   // Mapa etapa -> campo de data correspondente (algumas etapas não têm data própria)
@@ -305,10 +306,10 @@ async function loadData(){
     var cargoMap={};
     (dataCargos.cargos||[]).forEach(function(c){ cargoMap[c.id]=c; });
 
-    rows=(data.solicitacoes||[]).map(function(s){
+    rows=(data.solicitacoes||[]).filter(function(s){ return s; }).map(function(s){
       return {
         id:s.id, numero_sps:s.numero_sps, fiscal:s.fiscal, gerente:s.gerente,
-        status:s.status, cargo_codigo:s.cargo_codigo||null, cargo_desc:s.cargo_desc||null,
+        status:s.status||null, cargo_codigo:s.cargo_codigo||null, cargo_desc:s.cargo_desc||null,
         cargo_nivel:(s.cargo_rel&&cargoMap[s.cargo_rel])?cargoMap[s.cargo_rel].senioridade:null,
         data_email:s.data_email, data_curriculos:s.data_curriculos,
         data_entrevista:s.data_entrevista, data_escolhido:s.data_escolhido,
@@ -330,6 +331,7 @@ function applyFilter(){
   var q=document.getElementById('sq').value.toLowerCase();
   var sf=document.getElementById('sf').value;
   filt=rows.filter(function(r){
+    if(!r)return false;
     if(q&&!(r.numero_sps||'').toLowerCase().includes(q)&&!(r.fiscal||'').toLowerCase().includes(q))return false;
     if(sf==='aberto'&&['Contratado','Cancelado'].includes(r.status))return false;
     if(sf==='atrasado'){var n=duLiq(r);return semaforo(n,r.status)==='vermelho';}
@@ -374,7 +376,7 @@ function render(){
         '</div>' +
       '</div>' +
       (cargoStr?'<div style="font-size:12px;color:var(--text2);margin-bottom:6px;padding:0 4px">📌 '+cargoStr+'</div>':'')+
-      '<div class="trilho-wrap">'+trilhoHTML(r.status)+'</div>' +
+      '<div class="trilho-wrap">'+trilhoHTML(r)+'</div>' +
       '<div class="card-bottom">' +
         '<div class="card-info">👤 Fiscal: <strong>'+(r.fiscal||'—')+'</strong></div>' +
         '<div class="card-info">📅 E-mail: <strong>'+fmtD(r.data_email)+'</strong></div>' +
@@ -393,7 +395,7 @@ function openModal(idx){
   document.getElementById('m-sub').textContent='Fiscal: '+(r.fiscal||'—')+' · '+(r.status||'—');
   var cargoStr=cargoFull(r);
   document.getElementById('mb').innerHTML=
-    '<div style="margin-bottom:16px">'+trilhoHTML(r.status)+'</div>'+
+    '<div style="margin-bottom:16px">'+trilhoHTML(r)+'</div>'+
     '<div class="secao">Identificação</div>'+
     '<div class="g3">'+campo('Número SPS',r.numero_sps)+campo('Status',statusBadge(r.status))+campo('Currículos enviados',r.total_curriculos)+'</div>'+
     '<div class="g2" style="margin-top:8px">'+campo('Fiscal do Contrato',r.fiscal)+campo('Gerente Demandante',r.gerente)+'</div>'+
