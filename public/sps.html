@@ -62,7 +62,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 /* Trilho de progresso */
 .trilho-wrap{margin-bottom:4px}
 .trilho{display:flex;align-items:flex-start}
-.t-item{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
+.trilho.compacto{justify-content:flex-start;gap:4px}
+.trilho.compacto .t-item{flex:0 0 auto;width:90px}
+.t-item{flex:1;max-width:90px;display:flex;flex-direction:column;align-items:center;position:relative}
 .t-item:not(:last-child)::after{content:'';position:absolute;top:7px;left:50%;width:100%;height:2px;background:#E5E7EB;z-index:0}
 .t-item.done:not(:last-child)::after{background:var(--green)}
 .t-dot{width:14px;height:14px;border-radius:50%;border:2px solid #D1D5DB;background:#fff;z-index:1;position:relative;flex-shrink:0}
@@ -224,8 +226,47 @@ function semaforo(n,status){
 
 function fmtD(d){if(!d)return '—';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
 
+var STATUS_ABREV={
+  'Aguardando Currículos':'E-mail\nrecebido',
+  'Currículos Enviados':'Currículos\nenviados',
+  'Em Entrevista':'Em\nentrevista',
+  'Candidato Escolhido':'Candidato\nescolhido',
+  'Aguardando Autorização':'Aguard.\nautorização',
+  'Autorizado':'Autorizado',
+  'Em Contratação':'Em\ncontratação',
+  'Contratado':'Contratado',
+  'Cancelado':'Cancelado',
+};
+
 function trilhoHTML(r){
   if(!r) r = {};
+  if(r.eventos && r.eventos.length>0) return trilhoEventosHTML(r);
+  return trilhoFixoHTML(r);
+}
+
+// Trilho desenhado a partir da linha do tempo real de eventos (suporta idas e vindas)
+function trilhoEventosHTML(r){
+  var eventos=r.eventos;
+  var h='<div class="trilho compacto">';
+  var dataAnterior=null;
+  eventos.forEach(function(ev,i){
+    var isUltimo=(i===eventos.length-1);
+    var cls=isUltimo?'current':'done';
+    var label=(STATUS_ABREV[ev.status]||ev.status||'').replace('\n','<br>');
+    var dataHTML='<div class="t-date">'+fmtD(ev.data)+'</div>';
+    var gapHTML='';
+    if(dataAnterior){
+      var dias=calcDU(dataAnterior,ev.data);
+      if(dias>0) gapHTML='<div class="t-gap">'+dias+'d</div>';
+    }
+    dataAnterior=ev.data;
+    h+='<div class="t-item '+cls+'">'+gapHTML+'<div class="t-dot"></div><div class="t-label">'+label+'</div>'+dataHTML+'</div>';
+  });
+  return h+'</div>';
+}
+
+// Trilho fixo antigo (fallback para SPS que ainda não têm eventos cadastrados)
+function trilhoFixoHTML(r){
   var status=r.status;
   var idx=EI[status]??0;
   // Mapa etapa -> campo de data correspondente (algumas etapas não têm data própria)
@@ -297,16 +338,28 @@ async function loadData(){
   var btn=document.getElementById('btn');
   btn.classList.add('spin');
   try{
-    var [res,resCargos]=await Promise.all([
+    var [res,resCargos,resEventos]=await Promise.all([
       fetch(API+'?db=solicitacoes',{cache:'no-store'}),
-      fetch(API+'?db=cargos_lista',{cache:'no-store'})
+      fetch(API+'?db=cargos_lista',{cache:'no-store'}),
+      fetch(API+'?db=eventos_sps',{cache:'no-store'})
     ]);
     var data=await res.json();
     var dataCargos=await resCargos.json();
+    var dataEventos=await resEventos.json();
     if(data.error)throw new Error(data.error);
 
     var cargoMap={};
     (dataCargos.cargos||[]).forEach(function(c){ cargoMap[c.id]=c; });
+
+    var eventosPorSPS={};
+    (dataEventos.eventos||[]).forEach(function(ev){
+      if(!ev||!ev.sps_id||!ev.data)return;
+      if(!eventosPorSPS[ev.sps_id])eventosPorSPS[ev.sps_id]=[];
+      eventosPorSPS[ev.sps_id].push(ev);
+    });
+    Object.keys(eventosPorSPS).forEach(function(k){
+      eventosPorSPS[k].sort(function(a,b){ return (a.data||'').localeCompare(b.data||''); });
+    });
 
     rows=(data.solicitacoes||[]).filter(function(s){ return s; }).map(function(s){
       return {
@@ -317,6 +370,7 @@ async function loadData(){
         data_entrevista:s.data_entrevista, data_escolhido:s.data_escolhido,
         data_autorizacao:s.data_autorizacao, data_admissao:s.data_admissao,
         total_curriculos:s.total_curriculos,
+        eventos:eventosPorSPS[s.id]||[],
       };
     });
     document.getElementById('sub').textContent=rows.length+' solicitações';
