@@ -411,10 +411,15 @@ function recarregarTudo() {
 }
 
 // ── Cargos ──
+function cargoLabel(c) {
+  var base = c.codigo + (c.descricao ? ' — ' + c.descricao : '');
+  return c.senioridade ? base + ' (' + c.senioridade + ')' : base;
+}
+
 function preencherCargos() {
   var opts = '<option value="">Selecione o cargo...</option>' +
     cargosLista.map(function(c){
-      return '<option value="' + c.id + '">' + c.codigo + (c.descricao ? ' — ' + c.descricao : '') + '</option>';
+      return '<option value="' + c.id + '">' + cargoLabel(c) + '</option>';
     }).join('');
   document.getElementById('n-cargo').innerHTML = opts;
   document.getElementById('c-cargo').innerHTML = opts;
@@ -426,7 +431,7 @@ function preencherSPSCandidato() {
   document.getElementById('c-sps-select').innerHTML =
     '<option value="">Selecione uma SPS aberta...</option>' +
     abertas.map(function(s){
-      var cargo = s.cargo_codigo ? s.cargo_codigo + (s.cargo_desc ? ' — ' + s.cargo_desc : '') : '—';
+      var cargo = s.cargo_codigo ? s.cargo_codigo + (s.cargo_desc ? ' — ' + s.cargo_desc : '') + (s.cargo_nivel ? ' (' + s.cargo_nivel + ')' : '') : '—';
       return '<option value="' + s.id + '" data-num="' + (s.numero_sps||'') + '" data-ger="' + (s.gerente||'') + '">' +
         (s.numero_sps||'') + ' · ' + cargo + ' · ' + (s.gerente||'—') + '</option>';
     }).join('');
@@ -440,7 +445,7 @@ function renderListaSPS(lista) {
     return;
   }
   document.getElementById('lista-sps').innerHTML = lista.map(function(s) {
-    var cargo = s.cargo_codigo ? s.cargo_codigo + (s.cargo_desc ? ' — ' + s.cargo_desc : '') : '—';
+    var cargo = s.cargo_codigo ? s.cargo_codigo + (s.cargo_desc ? ' — ' + s.cargo_desc : '') + (s.cargo_nivel ? ' (' + s.cargo_nivel + ')' : '') : '—';
     return '<div class="sps-list-item" data-id="' + s.id + '">' +
       '<span class="sps-num">' + (s.numero_sps||'—') + '</span>' +
       '<span class="sps-info">📌 ' + cargo + ' · 👤 ' + (s.gerente||'—') + '</span>' +
@@ -479,7 +484,7 @@ function preencherForm(sps) {
   spsId = sps.id;
   document.getElementById('card-numero').textContent = sps.numero_sps || '—';
   document.getElementById('card-info').textContent =
-    'Cargo: ' + (sps.cargo_codigo||'—') + ' · Gerente: ' + (sps.gerente||'—') + ' · Status: ' + (sps.status||'—');
+    'Cargo: ' + (sps.cargo_codigo||'—') + (sps.cargo_nivel ? ' (' + sps.cargo_nivel + ')' : '') + ' · Gerente: ' + (sps.gerente||'—') + ' · Status: ' + (sps.status||'—');
   document.getElementById('sps-selecionada').classList.add('visible');
   document.getElementById('a-status').value = sps.status || 'Aguardando Currículos';
   document.getElementById('a-gerente').value = sps.gerente || '';
