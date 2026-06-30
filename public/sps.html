@@ -221,12 +221,37 @@ function semaforo(n,status){
 
 function fmtD(d){if(!d)return '—';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
 
-function trilhoHTML(status){
+function trilhoHTML(r){
+  var status=r.status;
   var idx=EI[status]??0;
+  // Mapa etapa -> campo de data correspondente (algumas etapas não têm data própria)
+  var datasPorEtapa=[
+    r.data_email,        // E-mail recebido
+    r.data_curriculos,   // Currículos enviados
+    r.data_entrevista,   // Em entrevista
+    r.data_escolhido,    // Candidato escolhido
+    null,                // Aguard. autorização (sem data própria)
+    r.data_autorizacao,  // Autorizado
+    null,                // Em contratação (sem data própria)
+    r.data_admissao,     // Contratado
+  ];
   var h='<div class="trilho">';
+  var dataAnterior=null;
   ETAPAS.forEach(function(e,i){
     var cls=i<idx?'done':i===idx?'current':'';
-    h+='<div class="t-item '+cls+'"><div class="t-dot"></div><div class="t-label">'+e.l.replace('\n','<br>')+'</div></div>';
+    var dataEtapa=datasPorEtapa[i];
+    var dataHTML='';
+    var diasHTML='';
+    if(dataEtapa){
+      dataHTML='<div class="t-date">'+fmtD(dataEtapa)+'</div>';
+      if(dataAnterior){
+        var dias=calcDU(dataAnterior,dataEtapa);
+        if(dias>0) diasHTML='<div class="t-gap">'+dias+'d</div>';
+      }
+      dataAnterior=dataEtapa;
+    }
+    if(i>0) h+=diasHTML?('<div class="t-gap-wrap">'+diasHTML+'</div>'):'<div class="t-gap-wrap"></div>';
+    h+='<div class="t-item '+cls+'"><div class="t-dot"></div><div class="t-label">'+e.l.replace('\n','<br>')+'</div>'+dataHTML+'</div>';
   });
   return h+'</div>';
 }
@@ -270,8 +295,8 @@ async function loadData(){
   btn.classList.add('spin');
   try{
     var [res,resCargos]=await Promise.all([
-      fetch(API+'?db=solicitacoes'),
-      fetch(API+'?db=cargos_lista')
+      fetch(API+'?db=solicitacoes',{cache:'no-store'}),
+      fetch(API+'?db=cargos_lista',{cache:'no-store'})
     ]);
     var data=await res.json();
     var dataCargos=await resCargos.json();
