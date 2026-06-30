@@ -43,6 +43,7 @@ tbody td{padding:11px 14px;font-size:13px;overflow:hidden;text-overflow:ellipsis
 .badge-a{background:#ECFDF5;color:#065F46;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px}
 .badge-d{background:#FEF2F2;color:#991B1B;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px}
 .avatar{width:28px;height:28px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#fff;flex-shrink:0}
+.cargo-niv{color:var(--text2);font-weight:400;font-size:12px}
 .pag{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text2)}
 .pag button{padding:4px 12px;border:1px solid var(--border);border-radius:6px;background:var(--white);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif}
 .pag button:disabled{opacity:0.4;cursor:default}
@@ -108,16 +109,16 @@ tbody td{padding:11px 14px;font-size:13px;overflow:hidden;text-overflow:ellipsis
     <table>
       <thead>
         <tr>
-          <th class="sortable sort-active" style="width:36%" onclick="sortBy('nome')" id="th-nome">
+          <th class="sortable sort-active" style="width:34%" onclick="sortBy('nome')" id="th-nome">
             Nome <span class="sort-icon" id="si-nome">↑</span>
           </th>
-          <th class="sortable" style="width:12%" onclick="sortBy('matricula')" id="th-matricula">
+          <th class="sortable" style="width:11%" onclick="sortBy('matricula')" id="th-matricula">
             Matrícula <span class="sort-icon" id="si-matricula">↕</span>
           </th>
-          <th class="sortable" style="width:14%" onclick="sortBy('data_admissao')" id="th-data_admissao">
+          <th class="sortable" style="width:13%" onclick="sortBy('data_admissao')" id="th-data_admissao">
             Admissão <span class="sort-icon" id="si-data_admissao">↕</span>
           </th>
-          <th class="sortable" style="width:22%" onclick="sortBy('cargo')" id="th-cargo">
+          <th class="sortable" style="width:28%" onclick="sortBy('cargo')" id="th-cargo">
             Cargo <span class="sort-icon" id="si-cargo">↕</span>
           </th>
           <th style="width:14%;text-align:center">Status</th>
@@ -181,6 +182,11 @@ function campo(label, val) {
     (v ? v : '<span class="campo-e">Em branco</span>') + '</div></div>';
 }
 
+function cargoComNivel(cargo, nivel) {
+  if (!cargo) return null;
+  return nivel ? (cargo + ' (' + nivel + ')') : cargo;
+}
+
 function sortBy(field) {
   if (sortField === field) {
     sortAsc = !sortAsc;
@@ -188,7 +194,6 @@ function sortBy(field) {
     sortField = field;
     sortAsc = true;
   }
-  // Atualizar visual dos cabeçalhos
   ['nome','matricula','data_admissao','cargo'].forEach(function(f) {
     var th = document.getElementById('th-' + f);
     var si = document.getElementById('si-' + f);
@@ -297,7 +302,6 @@ function applyFilter() {
     (!s || r.status === s)
   );
 
-  // Ordenação
   filt.sort(function(a, b) {
     var va = (a[sortField] || '').toString().toLowerCase();
     var vb = (b[sortField] || '').toString().toLowerCase();
@@ -332,6 +336,7 @@ function render() {
 
   tb.innerHTML = slice.map((r,i) => {
     var ini = (r.nome||'?').split(' ').slice(0,2).map(n=>n[0]).join('');
+    var cargoLabel = cargoComNivel(r.cargo, r.nivel);
     return '<tr onclick="openModal(' + (start+i) + ')">' +
       '<td><div style="display:flex;align-items:center;gap:9px">' +
         '<div class="avatar">' + ini + '</div>' +
@@ -339,7 +344,7 @@ function render() {
       '</div></td>' +
       '<td style="color:var(--text2)">' + (r.matricula||'—') + '</td>' +
       '<td style="color:var(--text2)">' + (fmtDate(r.data_admissao)||'—') + '</td>' +
-      '<td style="color:var(--text2)">' + (r.cargo||'—') + '</td>' +
+      '<td style="color:var(--text2)">' + (cargoLabel||'—') + '</td>' +
       '<td style="text-align:center"><span class="' + (r.status==='Ativo'?'badge-a':'badge-d') + '">' + (r.status||'—') + '</span></td>' +
     '</tr>';
   }).join('');
@@ -377,7 +382,7 @@ function openModal(idx) {
     '<div class="g3">' +
       campo('Código do Cargo', r.cod_cargo) +
       campo('Cargo', r.cargo) +
-      campo('Nível', r.nivel) +
+      campo('Senioridade', r.nivel) +
     '</div>' +
     '<div class="g2" style="margin-top:8px">' +
       campo('Salário', r.salario) +

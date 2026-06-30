@@ -30,6 +30,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .card-icon.green{background:#E6F4EF}
 .card-icon.amber{background:#FEF3DC}
 .card-icon.red{background:#FDECEA}
+.card-icon.purple{background:#F1ECFE}
 .card-title{font-size:15px;font-weight:500;color:var(--text)}
 .card-desc{font-size:13px;color:var(--text2);line-height:1.5}
 .card-footer{font-size:11px;color:var(--blue);font-weight:500;margin-top:4px}
@@ -40,99 +41,72 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </style>
 </head>
 <body>
-
 <header class="header">
-  <div class="header-left">
-    <div class="logo">BI</div>
-    <div class="brand">
-      <div class="brand-name">BBTS — Portal de Gestão</div>
-      <div class="brand-sub">Painel de acompanhamento interno</div>
-    </div>
-  </div>
-  <div class="header-right" id="data-hora">—</div>
+<div class="header-left">
+<div class="logo">BI</div>
+<div class="brand">
+<div class="brand-name">BBTS — Portal de Gestão</div>
+<div class="brand-sub">Painel de acompanhamento interno</div>
+</div>
+</div>
+<div class="header-right" id="data-hora">—</div>
 </header>
-
 <main class="main">
-  <div class="hero">
-    <div class="hero-title">Bem-vindo ao Portal BBTS</div>
-    <div class="hero-sub">Selecione um painel para acessar os dados</div>
-  </div>
-
-  <div class="grid">
-
-    <a href="/colaboradores.html" class="card">
-      <div class="card-icon blue">👥</div>
-      <div>
-        <div class="card-title">Gestão de Pessoas</div>
-        <div class="card-desc">Cadastro completo de colaboradores, dados pessoais, vínculos, cargos e informações bancárias.</div>
-      </div>
-      <div class="card-footer">Acessar painel →</div>
-    </a>
-
-    <a href="/sps.html" class="card">
-      <div class="card-icon green">📋</div>
-      <div>
-        <div class="card-title">Contratações / SPS</div>
-        <div class="card-desc">Acompanhamento de solicitações de posto, prazos, candidatos e semáforo de progresso.</div>
-      </div>
-      <div class="card-footer">Acessar painel →</div>
-    </a>
-    <a href="/gestao-sps.html" class="card">
-      <div class="card-icon" style="background:#FEF3DC">✏️</div>
-      <div>
-        <div class="card-title">Gestão de SPS</div>
-        <div class="card-desc">Criar e atualizar solicitações de posto, status e datas do cronograma.</div>
-      </div>
-      <div class="card-footer">Acessar →</div>
-    </a>
-
-    <a href="/ferias.html" class="card">
-      <div class="card-icon" style="background:#E6F4EF">🏖️</div>
-      <div>
-        <div class="card-title">Férias</div>
-        <div class="card-desc">Levantamento de férias por colaborador, período e distribuição de dias por mês.</div>
-      </div>
-      <div class="card-footer">Acessar painel →</div>
-    </a>
-
-    <a href="/banco-horas.html" class="card">
-      <div class="card-icon" style="background:#EEF0FF">⏱️</div>
-      <div>
-        <div class="card-title">Banco de Horas</div>
-        <div class="card-desc">Acompanhamento semanal do saldo de horas, tendência e dias necessários para zerar.</div>
-      </div>
-      <div class="card-footer">Acessar painel →</div>
-    </a>
-    <div class="card em-breve">
-      <div class="card-icon amber">💻</div>
-      <div>
-        <div class="card-title">Equipamentos <span class="badge-breve">Em breve</span></div>
-        <div class="card-desc">Controle de notebooks, patrimônios e devoluções de colaboradores desligados.</div>
-      </div>
-      <div class="card-footer">Em desenvolvimento</div>
-    </div>
-
-    <a href="/atestados.html" class="card">
-      <div class="card-icon red">🏥</div>
-      <div>
-        <div class="card-title">Atestados</div>
-        <div class="card-desc">Monitoramento de atestados médicos, CIDs e alertas de encaminhamento ao INSS.</div>
-      </div>
-      <div class="card-footer">Acessar painel →</div>
-    </a>
-
-  </div>
+<div class="hero">
+<div class="hero-title">Bem-vindo ao Portal BBTS</div>
+<div class="hero-sub">Selecione um painel para acessar os dados</div>
+</div>
+<div class="grid">
+<a href="/colaboradores.html" class="card">
+<div class="card-icon blue">👥</div>
+<div>
+<div class="card-title">Gestão de Pessoas</div>
+<div class="card-desc">Cadastro completo de colaboradores, dados pessoais, vínculos, cargos e informações bancárias.</div>
+</div>
+<div class="card-footer">Acessar painel →</div>
+</a>
+<a href="/sps.html" class="card">
+<div class="card-icon green">📋</div>
+<div>
+<div class="card-title">Contratações / SPS</div>
+<div class="card-desc">Acompanhamento de solicitações de posto, prazos, candidatos e semáforo de progresso.</div>
+</div>
+<div class="card-footer">Acessar painel →</div>
+</a>
+<a href="/reenquadramentos.html" class="card">
+<div class="card-icon purple">🔄</div>
+<div>
+<div class="card-title">Reenquadramentos</div>
+<div class="card-desc">Histórico de mudanças de cargo e posto SGPS dos colaboradores, com senioridade atual.</div>
+</div>
+<div class="card-footer">Acessar painel →</div>
+</a>
+<div class="card em-breve">
+<div class="card-icon amber">💻</div>
+<div>
+<div class="card-title">Equipamentos <span class="badge-breve">Em breve</span></div>
+<div class="card-desc">Controle de notebooks, patrimônios e devoluções de colaboradores desligados.</div>
+</div>
+<div class="card-footer">Em desenvolvimento</div>
+</div>
+<div class="card em-breve">
+<div class="card-icon red">🏥</div>
+<div>
+<div class="card-title">Afastamentos <span class="badge-breve">Em breve</span></div>
+<div class="card-desc">Atestados, férias e acompanhamento de colaboradores afastados.</div>
+</div>
+<div class="card-footer">Em desenvolvimento</div>
+</div>
+</div>
 </main>
-
 <footer class="footer">
-  Portal BBTS · Dados sincronizados com <span>Notion</span> em tempo real
+Portal BBTS · Dados sincronizados com <span>Notion</span> em tempo real
 </footer>
-
 <script>
 function atualizarHora(){
-  var agora=new Date();
-  var opts={weekday:'long',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'};
-  document.getElementById('data-hora').textContent=agora.toLocaleDateString('pt-BR',opts);
+var agora=new Date();
+var opts={weekday:'long',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'};
+document.getElementById('data-hora').textContent=agora.toLocaleDateString('pt-BR',opts);
 }
 atualizarHora();
 setInterval(atualizarHora,60000);
