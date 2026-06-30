@@ -139,14 +139,19 @@ function parseCargo(pg) {
 function parseEquipamento(pg) {
   var p = pg.properties;
   return {
-    id:             pg.id,
-    patrimonio:     prop(p, 'Patrimônio', 'title'),
-    marca:          prop(p, 'Marca', 'text'),
-    tipo:           prop(p, 'Tipo de Equipamento', 'select'),
-    situacao:       prop(p, 'Situação Devolução', 'select'),
-    responsavel:    prop(p, 'Responsável Recebimento', 'text'),
-    data_devolucao: prop(p, 'Data de Devolução', 'date'),
-    pessoa_id:      getRelId(p, 'Pessoa'),
+    id:                pg.id,
+    patrimonio:        prop(p, 'Patrimônio', 'title'),
+    numero_patrimonio: prop(p, 'Número de Patrimônio', 'text'),
+    marca:             prop(p, 'Marca', 'text'),
+    modelo:            prop(p, 'Modelo', 'text'),
+    tipo:              prop(p, 'Tipo de Equipamento', 'select'),
+    situacao:          prop(p, 'Situação Devolução', 'select'),
+    responsavel:       prop(p, 'Responsável Recebimento', 'text'),
+    de_acordo:         prop(p, 'De Acordo Recebimento', 'text'),
+    observacao:        prop(p, 'Observação', 'text'),
+    data_entrega:      prop(p, 'date:Data de Entrega:start', 'date'),
+    data_devolucao:    prop(p, 'date:Data de Devolução:start', 'date'),
+    pessoa_id:         getRelId(p, 'Pessoa'),
   };
 }
 
@@ -666,6 +671,45 @@ async function realHandler(req, res) {
       }).filter(function(e) { return e.sps_id && e.data; })
         .sort(function(a,b) { return (a.data||'').localeCompare(b.data||''); });
       return res.status(200).json({ eventos: eventos, timestamp: new Date().toISOString() });
+    }
+
+    if (db === 'equipamentos_lista') {
+      var [eqPages, pessoaPages, vinculoPages] = await Promise.all([
+        fetchAll(DBS.equipamentos),
+        fetchAll(DBS.pessoas),
+        fetchAll(DBS.vinculos),
+      ]);
+
+      var pessoaMap = {};
+      pessoaPages.forEach(function(pg) {
+        var nome = prop(pg.properties, 'Nome Completo', 'title') || prop(pg.properties, 'Nome', 'title');
+        if (nome) pessoaMap[pg.id] = nome;
+      });
+
+      // Mapa pessoa_id -> status do vínculo mais relevante (prioriza Ativo se houver mais de um vínculo)
+      var statusPorPessoa = {};
+      var matriculaPorPessoa = {};
+      vinculoPages.forEach(function(pg) {
+        var p = pg.properties;
+        var pessoaId = getRelId(p, 'Pessoa');
+        if (!pessoaId) return;
+        var status = prop(p, 'Status', 'select');
+        var matricula = prop(p, 'Matrícula', 'title');
+        if (!statusPorPessoa[pessoaId] || status === 'Ativo') {
+          statusPorPessoa[pessoaId] = status;
+          matriculaPorPessoa[pessoaId] = matricula;
+        }
+      });
+
+      var equipamentos = eqPages.map(function(pg) {
+        var eq = parseEquipamento(pg);
+        eq.pessoa_nome = eq.pessoa_id ? (pessoaMap[eq.pessoa_id] || null) : null;
+        eq.pessoa_status = eq.pessoa_id ? (statusPorPessoa[eq.pessoa_id] || null) : null;
+        eq.pessoa_matricula = eq.pessoa_id ? (matriculaPorPessoa[eq.pessoa_id] || null) : null;
+        return eq;
+      });
+
+      return res.status(200).json({ equipamentos: equipamentos, timestamp: new Date().toISOString() });
     }
 
     if (db === 'sps_abertas') {
