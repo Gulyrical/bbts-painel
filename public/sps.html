@@ -211,7 +211,18 @@ function calcDU(s,e,pausas=[]){
 }
 
 function duLiq(r){
-  if(!r||!r.data_email)return null;
+  if(!r)return null;
+  // Se tem eventos cadastrados, calcula do primeiro ao último evento (linha do tempo real)
+  if(r.eventos && r.eventos.length>0){
+    var primeira=r.eventos[0].data;
+    var ultima=r.eventos[r.eventos.length-1].data;
+    var statusFinal=r.eventos[r.eventos.length-1].status;
+    var emAndamento=!['Contratado','Cancelado'].includes(statusFinal);
+    var fim=emAndamento?null:ultima; // se ainda em andamento, conta até hoje; senão, até a última data
+    return calcDU(primeira,fim);
+  }
+  // Fallback: campos antigos fixos
+  if(!r.data_email)return null;
   var pausas=[];
   if(r.data_curriculos&&r.data_entrevista)pausas.push({i:r.data_curriculos,f:r.data_entrevista});
   if(r.data_escolhido&&r.data_autorizacao)pausas.push({i:r.data_escolhido,f:r.data_autorizacao});
