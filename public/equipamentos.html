@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBTS — Equipamentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#465EFF;--bg:#F5F6F8;--white:#fff;--border:#E5E7EB;--text:#111827;--text2:#6B7280;
+  --green:#10B981;--red:#EF4444;--amber:#E8A020;--radius:8px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+.header{background:var(--blue);height:58px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.header-left{display:flex;align-items:center;gap:12px}
+.brand-mark{width:32px;height:32px;background:rgba(255,255,255,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.brand-name{font-size:14px;font-weight:600;color:#fff}
+.brand-sub{font-size:11px;opacity:0.65;margin-top:1px;color:#fff}
+.header-right{display:flex;align-items:center;gap:10px}
+.btn-acao{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif}
+.btn-acao:hover{background:rgba(255,255,255,0.25)}
+.btn-acao.spin span{display:inline-block;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.main{max-width:1200px;margin:0 auto;padding:24px 28px}
+
+/* ABAS */
+.tabs{display:flex;gap:2px;background:#E5E7EB;border-radius:8px;padding:3px;margin-bottom:20px;width:fit-content}
+.tab{padding:7px 20px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);transition:all 0.15s;position:relative}
+.tab.active{background:var(--white);color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.tab:hover:not(.active){color:var(--text)}
+.tab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:20px;background:var(--red);color:#fff;font-size:10px;font-weight:600;margin-left:6px}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.stat .num{font-size:24px;font-weight:700;line-height:1}
+.stat .lbl{font-size:11px;color:var(--text2);margin-top:5px;text-transform:uppercase;letter-spacing:0.04em}
+.stat.blue .num{color:var(--blue)}
+.stat.green .num{color:var(--green)}
+.stat.red .num{color:var(--red)}
+.stat.amber .num{color:var(--amber)}
+
+/* ALERTA */
+.alerta-critica{background:#FDECEA;border:1px solid #F5B5AE;border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.alerta-critica .icone{font-size:22px}
+.alerta-critica .texto{flex:1}
+.alerta-critica .titulo{font-size:13px;font-weight:600;color:#7A1F17}
+.alerta-critica .desc{font-size:12px;color:#991B1B;margin-top:2px}
+
+/* FILTROS */
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.search{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;width:260px;background:var(--white)}
+.search:focus{outline:none;border-color:var(--blue)}
+.fbtn{padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--white);font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+.fbtn:hover,.fbtn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* TABELA */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{border-bottom:1px solid var(--border)}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap}
+tbody tr{border-bottom:1px solid #F3F4F6}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#F9FAFB}
+td{padding:10px 14px;vertical-align:middle}
+td.patrimonio{font-weight:600;color:var(--blue)}
+td.pessoa{font-weight:500}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.badge.devolvido{background:#ECFDF5;color:#065F46}
+.badge.pendente{background:#FEF2F2;color:#991B1B}
+.badge.parcial{background:#FEF3DC;color:#7A4E00}
+.badge.naodevolvido{background:#F3F4F6;color:#374151}
+.badge-status{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot.ativo{background:var(--green)}
+.dot.desligado{background:var(--red)}
+.tipo-tag{font-size:11px;color:var(--text2)}
+.empty{text-align:center;padding:40px;color:var(--text2);font-size:13px}
+.loading{text-align:center;padding:60px;color:var(--text2);font-size:13px}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <div class="brand-mark">💻</div>
+    <div>
+      <div class="brand-name">BBTS — Equipamentos</div>
+      <div class="brand-sub" id="sub">Carregando...</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span style="font-size:11px;color:rgba(255,255,255,0.55)" id="upd">—</span>
+    <button class="btn-acao" id="btn" onclick="loadData()"><span id="ri">↻</span> Atualizar</button>
+    <a href="/" class="btn-acao">← Portal</a>
+  </div>
+</header>
+
+<main class="main">
+  <div class="tabs">
+    <div class="tab active" id="tab-btn-todos">📋 Todos os Equipamentos</div>
+    <div class="tab" id="tab-btn-pendencias">⚠️ Pendências de Devolução<span class="tab-badge" id="badge-pend" style="display:none">0</span></div>
+  </div>
+
+  <!-- ── ABA: TODOS ── -->
+  <div id="aba-todos">
+    <div class="stats">
+      <div class="stat blue"><div class="num" id="st-total">—</div><div class="lbl">Total de Equipamentos</div></div>
+      <div class="stat green"><div class="num" id="st-devolvidos">—</div><div class="lbl">Devolvidos</div></div>
+      <div class="stat amber"><div class="num" id="st-parcial">—</div><div class="lbl">Parciais</div></div>
+      <div class="stat red"><div class="num" id="st-pendentes">—</div><div class="lbl">Pendentes / Não Devolvidos</div></div>
+    </div>
+
+    <div class="filters">
+      <input class="search" id="busca-todos" type="text" placeholder="Buscar por patrimônio, pessoa ou marca...">
+      <button class="fbtn active" data-tf="">Todos</button>
+      <button class="fbtn" data-tf="Notebook">Notebook</button>
+      <button class="fbtn" data-tf="Desktop">Desktop</button>
+      <button class="fbtn" data-tf="Celular">Celular</button>
+      <button class="fbtn" data-tf="Monitor">Monitor</button>
+      <button class="fbtn" data-tf="Outros">Outros</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:14%">Patrimônio</th>
+            <th style="width:10%">Tipo</th>
+            <th style="width:22%">Colaborador</th>
+            <th style="width:12%">Status Colab.</th>
+            <th style="width:14%">Entrega</th>
+            <th style="width:14%">Devolução</th>
+            <th style="width:14%">Situação</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-todos"><tr><td colspan="7" class="loading">Carregando equipamentos...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── ABA: PENDÊNCIAS ── -->
+  <div id="aba-pendencias" style="display:none">
+    <div id="alerta-wrap"></div>
+
+    <div class="filters">
+      <input class="search" id="busca-pend" type="text" placeholder="Buscar por patrimônio ou pessoa...">
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:16%">Patrimônio</th>
+            <th style="width:10%">Tipo</th>
+            <th style="width:24%">Colaborador (Desligado)</th>
+            <th style="width:14%">Matrícula</th>
+            <th style="width:14%">Entrega</th>
+            <th style="width:22%">Situação</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-pend"><tr><td colspan="6" class="loading">Carregando pendências...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+const API = '/api/notion';
+let equipamentos = [];
+
+function setTab(tab) {
+  document.getElementById('tab-btn-todos').classList.toggle('active', tab === 'todos');
+  document.getElementById('tab-btn-pendencias').classList.toggle('active', tab === 'pendencias');
+  document.getElementById('aba-todos').style.display = tab === 'todos' ? 'block' : 'none';
+  document.getElementById('aba-pendencias').style.display = tab === 'pendencias' ? 'block' : 'none';
+}
+document.getElementById('tab-btn-todos').addEventListener('click', function(){ setTab('todos'); });
+document.getElementById('tab-btn-pendencias').addEventListener('click', function(){ setTab('pendencias'); });
+
+function fmtD(d) {
+  if (!d) return '—';
+  var p = d.split('-');
+  return p[2] + '/' + p[1] + '/' + p[0];
+}
+
+function situacaoBadge(s) {
+  var map = {
+    'Devolvido': {cls:'devolvido', l:'Devolvido'},
+    'Pendente': {cls:'pendente', l:'Pendente'},
+    'Parcial': {cls:'parcial', l:'Parcial'},
+    'Não Devolvido': {cls:'naodevolvido', l:'Não Devolvido'},
+  };
+  var m = map[s] || {cls:'naodevolvido', l: s || '—'};
+  return '<span class="badge ' + m.cls + '">' + m.l + '</span>';
+}
+
+function statusColabBadge(status) {
+  if (!status) return '<span style="color:var(--text2)">—</span>';
+  var isAtivo = status === 'Ativo';
+  return '<span class="badge-status"><span class="dot ' + (isAtivo?'ativo':'desligado') + '"></span>' + status + '</span>';
+}
+
+// ═══════════ ABA TODOS ═══════════
+let filtroTipoTodos = '';
+
+document.querySelectorAll('#aba-todos .fbtn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#aba-todos .fbtn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    filtroTipoTodos = b.dataset.tf;
+    renderTodos();
+  });
+});
+document.getElementById('busca-todos').addEventListener('input', renderTodos);
+
+function renderTodos() {
+  var busca = document.getElementById('busca-todos').value.toLowerCase();
+  var tbody = document.getElementById('tbody-todos');
+
+  var filtrados = equipamentos.filter(e => {
+    var matchBusca = !busca ||
+      (e.patrimonio||'').toLowerCase().includes(busca) ||
+      (e.pessoa_nome||'').toLowerCase().includes(busca) ||
+      (e.marca||'').toLowerCase().includes(busca);
+    var matchTipo = !filtroTipoTodos || e.tipo === filtroTipoTodos;
+    return matchBusca && matchTipo;
+  });
+
+  if (!filtrados.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhum equipamento encontrado.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtrados.map(e => {
+    return '<tr>' +
+      '<td class="patrimonio">' + (e.patrimonio || '—') + '</td>' +
+      '<td class="tipo-tag">' + (e.tipo || '—') + '</td>' +
+      '<td class="pessoa">' + (e.pessoa_nome || '<span style="color:var(--text2)">Não atribuído</span>') + '</td>' +
+      '<td>' + statusColabBadge(e.pessoa_status) + '</td>' +
+      '<td style="color:var(--text2)">' + fmtD(e.data_entrega) + '</td>' +
+      '<td style="color:var(--text2)">' + fmtD(e.data_devolucao) + '</td>' +
+      '<td>' + situacaoBadge(e.situacao) + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ═══════════ ABA PENDÊNCIAS ═══════════
+document.getElementById('busca-pend').addEventListener('input', renderPendencias);
+
+function getPendencias() {
+  // Foco: colaborador Desligado + situação de devolução não concluída
+  return equipamentos.filter(e =>
+    e.pessoa_status === 'Desligado' &&
+    ['Pendente', 'Parcial', 'Não Devolvido'].includes(e.situacao)
+  );
+}
+
+function renderPendencias() {
+  var busca = document.getElementById('busca-pend').value.toLowerCase();
+  var tbody = document.getElementById('tbody-pend');
+  var pendencias = getPendencias();
+
+  var filtrados = pendencias.filter(e =>
+    !busca ||
+    (e.patrimonio||'').toLowerCase().includes(busca) ||
+    (e.pessoa_nome||'').toLowerCase().includes(busca)
+  );
+
+  var alertaWrap = document.getElementById('alerta-wrap');
+  if (pendencias.length > 0) {
+    alertaWrap.innerHTML = '<div class="alerta-critica">' +
+      '<div class="icone">🚨</div>' +
+      '<div class="texto">' +
+        '<div class="titulo">' + pendencias.length + ' equipamento(s) com colaborador desligado e devolução pendente</div>' +
+        '<div class="desc">Esses casos precisam de atenção prioritária para recuperação de patrimônio.</div>' +
+      '</div>' +
+    '</div>';
+  } else {
+    alertaWrap.innerHTML = '<div class="alerta-critica" style="background:#ECFDF5;border-color:#A7D4C0">' +
+      '<div class="icone">✅</div>' +
+      '<div class="texto">' +
+        '<div class="titulo" style="color:#065F46">Nenhuma pendência crítica no momento</div>' +
+        '<div class="desc" style="color:#1A5C44">Todos os colaboradores desligados devolveram seus equipamentos.</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  if (!filtrados.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhuma pendência encontrada.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtrados.map(e => {
+    return '<tr>' +
+      '<td class="patrimonio">' + (e.patrimonio || '—') + '</td>' +
+      '<td class="tipo-tag">' + (e.tipo || '—') + '</td>' +
+      '<td class="pessoa">' + (e.pessoa_nome || '—') + '</td>' +
+      '<td style="color:var(--text2)">' + (e.pessoa_matricula || '—') + '</td>' +
+      '<td style="color:var(--text2)">' + fmtD(e.data_entrega) + '</td>' +
+      '<td>' + situacaoBadge(e.situacao) + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ═══════════ INIT / STATS ═══════════
+function renderStats() {
+  document.getElementById('st-total').textContent = equipamentos.length;
+  document.getElementById('st-devolvidos').textContent = equipamentos.filter(e => e.situacao === 'Devolvido').length;
+  document.getElementById('st-parcial').textContent = equipamentos.filter(e => e.situacao === 'Parcial').length;
+  document.getElementById('st-pendentes').textContent = equipamentos.filter(e => ['Pendente','Não Devolvido'].includes(e.situacao)).length;
+
+  var pendencias = getPendencias();
+  var badge = document.getElementById('badge-pend');
+  if (pendencias.length > 0) {
+    badge.style.display = 'inline-flex';
+    badge.textContent = pendencias.length;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+async function loadData() {
+  var btn = document.getElementById('btn');
+  btn.classList.add('spin');
+  try {
+    var r = await fetch(API + '?db=equipamentos_lista', {cache:'no-store'}).then(r => r.json());
+    if (r.error) throw new Error(r.error);
+    equipamentos = r.equipamentos || [];
+
+    document.getElementById('sub').textContent = equipamentos.length + ' equipamentos cadastrados';
+    document.getElementById('upd').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+    renderStats();
+    renderTodos();
+    renderPendencias();
+  } catch (e) {
+    document.getElementById('sub').textContent = 'Erro: ' + e.message;
+    document.getElementById('tbody-todos').innerHTML = '<tr><td colspan="7" class="empty">⚠ ' + e.message + '</td></tr>';
+  }
+  btn.classList.remove('spin');
+}
+
+loadData();
+</script>
+</body>
+</html>
