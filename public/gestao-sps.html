@@ -57,6 +57,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .etapa-nome{font-size:13px;font-weight:500}
 .etapa-desc{font-size:11px;color:var(--text2);margin-top:2px}
 
+/* EVENTOS SPS */
+.ev-row{display:grid;grid-template-columns:100px 1fr 1fr 32px;gap:8px;align-items:center;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--white);margin-bottom:6px;font-size:13px}
+.ev-row:last-child{margin-bottom:0}
+.ev-data{font-family:monospace;color:var(--text2);font-size:12px}
+.ev-status{font-weight:500}
+.ev-obs{color:var(--text2);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ev-del{background:none;border:none;cursor:pointer;color:var(--text2);font-size:15px;padding:2px;border-radius:4px}
+.ev-del:hover{color:var(--red);background:var(--red-lt)}
+.ev-gap{font-size:11px;color:var(--blue);background:#EEF0FF;padding:1px 7px;border-radius:10px;display:inline-block;margin-left:6px}
+
 /* LISTA SPS */
 .busca-wrap{display:flex;gap:8px;margin-bottom:16px}
 .busca-input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:'Inter',sans-serif}
@@ -209,44 +219,38 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
     </div>
 
     <div id="form-editar" style="display:none">
+      <select id="a-status" style="display:none"></select>
       <div class="form-section">
         <div class="form-titulo">Status Atual</div>
-        <select class="form-select" id="a-status" style="width:100%">
-          <option>Aguardando Currículos</option>
-          <option>Currículos Enviados</option>
-          <option>Em Entrevista</option>
-          <option>Candidato Escolhido</option>
-          <option>Aguardando Autorização</option>
-          <option>Autorizado</option>
-          <option>Em Contratação</option>
-          <option>Contratado</option>
-          <option>Cancelado</option>
-        </select>
+        <div class="campo"><div class="campo-v" id="status-atual-display" style="font-size:14px">—</div></div>
+        <div class="nota" style="margin-top:8px">💡 O status atual é sempre o do evento mais recente adicionado no Histórico abaixo. Para mudar o status, adicione um novo evento.</div>
       </div>
 
       <div class="form-section">
-        <div class="form-titulo">Cronograma de Datas</div>
-        <div class="etapa-row" id="et-curriculos">
-          <div><div class="etapa-nome">📄 Currículos Enviados</div><div class="etapa-desc">Data do envio ao fiscal</div></div>
-          <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-curriculos"></div>
+        <div class="form-titulo">Histórico de Status <span style="font-weight:400;color:var(--text2);text-transform:none;letter-spacing:0">(linha do tempo completa — nada é sobrescrito)</span></div>
+        <div id="lista-eventos" style="margin-bottom:14px">
+          <div style="text-align:center;padding:16px;color:var(--text2);font-size:12px">Carregando eventos...</div>
         </div>
-        <div class="etapa-row" id="et-entrevista">
-          <div><div class="etapa-nome">🎯 Pedido de Entrevista</div><div class="etapa-desc">Data da solicitação</div></div>
-          <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-entrevista"></div>
+        <div style="display:grid;grid-template-columns:140px 1fr 1fr auto;gap:8px;align-items:end;padding-top:10px;border-top:1px solid var(--border)">
+          <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="ev-data"></div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="ev-status">
+              <option>Aguardando Currículos</option>
+              <option>Currículos Enviados</option>
+              <option>Em Entrevista</option>
+              <option>Candidato Escolhido</option>
+              <option>Aguardando Autorização</option>
+              <option>Autorizado</option>
+              <option>Em Contratação</option>
+              <option>Contratado</option>
+              <option>Cancelado</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Observação (opcional)</label><input type="text" class="form-input" id="ev-obs" placeholder="Ex: candidato desistiu, reabriu etapa"></div>
+          <button class="btn-primary" id="btn-add-evento" style="white-space:nowrap">+ Adicionar</button>
         </div>
-        <div class="etapa-row" id="et-escolhido">
-          <div><div class="etapa-nome">✅ Candidato Escolhido</div><div class="etapa-desc">Data da seleção</div></div>
-          <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-escolhido"></div>
-        </div>
-        <div class="etapa-row" id="et-autorizacao">
-          <div><div class="etapa-nome">📝 Autorização</div><div class="etapa-desc">Data do recebimento</div></div>
-          <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-autorizacao"></div>
-        </div>
-        <div class="etapa-row" id="et-admissao">
-          <div><div class="etapa-nome">🎉 Admissão</div><div class="etapa-desc">Data de admissão</div></div>
-          <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="a-admissao"></div>
-        </div>
-        <div class="nota">💡 Para apagar uma data, faça diretamente no Notion. Datas em branco aqui não alteram o que já está salvo.</div>
+        <div class="nota">💡 Cada linha adicionada aqui fica registrada para sempre — se o processo "voltar" (ex: candidato desiste), basta adicionar uma nova linha com a data e o status atual. O gráfico do painel usa esse histórico para mostrar a linha do tempo real, incluindo retrocessos.</div>
       </div>
 
       <div class="form-section">
@@ -495,32 +499,116 @@ function preencherForm(sps) {
     'Cargo: ' + (sps.cargo_codigo||'—') + (sps.cargo_nivel ? ' (' + sps.cargo_nivel + ')' : '') + ' · Gerente: ' + (sps.gerente||'—') + ' · Status: ' + (sps.status||'—');
   document.getElementById('sps-selecionada').classList.add('visible');
   document.getElementById('a-status').value = sps.status || 'Aguardando Currículos';
+  document.getElementById('status-atual-display').textContent = sps.status || 'Aguardando Currículos';
   document.getElementById('a-gerente').value = sps.gerente || '';
   document.getElementById('a-fiscal').value = sps.fiscal || '';
   document.getElementById('a-obs').value = sps.observacoes || '';
-  document.getElementById('a-curriculos').value = sps.data_curriculos || '';
-  document.getElementById('a-entrevista').value = sps.data_entrevista || '';
-  document.getElementById('a-escolhido').value = sps.data_escolhido || '';
-  document.getElementById('a-autorizacao').value = sps.data_autorizacao || '';
-  document.getElementById('a-admissao').value = sps.data_admissao || '';
+  document.getElementById('ev-status').value = sps.status || 'Aguardando Currículos';
+  document.getElementById('ev-data').value = '';
+  document.getElementById('ev-obs').value = '';
   document.getElementById('form-editar').style.display = 'block';
-  atualizarEtapas();
+  carregarEventosSPS(sps.id);
   document.getElementById('form-editar').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-function atualizarEtapas() {
-  var status = document.getElementById('a-status').value;
-  var ordem = ['Aguardando Currículos','Currículos Enviados','Em Entrevista','Candidato Escolhido','Aguardando Autorização','Autorizado','Em Contratação','Contratado'];
-  var idx = ordem.indexOf(status);
-  var mapa = {'et-curriculos':1,'et-entrevista':2,'et-escolhido':3,'et-autorizacao':5,'et-admissao':7};
-  Object.keys(mapa).forEach(function(id) {
-    var el = document.getElementById(id);
-    el.classList.remove('ativa','concluida');
-    if (idx > mapa[id]) el.classList.add('concluida');
-    else if (idx === mapa[id]) el.classList.add('ativa');
-  });
+// ── Eventos SPS (histórico tipo Excel) ──
+function calcDU(s, e) {
+  if (!s || !e) return null;
+  var sd = new Date(s + 'T12:00:00'), ed = new Date(e + 'T12:00:00');
+  if (ed < sd) return null;
+  var n = 0;
+  for (var d = new Date(sd); d <= ed; d.setDate(d.getDate() + 1)) {
+    if (d.getDay() !== 0 && d.getDay() !== 6) n++;
+  }
+  return n;
 }
-document.getElementById('a-status').addEventListener('change', atualizarEtapas);
+
+function fmtDataBR(d) {
+  if (!d) return '—';
+  var p = d.split('-');
+  return p[2] + '/' + p[1] + '/' + p[0];
+}
+
+async function carregarEventosSPS(spsId) {
+  var div = document.getElementById('lista-eventos');
+  div.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text2);font-size:12px">Carregando eventos...</div>';
+  try {
+    var r = await fetch(API + '?db=eventos_sps').then(r => r.json());
+    var eventos = (r.eventos || []).filter(e => e.sps_id === spsId).sort((a,b) => (a.data||'').localeCompare(b.data||''));
+    renderEventos(eventos);
+  } catch (e) {
+    div.innerHTML = '<div style="color:var(--red);padding:12px;font-size:12px">Erro ao carregar eventos: ' + e.message + '</div>';
+  }
+}
+
+function renderEventos(eventos) {
+  var div = document.getElementById('lista-eventos');
+  if (!eventos.length) {
+    div.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text2);font-size:12px">Nenhum evento registrado ainda. Adicione o primeiro abaixo.</div>';
+    return;
+  }
+  var html = '';
+  eventos.forEach(function(ev, i) {
+    var gap = '';
+    if (i > 0) {
+      var dias = calcDU(eventos[i-1].data, ev.data);
+      if (dias !== null && dias > 0) gap = '<span class="ev-gap">+' + dias + 'd úteis</span>';
+    }
+    html += '<div class="ev-row">' +
+      '<span class="ev-data">' + fmtDataBR(ev.data) + '</span>' +
+      '<span class="ev-status">' + ev.status + gap + '</span>' +
+      '<span class="ev-obs">' + (ev.observacao || '') + '</span>' +
+      '<button class="ev-del" onclick="excluirEvento(\'' + ev.id + '\',\'' + spsId + '\')" title="Excluir evento">✕</button>' +
+    '</div>';
+  });
+  div.innerHTML = html;
+}
+
+document.getElementById('btn-add-evento').addEventListener('click', async function() {
+  if (!spsId) { toast('Selecione uma SPS primeiro', 'error'); return; }
+  var data = document.getElementById('ev-data').value;
+  var status = document.getElementById('ev-status').value;
+  var obs = document.getElementById('ev-obs').value.trim();
+  if (!data) { toast('Preencha a data do evento!', 'error'); return; }
+  var btn = this; btn.disabled = true; btn.textContent = 'Adicionando...';
+  try {
+    var res = await fetch(API, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ action: 'criar_evento_sps', dados: { sps_id: spsId, data: data, status: status, observacao: obs } })
+    });
+    var d = await res.json();
+    if (d.error) throw new Error(d.error);
+    toast('Evento adicionado!', 'success');
+    document.getElementById('ev-data').value = '';
+    document.getElementById('ev-obs').value = '';
+    document.getElementById('a-status').value = status;
+    document.getElementById('status-atual-display').textContent = status;
+    var sps = todasSPS.find(function(s){ return s.id === spsId; });
+    if (sps) sps.status = status;
+    document.getElementById('card-info').textContent =
+      'Cargo: ' + (sps ? (sps.cargo_codigo||'—') : '—') + ' · Gerente: ' + (sps ? (sps.gerente||'—') : '—') + ' · Status: ' + status;
+    carregarEventosSPS(spsId);
+  } catch (e) {
+    toast('Erro: ' + e.message, 'error');
+  }
+  btn.disabled = false; btn.textContent = '+ Adicionar';
+});
+
+async function excluirEvento(eventoId, spsId) {
+  if (!confirm('Excluir este evento do histórico?')) return;
+  try {
+    var res = await fetch(API, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ action: 'excluir_evento_sps', page_id: eventoId })
+    });
+    var d = await res.json();
+    if (d.error) throw new Error(d.error);
+    toast('Evento removido', 'success');
+    carregarEventosSPS(spsId);
+  } catch (e) {
+    toast('Erro: ' + e.message, 'error');
+  }
+}
 
 document.getElementById('btn-cancelar').addEventListener('click', function() {
   spsId = null;
@@ -571,11 +659,6 @@ document.getElementById('btn-salvar').addEventListener('click', async function()
         gerente: document.getElementById('a-gerente').value.trim(),
         fiscal: document.getElementById('a-fiscal').value.trim(),
         observacoes: document.getElementById('a-obs').value.trim(),
-        data_curriculos: document.getElementById('a-curriculos').value || null,
-        data_entrevista: document.getElementById('a-entrevista').value || null,
-        data_escolhido: document.getElementById('a-escolhido').value || null,
-        data_autorizacao: document.getElementById('a-autorizacao').value || null,
-        data_admissao: document.getElementById('a-admissao').value || null,
       }})
     });
     var d = await res.json();
