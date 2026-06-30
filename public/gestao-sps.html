@@ -387,8 +387,8 @@ document.getElementById('tab-btn-ver-cand').addEventListener('click', function()
 async function carregarDados() {
   try {
     var [resSPS, resCargos] = await Promise.all([
-      fetch(API + '?db=solicitacoes'),
-      fetch(API + '?db=cargos_lista')
+      fetch(API + '?db=solicitacoes', {cache:'no-store'}),
+      fetch(API + '?db=cargos_lista', {cache:'no-store'})
     ]);
     var dSPS = await resSPS.json();
     var dCargos = await resCargos.json();
@@ -535,7 +535,7 @@ async function carregarEventosSPS(spsId) {
   var div = document.getElementById('lista-eventos');
   div.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text2);font-size:12px">Carregando eventos...</div>';
   try {
-    var r = await fetch(API + '?db=eventos_sps').then(r => r.json());
+    var r = await fetch(API + '?db=eventos_sps', {cache:'no-store'}).then(r => r.json());
     var eventos = (r.eventos || []).filter(e => e.sps_id === spsId).sort((a,b) => (a.data||'').localeCompare(b.data||''));
     renderEventos(eventos);
 
@@ -703,7 +703,7 @@ async function carregarCandidatos() {
   if (todosCandidatos.length > 0) { renderCandidatos(todosCandidatos); return; }
   document.getElementById('lista-cand').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">Carregando...</div>';
   try {
-    var res = await fetch(API + '?db=candidatos');
+    var res = await fetch(API + '?db=candidatos', {cache:'no-store'});
     var d = await res.json();
     todosCandidatos = d.candidatos || [];
     renderCandidatos(todosCandidatos);
