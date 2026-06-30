@@ -115,28 +115,21 @@ td.pessoa{font-weight:500}
 
     <div class="filters">
       <input class="search" id="busca-todos" type="text" placeholder="Buscar por patrimônio, pessoa ou marca...">
-      <button class="fbtn active" data-tf="">Todos</button>
-      <button class="fbtn" data-tf="Notebook">Notebook</button>
-      <button class="fbtn" data-tf="Desktop">Desktop</button>
-      <button class="fbtn" data-tf="Celular">Celular</button>
-      <button class="fbtn" data-tf="Monitor">Monitor</button>
-      <button class="fbtn" data-tf="Outros">Outros</button>
     </div>
 
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th style="width:14%">Patrimônio</th>
-            <th style="width:10%">Tipo</th>
-            <th style="width:22%">Colaborador</th>
-            <th style="width:12%">Status Colab.</th>
-            <th style="width:14%">Entrega</th>
-            <th style="width:14%">Devolução</th>
-            <th style="width:14%">Situação</th>
+            <th style="width:16%">Patrimônio</th>
+            <th style="width:12%">Tipo</th>
+            <th style="width:26%">Colaborador</th>
+            <th style="width:14%">Status Colab.</th>
+            <th style="width:16%">Devolução</th>
+            <th style="width:16%">Situação</th>
           </tr>
         </thead>
-        <tbody id="tbody-todos"><tr><td colspan="7" class="loading">Carregando equipamentos...</td></tr></tbody>
+        <tbody id="tbody-todos"><tr><td colspan="6" class="loading">Carregando equipamentos...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -153,15 +146,14 @@ td.pessoa{font-weight:500}
       <table>
         <thead>
           <tr>
-            <th style="width:16%">Patrimônio</th>
-            <th style="width:10%">Tipo</th>
-            <th style="width:24%">Colaborador (Desligado)</th>
-            <th style="width:14%">Matrícula</th>
-            <th style="width:14%">Entrega</th>
-            <th style="width:22%">Situação</th>
+            <th style="width:18%">Patrimônio</th>
+            <th style="width:12%">Tipo</th>
+            <th style="width:28%">Colaborador (Desligado)</th>
+            <th style="width:16%">Matrícula</th>
+            <th style="width:26%">Situação</th>
           </tr>
         </thead>
-        <tbody id="tbody-pend"><tr><td colspan="6" class="loading">Carregando pendências...</td></tr></tbody>
+        <tbody id="tbody-pend"><tr><td colspan="5" class="loading">Carregando pendências...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -204,16 +196,6 @@ function statusColabBadge(status) {
 }
 
 // ═══════════ ABA TODOS ═══════════
-let filtroTipoTodos = '';
-
-document.querySelectorAll('#aba-todos .fbtn').forEach(b => {
-  b.addEventListener('click', () => {
-    document.querySelectorAll('#aba-todos .fbtn').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    filtroTipoTodos = b.dataset.tf;
-    renderTodos();
-  });
-});
 document.getElementById('busca-todos').addEventListener('input', renderTodos);
 
 function renderTodos() {
@@ -221,16 +203,14 @@ function renderTodos() {
   var tbody = document.getElementById('tbody-todos');
 
   var filtrados = equipamentos.filter(e => {
-    var matchBusca = !busca ||
+    return !busca ||
       (e.patrimonio||'').toLowerCase().includes(busca) ||
       (e.pessoa_nome||'').toLowerCase().includes(busca) ||
       (e.marca||'').toLowerCase().includes(busca);
-    var matchTipo = !filtroTipoTodos || e.tipo === filtroTipoTodos;
-    return matchBusca && matchTipo;
   });
 
   if (!filtrados.length) {
-    tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhum equipamento encontrado.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum equipamento encontrado.</td></tr>';
     return;
   }
 
@@ -240,7 +220,6 @@ function renderTodos() {
       '<td class="tipo-tag">' + (e.tipo || '—') + '</td>' +
       '<td class="pessoa">' + (e.pessoa_nome || '<span style="color:var(--text2)">Não atribuído</span>') + '</td>' +
       '<td>' + statusColabBadge(e.pessoa_status) + '</td>' +
-      '<td style="color:var(--text2)">' + fmtD(e.data_entrega) + '</td>' +
       '<td style="color:var(--text2)">' + fmtD(e.data_devolucao) + '</td>' +
       '<td>' + situacaoBadge(e.situacao) + '</td>' +
     '</tr>';
@@ -289,7 +268,7 @@ function renderPendencias() {
   }
 
   if (!filtrados.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhuma pendência encontrada.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhuma pendência encontrada.</td></tr>';
     return;
   }
 
@@ -299,7 +278,6 @@ function renderPendencias() {
       '<td class="tipo-tag">' + (e.tipo || '—') + '</td>' +
       '<td class="pessoa">' + (e.pessoa_nome || '—') + '</td>' +
       '<td style="color:var(--text2)">' + (e.pessoa_matricula || '—') + '</td>' +
-      '<td style="color:var(--text2)">' + fmtD(e.data_entrega) + '</td>' +
       '<td>' + situacaoBadge(e.situacao) + '</td>' +
     '</tr>';
   }).join('');
@@ -338,7 +316,7 @@ async function loadData() {
     renderPendencias();
   } catch (e) {
     document.getElementById('sub').textContent = 'Erro: ' + e.message;
-    document.getElementById('tbody-todos').innerHTML = '<tr><td colspan="7" class="empty">⚠ ' + e.message + '</td></tr>';
+    document.getElementById('tbody-todos').innerHTML = '<tr><td colspan="6" class="empty">⚠ ' + e.message + '</td></tr>';
   }
   btn.classList.remove('spin');
 }
