@@ -12,6 +12,7 @@ const DBS = {
   envios:        'b701ee07-4324-40db-96e3-1e864b20b3b8',
   candidatos:    'd289f1f6-e5c4-49c4-b1f4-62613e168a4d',
   vagas:         'fd6d7e56-f4a5-493f-8da6-b7fade3ecee3',
+  eventos_sps:   '7284912d-8edb-4692-918b-0cda0463ed0a',
 };
 
 async function queryDB(dbId, cursor) {
@@ -389,6 +390,48 @@ module.exports = async function handler(req, res) {
 
         return res.status(200).json({ ok: true });
       }
+
+      if (action === 'criar_evento_sps') {
+        // dados: { sps_id, data, status, observacao }
+        var props = {
+          'Evento': { title: [{ text: { content: (dados.status || 'Evento') + ' — ' + (dados.data || '') } }] },
+          'SPS': { relation: [{ id: dados.sps_id }] },
+          'Status': { select: { name: dados.status } },
+        };
+        if (dados.data) props['Data'] = { date: { start: dados.data } };
+        if (dados.observacao) props['Observação'] = { rich_text: [{ text: { content: dados.observacao } }] };
+
+        var r = await fetch('https://api.notion.com/v1/pages', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ parent: { database_id: DBS.eventos_sps }, properties: props })
+        });
+        var d = await r.json();
+        if (d.object === 'error') return res.status(400).json({ error: d.message });
+
+        // Também atualiza o Status atual da SPS principal para refletir o evento mais recente
+        if (dados.sps_id && dados.status) {
+          await fetch('https://api.notion.com/v1/pages/' + dados.sps_id, {
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ properties: { 'Status': { select: { name: dados.status } } } })
+          });
+        }
+
+        return res.status(200).json({ ok: true, id: d.id });
+      }
+
+      if (action === 'excluir_evento_sps') {
+        var eid = body.page_id;
+        var r = await fetch('https://api.notion.com/v1/pages/' + eid, {
+          method: 'PATCH',
+          headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ archived: true })
+        });
+        var d = await r.json();
+        if (d.object === 'error') return res.status(400).json({ error: d.message });
+        return res.status(200).json({ ok: true });
+      }
       return res.status(400).json({ error: 'action inválida' });
     } catch(err) {
       return res.status(500).json({ error: err.message });
@@ -595,6 +638,22 @@ module.exports = async function handler(req, res) {
       }).filter(function(v) { return v.codigo; })
         .sort(function(a,b) { return (a.codigo||'').localeCompare(b.codigo||''); });
       return res.status(200).json({ vagas: vagas, timestamp: new Date().toISOString() });
+    }
+
+    if (db === 'eventos_sps') {
+      var pages = await fetchAll(DBS.eventos_sps);
+      var eventos = pages.map(function(pg) {
+        var p = pg.properties;
+        return {
+          id: pg.id,
+          sps_id: getRelId(p, 'SPS'),
+          data: prop(p, 'Data', 'date'),
+          status: prop(p, 'Status', 'select'),
+          observacao: prop(p, 'Observação', 'text'),
+        };
+      }).filter(function(e) { return e.sps_id && e.data; })
+        .sort(function(a,b) { return (a.data||'').localeCompare(b.data||''); });
+      return res.status(200).json({ eventos: eventos, timestamp: new Date().toISOString() });
     }
 
     if (db === 'sps_abertas') {
