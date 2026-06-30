@@ -517,8 +517,10 @@ function calcDU(s, e) {
   var sd = new Date(s + 'T12:00:00'), ed = new Date(e + 'T12:00:00');
   if (ed < sd) return null;
   var n = 0;
-  for (var d = new Date(sd); d <= ed; d.setDate(d.getDate() + 1)) {
-    if (d.getDay() !== 0 && d.getDay() !== 6) n++;
+  // Conta os dias úteis ENTRE as duas datas (exclusivo o dia inicial), ou seja, a distância real
+  for (var d = new Date(sd); d < ed; d.setDate(d.getDate() + 1)) {
+    var prox = new Date(d); prox.setDate(prox.getDate() + 1);
+    if (prox.getDay() !== 0 && prox.getDay() !== 6) n++;
   }
   return n;
 }
@@ -536,6 +538,25 @@ async function carregarEventosSPS(spsId) {
     var r = await fetch(API + '?db=eventos_sps').then(r => r.json());
     var eventos = (r.eventos || []).filter(e => e.sps_id === spsId).sort((a,b) => (a.data||'').localeCompare(b.data||''));
     renderEventos(eventos);
+
+    // Sincroniza o "status atual" com o evento mais recente (cobre o caso de exclusão de evento)
+    if (eventos.length > 0) {
+      var statusAtual = eventos[eventos.length - 1].status;
+      document.getElementById('a-status').value = statusAtual;
+      document.getElementById('status-atual-display').textContent = statusAtual;
+      var sps = todasSPS.find(function(s){ return s.id === spsId; });
+      if (sps && sps.status !== statusAtual) {
+        sps.status = statusAtual;
+        document.getElementById('card-info').textContent =
+          'Cargo: ' + (sps.cargo_codigo||'—') + ' · Gerente: ' + (sps.gerente||'—') + ' · Status: ' + statusAtual;
+        renderListaSPS(todasSPS);
+        // Sincroniza também o Status na página principal da SPS no Notion
+        fetch(API, {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'atualizar_sps', page_id: spsId, dados: { status: statusAtual } })
+        });
+      }
+    }
   } catch (e) {
     div.innerHTML = '<div style="color:var(--red);padding:12px;font-size:12px">Erro ao carregar eventos: ' + e.message + '</div>';
   }
@@ -587,6 +608,7 @@ document.getElementById('btn-add-evento').addEventListener('click', async functi
     if (sps) sps.status = status;
     document.getElementById('card-info').textContent =
       'Cargo: ' + (sps ? (sps.cargo_codigo||'—') : '—') + ' · Gerente: ' + (sps ? (sps.gerente||'—') : '—') + ' · Status: ' + status;
+    renderListaSPS(todasSPS);
     carregarEventosSPS(spsId);
   } catch (e) {
     toast('Erro: ' + e.message, 'error');
