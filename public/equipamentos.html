@@ -100,7 +100,7 @@ td.pessoa{font-weight:500}
 <main class="main">
   <div class="tabs">
     <div class="tab active" id="tab-btn-todos">📋 Todos os Equipamentos</div>
-    <div class="tab" id="tab-btn-devolucoes">📤 Devoluções<span class="tab-badge" id="badge-devconf" style="display:none">0</span></div>
+    <div class="tab" id="tab-btn-devolucoes">📤 Devoluções</div>
   </div>
 
   <!-- ── ABA: TODOS ── -->
@@ -236,7 +236,7 @@ function renderTodos() {
       '<td class="pessoa">' + (e.pessoa_nome || '<span style="color:var(--text2)">Não atribuído</span>') + '</td>' +
       '<td>' + statusColabBadge(e.pessoa_status) + '</td>' +
       '<td style="color:var(--text2)">' + fmtD(e.data_devolucao) + '</td>' +
-      '<td>' + situacaoBadge(e.situacao) + '</td>' +
+      '<td>' + situacaoBadge(efetivaSituacao(e)) + '</td>' +
     '</tr>';
   }).join('');
 }
@@ -301,51 +301,57 @@ function renderStatsDev() {
   document.getElementById('dv-devolvidos').textContent = devolucoes.filter(e => e.situacao === 'Devolvido').length;
   document.getElementById('dv-parcial').textContent = devolucoes.filter(e => ['Parcial','Alfândega'].includes(e.situacao)).length;
   document.getElementById('dv-pendentes').textContent = devolucoes.filter(e => e.situacao === 'Pendente').length;
-
-  var pendConf = devolucoes.filter(e => e.confirmacao_pendente).length;
-  var badge = document.getElementById('badge-devconf');
-  if (pendConf > 0) {
-    badge.style.display = 'inline-flex';
-    badge.textContent = pendConf;
-  } else {
-    badge.style.display = 'none';
-  }
 }
 
-async function loadDevolucoes() {
-  try {
-    var r = await fetch(API + '?db=devolucao_equipamentos', {cache:'no-store'}).then(r => r.json());
-    if (r.error) throw new Error(r.error);
-    devolucoes = r.devolucoes || [];
-    renderStatsDev();
-    renderDevolucoes();
-  } catch (e) {
-    document.getElementById('tbody-dev').innerHTML = '<tr><td colspan="8" class="empty">⚠ ' + e.message + '</td></tr>';
-  }
+// Mapa patrimônio -> situação, construído a partir da base de Devoluções,
+// usado para refletir a situação na aba "Todos os Equipamentos" quando o
+// próprio registro de Equipamento não tem o campo Situação preenchido.
+let devSituacaoMap = {};
+function buildDevSituacaoMap() {
+  devSituacaoMap = {};
+  devolucoes.forEach(function(d) {
+    if (!d.patrimonio) return;
+    var chave = String(d.patrimonio).trim();
+    if (chave) devSituacaoMap[chave] = d.situacao;
+  });
+}
+function efetivaSituacao(e) {
+  if (e.situacao) return e.situacao;
+  var chavePat = e.patrimonio ? String(e.patrimonio).trim() : null;
+  var chaveNum = e.numero_patrimonio ? String(e.numero_patrimonio).trim() : null;
+  return (chavePat && devSituacaoMap[chavePat]) || (chaveNum && devSituacaoMap[chaveNum]) || null;
 }
 
 // ═══════════ INIT / STATS ═══════════
 function renderStats() {
   document.getElementById('st-total').textContent = equipamentos.length;
-  document.getElementById('st-devolvidos').textContent = equipamentos.filter(e => e.situacao === 'Devolvido').length;
-  document.getElementById('st-parcial').textContent = equipamentos.filter(e => e.situacao === 'Parcial').length;
-  document.getElementById('st-pendentes').textContent = equipamentos.filter(e => ['Pendente','Não Devolvido'].includes(e.situacao)).length;
+  document.getElementById('st-devolvidos').textContent = equipamentos.filter(e => efetivaSituacao(e) === 'Devolvido').length;
+  document.getElementById('st-parcial').textContent = equipamentos.filter(e => ['Parcial','Alfândega'].includes(efetivaSituacao(e))).length;
+  document.getElementById('st-pendentes').textContent = equipamentos.filter(e => ['Pendente','Não Devolvido'].includes(efetivaSituacao(e))).length;
 }
 
 async function loadData() {
   var btn = document.getElementById('btn');
   btn.classList.add('spin');
   try {
-    var r = await fetch(API + '?db=equipamentos_lista', {cache:'no-store'}).then(r => r.json());
+    var [r, rDev] = await Promise.all([
+      fetch(API + '?db=equipamentos_lista', {cache:'no-store'}).then(r => r.json()),
+      fetch(API + '?db=devolucao_equipamentos', {cache:'no-store'}).then(r => r.json()),
+    ]);
     if (r.error) throw new Error(r.error);
     equipamentos = r.equipamentos || [];
+
+    if (rDev.error) throw new Error(rDev.error);
+    devolucoes = rDev.devolucoes || [];
+    buildDevSituacaoMap();
 
     document.getElementById('sub').textContent = equipamentos.length + ' equipamentos cadastrados';
     document.getElementById('upd').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 
     renderStats();
     renderTodos();
-    await loadDevolucoes();
+    renderStatsDev();
+    renderDevolucoes();
   } catch (e) {
     document.getElementById('sub').textContent = 'Erro: ' + e.message;
     document.getElementById('tbody-todos').innerHTML = '<tr><td colspan="6" class="empty">⚠ ' + e.message + '</td></tr>';
