@@ -394,6 +394,14 @@ async function carregarDados() {
     });
     cargosLista = dCargos.cargos || [];
 
+    var cargoMap = {};
+    cargosLista.forEach(function(c){ cargoMap[c.id] = c; });
+    todasSPS.forEach(function(s){
+      if (s.cargo_rel && cargoMap[s.cargo_rel]) {
+        s.cargo_nivel = cargoMap[s.cargo_rel].senioridade;
+      }
+    });
+
     renderListaSPS(todasSPS);
     preencherCargos();
     preencherSPSCandidato();
