@@ -76,6 +76,10 @@ td.salario{font-variant-numeric:tabular-nums;color:var(--text)}
 .badge-niv.Gerencial{background:#FEF2F2;color:#991B1B}
 .qtd-badge{display:inline-flex;align-items:center;justify-content:center;min-width:24px;padding:2px 8px;border-radius:20px;font-size:12px;font-weight:600;background:#EEF0FF;color:var(--blue)}
 .qtd-badge.zero{background:#F3F4F6;color:var(--text2)}
+.saldo-badge{display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.saldo-badge.pos{background:#ECFDF5;color:#065F46}
+.saldo-badge.neg{background:#FEF2F2;color:#991B1B}
+.saldo-badge.zero{background:#F3F4F6;color:var(--text2)}
 .empty{text-align:center;padding:40px;color:var(--text2);font-size:13px}
 .loading{text-align:center;padding:60px;color:var(--text2);font-size:13px}
 </style>
@@ -98,7 +102,7 @@ td.salario{font-variant-numeric:tabular-nums;color:var(--text)}
 
   <div class="tabs">
     <div class="tab active" id="tab-btn-cargos">📋 Cargos e Salários</div>
-    <div class="tab" id="tab-btn-quant">📊 Quantitativo</div>
+    <div class="tab" id="tab-btn-quant">📊 Vagas x Ativos</div>
   </div>
 
   <!-- ── ABA: CARGOS E SALÁRIOS ── -->
@@ -134,32 +138,35 @@ td.salario{font-variant-numeric:tabular-nums;color:var(--text)}
     </div>
   </div>
 
-  <!-- ── ABA: QUANTITATIVO ── -->
+  <!-- ── ABA: VAGAS X ATIVOS ── -->
   <div id="aba-quant" style="display:none">
     <div class="stats">
-      <div class="stat blue"><div class="num" id="qt-total">—</div><div class="lbl">Colaboradores Ativos</div></div>
-      <div class="stat green"><div class="num" id="qt-ocupados">—</div><div class="lbl">Postos Ocupados</div></div>
-      <div class="stat amber"><div class="num" id="qt-vazios">—</div><div class="lbl">Postos Sem Ocupantes</div></div>
+      <div class="stat blue"><div class="num" id="qt-vagas">—</div><div class="lbl">Vagas Contratuais</div></div>
+      <div class="stat"><div class="num" id="qt-ativos">—</div><div class="lbl">Colaboradores Ativos</div></div>
+      <div class="stat green" id="qt-saldo-card"><div class="num" id="qt-saldo">—</div><div class="lbl">Saldo Total</div></div>
     </div>
 
     <div class="filters">
       <input class="search" id="busca-quant" type="text" placeholder="Buscar por código ou descrição...">
       <button class="fbtn active" data-qf="">Todos</button>
-      <button class="fbtn" data-qf="ocupados">Com colaboradores</button>
-      <button class="fbtn" data-qf="vazios">Sem colaboradores</button>
+      <button class="fbtn" data-qf="positivo">Saldo positivo</button>
+      <button class="fbtn" data-qf="negativo">Saldo negativo</button>
+      <button class="fbtn" data-qf="zero">Saldo zerado</button>
     </div>
 
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th class="sortable sort-active-q" data-fq="codigo" style="width:14%">SGPS <span class="sort-icon">↑</span></th>
-            <th class="sortable" data-fq="descricao" style="width:38%">Descrição <span class="sort-icon">↕</span></th>
-            <th class="sortable" data-fq="senioridade" style="width:18%">Senioridade <span class="sort-icon">↕</span></th>
-            <th class="sortable" data-fq="qtd" style="width:30%;text-align:right">Colaboradores Ativos <span class="sort-icon">↕</span></th>
+            <th class="sortable sort-active-q" data-fq="codigo" style="width:11%">SGPS <span class="sort-icon">↑</span></th>
+            <th class="sortable" data-fq="descricao" style="width:33%">Descrição <span class="sort-icon">↕</span></th>
+            <th class="sortable" data-fq="senioridade" style="width:14%">Senioridade <span class="sort-icon">↕</span></th>
+            <th class="sortable" data-fq="vagas" style="width:14%;text-align:center">Vagas <span class="sort-icon">↕</span></th>
+            <th class="sortable" data-fq="ativos" style="width:14%;text-align:center">Ativos <span class="sort-icon">↕</span></th>
+            <th class="sortable" data-fq="saldo" style="width:14%;text-align:center">Saldo <span class="sort-icon">↕</span></th>
           </tr>
         </thead>
-        <tbody id="tbody-quant"><tr><td colspan="4" class="loading">Carregando dados...</td></tr></tbody>
+        <tbody id="tbody-quant"><tr><td colspan="6" class="loading">Carregando dados...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -269,30 +276,55 @@ let sortFieldQ = 'codigo';
 let sortAscQ = true;
 let filtroQtdQ = '';
 let quantData = [];
+let vagas = [];
 
 function calcularQuantitativo() {
+  // Mapa código SGPS -> qtd de vagas (a base de vagas usa o código como título, não relation)
+  var vagasMap = {};
+  vagas.forEach(v => { vagasMap[v.codigo] = v; });
+
+  // Contagem de ativos por cargo_id (cruzar via cargo do colaborador -> código SGPS)
+  var cargoIdParaCodigo = {};
+  cargos.forEach(c => { cargoIdParaCodigo[c.id] = c.codigo; });
+
   var contagem = {};
   vinculos.forEach(v => {
     if (v.status !== 'Ativo') return;
     if (!v.cargo_id) return;
-    contagem[v.cargo_id] = (contagem[v.cargo_id] || 0) + 1;
+    var codigo = cargoIdParaCodigo[v.cargo_id];
+    if (!codigo) return;
+    contagem[codigo] = (contagem[codigo] || 0) + 1;
   });
 
-  quantData = cargos.map(c => ({
-    id: c.id,
-    codigo: c.codigo,
-    descricao: c.descricao,
-    senioridade: c.senioridade,
-    qtd: contagem[c.id] || 0,
-  }));
+  // União dos códigos que existem em vagas e/ou em cargos
+  var codigosSet = {};
+  vagas.forEach(v => { codigosSet[v.codigo] = true; });
+  cargos.forEach(c => { codigosSet[c.codigo] = true; });
 
-  var totalAtivos = vinculos.filter(v => v.status === 'Ativo').length;
-  var ocupados = quantData.filter(c => c.qtd > 0).length;
-  var vazios = quantData.filter(c => c.qtd === 0).length;
+  quantData = Object.keys(codigosSet).map(codigo => {
+    var v = vagasMap[codigo];
+    var c = cargos.find(x => x.codigo === codigo);
+    var qtdVagas = v ? (v.qtde_contratual || 0) : 0;
+    var qtdAtivos = contagem[codigo] || 0;
+    return {
+      codigo: codigo,
+      descricao: (v && v.descricao) || (c && c.descricao) || '—',
+      senioridade: (v && v.senioridade) || (c && c.senioridade) || null,
+      vagas: qtdVagas,
+      ativos: qtdAtivos,
+      saldo: qtdVagas - qtdAtivos,
+    };
+  }).sort((a,b) => (a.codigo||'').localeCompare(b.codigo||''));
 
-  document.getElementById('qt-total').textContent = totalAtivos;
-  document.getElementById('qt-ocupados').textContent = ocupados;
-  document.getElementById('qt-vazios').textContent = vazios;
+  var totalVagas = vagas.reduce((s,v) => s + (v.qtde_contratual || 0), 0);
+  var totalAtivos = vinculos.filter(v => v.status === 'Ativo' && v.cargo_id && cargoIdParaCodigo[v.cargo_id]).length;
+  var saldoTotal = totalVagas - totalAtivos;
+
+  document.getElementById('qt-vagas').textContent = totalVagas;
+  document.getElementById('qt-ativos').textContent = totalAtivos;
+  document.getElementById('qt-saldo').textContent = (saldoTotal > 0 ? '+' : '') + saldoTotal;
+  var saldoCard = document.getElementById('qt-saldo-card');
+  saldoCard.className = 'stat ' + (saldoTotal > 0 ? 'green' : saldoTotal < 0 ? 'amber' : '');
 }
 
 document.querySelectorAll('#aba-quant .fbtn').forEach(b => {
@@ -325,13 +357,16 @@ function renderQuant() {
 
   var filtrados = quantData.filter(c => {
     var matchBusca = !busca || (c.codigo||'').toLowerCase().includes(busca) || (c.descricao||'').toLowerCase().includes(busca);
-    var matchQtd = !filtroQtdQ || (filtroQtdQ === 'ocupados' ? c.qtd > 0 : c.qtd === 0);
-    return matchBusca && matchQtd;
+    var matchSaldo = !filtroQtdQ ||
+      (filtroQtdQ === 'positivo' && c.saldo > 0) ||
+      (filtroQtdQ === 'negativo' && c.saldo < 0) ||
+      (filtroQtdQ === 'zero' && c.saldo === 0);
+    return matchBusca && matchSaldo;
   });
 
   filtrados.sort((a, b) => {
     var va = a[sortFieldQ], vb = b[sortFieldQ];
-    if (sortFieldQ === 'qtd') {
+    if (sortFieldQ === 'vagas' || sortFieldQ === 'ativos' || sortFieldQ === 'saldo') {
       return sortAscQ ? va - vb : vb - va;
     }
     va = (va || '').toString().toLowerCase();
@@ -340,19 +375,22 @@ function renderQuant() {
   });
 
   if (!filtrados.length) {
-    tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum cargo encontrado.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum cargo encontrado.</td></tr>';
     return;
   }
 
   tbody.innerHTML = filtrados.map(c => {
     var nivClass = (c.senioridade || '').replace('ê','e').replace('ú','u');
     var badge = c.senioridade ? '<span class="badge-niv ' + nivClass + '">' + c.senioridade + '</span>' : '<span style="color:var(--text2)">—</span>';
-    var qtdBadge = '<span class="qtd-badge' + (c.qtd === 0 ? ' zero' : '') + '">' + c.qtd + '</span>';
+    var saldoCls = c.saldo > 0 ? 'pos' : c.saldo < 0 ? 'neg' : 'zero';
+    var saldoTxt = (c.saldo > 0 ? '+' : '') + c.saldo;
     return '<tr>' +
       '<td class="codigo">' + (c.codigo || '—') + '</td>' +
       '<td>' + (c.descricao || '—') + '</td>' +
       '<td>' + badge + '</td>' +
-      '<td style="text-align:right">' + qtdBadge + '</td>' +
+      '<td style="text-align:center">' + c.vagas + '</td>' +
+      '<td style="text-align:center">' + c.ativos + '</td>' +
+      '<td style="text-align:center"><span class="saldo-badge ' + saldoCls + '">' + saldoTxt + '</span></td>' +
     '</tr>';
   }).join('');
 }
@@ -362,12 +400,14 @@ document.getElementById('busca-quant').addEventListener('input', renderQuant);
 // ── Init ──
 async function init() {
   try {
-    var [rCargos, rVinculos] = await Promise.all([
+    var [rCargos, rVinculos, rVagas] = await Promise.all([
       fetch(API + '?db=cargos_lista').then(r => r.json()),
       fetch(API + '?db=vinculos').then(r => r.json()),
+      fetch(API + '?db=vagas_lista').then(r => r.json()),
     ]);
     cargos = (rCargos.cargos || []).filter(c => c.codigo);
     vinculos = rVinculos.vinculos || [];
+    vagas = (rVagas.vagas || []).filter(v => v.codigo);
 
     renderStatsCargos();
     renderCargos();
@@ -375,7 +415,7 @@ async function init() {
     renderQuant();
   } catch (e) {
     document.getElementById('tbody-cargos').innerHTML = '<tr><td colspan="5" class="empty">⚠ Erro ao carregar: ' + e.message + '</td></tr>';
-    document.getElementById('tbody-quant').innerHTML = '<tr><td colspan="4" class="empty">⚠ Erro ao carregar: ' + e.message + '</td></tr>';
+    document.getElementById('tbody-quant').innerHTML = '<tr><td colspan="6" class="empty">⚠ Erro ao carregar: ' + e.message + '</td></tr>';
   }
 }
 
