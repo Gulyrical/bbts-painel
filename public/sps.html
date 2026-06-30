@@ -200,9 +200,11 @@ function calcDU(s,e,pausas=[]){
   if(!s)return null;
   var sd=new Date(s+'T12:00:00'),ed=new Date((e||new Date().toISOString().slice(0,10))+'T12:00:00');
   var n=0;
-  for(var d=new Date(sd);d<=ed;d.setDate(d.getDate()+1)){
-    if(!isDU(d))continue;
-    var ds=d.toISOString().slice(0,10);
+  // Conta os dias úteis ENTRE as duas datas (exclui o dia inicial, inclui o final) — distância real
+  for(var d=new Date(sd);d<ed;d.setDate(d.getDate()+1)){
+    var prox=new Date(d); prox.setDate(prox.getDate()+1);
+    if(!isDU(prox))continue;
+    var ds=prox.toISOString().slice(0,10);
     if(!pausas.some(function(p){return ds>=p.i&&ds<p.f;}))n++;
   }
   return n;
