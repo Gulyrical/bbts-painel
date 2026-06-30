@@ -42,13 +42,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .stat.red .num{color:var(--red)}
 .stat.amber .num{color:var(--amber)}
 
-/* ALERTA */
-.alerta-critica{background:#FDECEA;border:1px solid #F5B5AE;border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
-.alerta-critica .icone{font-size:22px}
-.alerta-critica .texto{flex:1}
-.alerta-critica .titulo{font-size:13px;font-weight:600;color:#7A1F17}
-.alerta-critica .desc{font-size:12px;color:#991B1B;margin-top:2px}
-
 /* FILTROS */
 .filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
 .search{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;width:260px;background:var(--white)}
@@ -107,7 +100,6 @@ td.pessoa{font-weight:500}
 <main class="main">
   <div class="tabs">
     <div class="tab active" id="tab-btn-todos">📋 Todos os Equipamentos</div>
-    <div class="tab" id="tab-btn-pendencias">⚠️ Pendências de Devolução<span class="tab-badge" id="badge-pend" style="display:none">0</span></div>
     <div class="tab" id="tab-btn-devolucoes">📤 Devoluções<span class="tab-badge" id="badge-devconf" style="display:none">0</span></div>
   </div>
 
@@ -137,30 +129,6 @@ td.pessoa{font-weight:500}
           </tr>
         </thead>
         <tbody id="tbody-todos"><tr><td colspan="6" class="loading">Carregando equipamentos...</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ── ABA: PENDÊNCIAS ── -->
-  <div id="aba-pendencias" style="display:none">
-    <div id="alerta-wrap"></div>
-
-    <div class="filters">
-      <input class="search" id="busca-pend" type="text" placeholder="Buscar por patrimônio ou pessoa...">
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:18%">Patrimônio</th>
-            <th style="width:12%">Tipo</th>
-            <th style="width:28%">Colaborador (Desligado)</th>
-            <th style="width:16%">Matrícula</th>
-            <th style="width:26%">Situação</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-pend"><tr><td colspan="5" class="loading">Carregando pendências...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -210,14 +178,11 @@ let equipamentos = [];
 
 function setTab(tab) {
   document.getElementById('tab-btn-todos').classList.toggle('active', tab === 'todos');
-  document.getElementById('tab-btn-pendencias').classList.toggle('active', tab === 'pendencias');
   document.getElementById('tab-btn-devolucoes').classList.toggle('active', tab === 'devolucoes');
   document.getElementById('aba-todos').style.display = tab === 'todos' ? 'block' : 'none';
-  document.getElementById('aba-pendencias').style.display = tab === 'pendencias' ? 'block' : 'none';
   document.getElementById('aba-devolucoes').style.display = tab === 'devolucoes' ? 'block' : 'none';
 }
 document.getElementById('tab-btn-todos').addEventListener('click', function(){ setTab('todos'); });
-document.getElementById('tab-btn-pendencias').addEventListener('click', function(){ setTab('pendencias'); });
 document.getElementById('tab-btn-devolucoes').addEventListener('click', function(){ setTab('devolucoes'); });
 
 function fmtD(d) {
@@ -271,63 +236,6 @@ function renderTodos() {
       '<td class="pessoa">' + (e.pessoa_nome || '<span style="color:var(--text2)">Não atribuído</span>') + '</td>' +
       '<td>' + statusColabBadge(e.pessoa_status) + '</td>' +
       '<td style="color:var(--text2)">' + fmtD(e.data_devolucao) + '</td>' +
-      '<td>' + situacaoBadge(e.situacao) + '</td>' +
-    '</tr>';
-  }).join('');
-}
-
-// ═══════════ ABA PENDÊNCIAS ═══════════
-document.getElementById('busca-pend').addEventListener('input', renderPendencias);
-
-function getPendencias() {
-  // Foco: colaborador Desligado + situação de devolução não concluída
-  return equipamentos.filter(e =>
-    e.pessoa_status === 'Desligado' &&
-    ['Pendente', 'Parcial', 'Não Devolvido'].includes(e.situacao)
-  );
-}
-
-function renderPendencias() {
-  var busca = document.getElementById('busca-pend').value.toLowerCase();
-  var tbody = document.getElementById('tbody-pend');
-  var pendencias = getPendencias();
-
-  var filtrados = pendencias.filter(e =>
-    !busca ||
-    (e.patrimonio||'').toLowerCase().includes(busca) ||
-    (e.pessoa_nome||'').toLowerCase().includes(busca)
-  );
-
-  var alertaWrap = document.getElementById('alerta-wrap');
-  if (pendencias.length > 0) {
-    alertaWrap.innerHTML = '<div class="alerta-critica">' +
-      '<div class="icone">🚨</div>' +
-      '<div class="texto">' +
-        '<div class="titulo">' + pendencias.length + ' equipamento(s) com colaborador desligado e devolução pendente</div>' +
-        '<div class="desc">Esses casos precisam de atenção prioritária para recuperação de patrimônio.</div>' +
-      '</div>' +
-    '</div>';
-  } else {
-    alertaWrap.innerHTML = '<div class="alerta-critica" style="background:#ECFDF5;border-color:#A7D4C0">' +
-      '<div class="icone">✅</div>' +
-      '<div class="texto">' +
-        '<div class="titulo" style="color:#065F46">Nenhuma pendência crítica no momento</div>' +
-        '<div class="desc" style="color:#1A5C44">Todos os colaboradores desligados devolveram seus equipamentos.</div>' +
-      '</div>' +
-    '</div>';
-  }
-
-  if (!filtrados.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhuma pendência encontrada.</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = filtrados.map(e => {
-    return '<tr>' +
-      '<td class="patrimonio">' + (e.patrimonio || '—') + '</td>' +
-      '<td class="tipo-tag">' + (e.tipo || '—') + '</td>' +
-      '<td class="pessoa">' + (e.pessoa_nome || '—') + '</td>' +
-      '<td style="color:var(--text2)">' + (e.pessoa_matricula || '—') + '</td>' +
       '<td>' + situacaoBadge(e.situacao) + '</td>' +
     '</tr>';
   }).join('');
@@ -422,15 +330,6 @@ function renderStats() {
   document.getElementById('st-devolvidos').textContent = equipamentos.filter(e => e.situacao === 'Devolvido').length;
   document.getElementById('st-parcial').textContent = equipamentos.filter(e => e.situacao === 'Parcial').length;
   document.getElementById('st-pendentes').textContent = equipamentos.filter(e => ['Pendente','Não Devolvido'].includes(e.situacao)).length;
-
-  var pendencias = getPendencias();
-  var badge = document.getElementById('badge-pend');
-  if (pendencias.length > 0) {
-    badge.style.display = 'inline-flex';
-    badge.textContent = pendencias.length;
-  } else {
-    badge.style.display = 'none';
-  }
 }
 
 async function loadData() {
@@ -446,7 +345,6 @@ async function loadData() {
 
     renderStats();
     renderTodos();
-    renderPendencias();
     await loadDevolucoes();
   } catch (e) {
     document.getElementById('sub').textContent = 'Erro: ' + e.message;
