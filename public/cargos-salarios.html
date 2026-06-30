@@ -122,13 +122,14 @@ td.salario{font-variant-numeric:tabular-nums;color:var(--text)}
       <table>
         <thead>
           <tr>
-            <th class="sortable sort-active" data-f="codigo" style="width:14%">SGPS <span class="sort-icon">↑</span></th>
-            <th class="sortable" data-f="descricao" style="width:42%">Descrição <span class="sort-icon">↕</span></th>
-            <th class="sortable" data-f="senioridade" style="width:18%">Senioridade <span class="sort-icon">↕</span></th>
-            <th class="sortable" data-f="salario" style="width:26%;text-align:right">Salário <span class="sort-icon">↕</span></th>
+            <th class="sortable sort-active" data-f="codigo" style="width:11%">SGPS <span class="sort-icon">↑</span></th>
+            <th class="sortable" data-f="descricao" style="width:35%">Descrição <span class="sort-icon">↕</span></th>
+            <th class="sortable" data-f="senioridade" style="width:14%">Senioridade <span class="sort-icon">↕</span></th>
+            <th class="sortable" data-f="salario" style="width:20%;text-align:right">Salário <span class="sort-icon">↕</span></th>
+            <th class="sortable" data-f="valor_custo" style="width:20%;text-align:right">Valor de Custo <span class="sort-icon">↕</span></th>
           </tr>
         </thead>
-        <tbody id="tbody-cargos"><tr><td colspan="4" class="loading">Carregando cargos...</td></tr></tbody>
+        <tbody id="tbody-cargos"><tr><td colspan="5" class="loading">Carregando cargos...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -234,7 +235,7 @@ function renderCargos() {
 
   filtrados.sort((a, b) => {
     var va = a[sortFieldC], vb = b[sortFieldC];
-    if (sortFieldC === 'salario') {
+    if (sortFieldC === 'salario' || sortFieldC === 'valor_custo') {
       va = va || 0; vb = vb || 0;
       return sortAscC ? va - vb : vb - va;
     }
@@ -244,7 +245,7 @@ function renderCargos() {
   });
 
   if (!filtrados.length) {
-    tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum cargo encontrado.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhum cargo encontrado.</td></tr>';
     return;
   }
 
@@ -256,6 +257,7 @@ function renderCargos() {
       '<td>' + (c.descricao || '—') + '</td>' +
       '<td>' + badge + '</td>' +
       '<td class="salario" style="text-align:right">' + fmtMoeda(c.salario) + '</td>' +
+      '<td class="salario" style="text-align:right">' + fmtMoeda(c.valor_custo) + '</td>' +
     '</tr>';
   }).join('');
 }
@@ -372,7 +374,7 @@ async function init() {
     calcularQuantitativo();
     renderQuant();
   } catch (e) {
-    document.getElementById('tbody-cargos').innerHTML = '<tr><td colspan="4" class="empty">⚠ Erro ao carregar: ' + e.message + '</td></tr>';
+    document.getElementById('tbody-cargos').innerHTML = '<tr><td colspan="5" class="empty">⚠ Erro ao carregar: ' + e.message + '</td></tr>';
     document.getElementById('tbody-quant').innerHTML = '<tr><td colspan="4" class="empty">⚠ Erro ao carregar: ' + e.message + '</td></tr>';
   }
 }
