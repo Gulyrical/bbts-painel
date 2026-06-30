@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBTS — Cargos e Salários</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#465EFF;
+  --bg:#F5F6F8;
+  --white:#fff;
+  --border:#E5E7EB;
+  --text:#111827;
+  --text2:#6B7280;
+  --green:#10B981;
+  --amber:#E8A020;
+  --radius:8px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+.header{background:var(--blue);height:52px;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.header-left{display:flex;align-items:center;gap:10px}
+.logo{width:28px;height:28px;background:rgba(255,255,255,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.brand{font-size:14px;font-weight:600;color:#fff}
+.back{font-size:12px;color:rgba(255,255,255,0.65);text-decoration:none}
+.back:hover{color:#fff}
+.main{max-width:1100px;margin:0 auto;padding:24px 20px}
+.page-title{margin-bottom:20px}
+.page-title h1{font-size:18px;font-weight:600}
+.page-title p{font-size:13px;color:var(--text2);margin-top:2px}
+
+/* ABAS */
+.tabs{display:flex;gap:2px;background:#E5E7EB;border-radius:8px;padding:3px;margin-bottom:20px;width:fit-content}
+.tab{padding:7px 20px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);transition:all 0.15s}
+.tab.active{background:var(--white);color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.tab:hover:not(.active){color:var(--text)}
+
+/* STATS */
+.stats{display:flex;gap:12px;margin-bottom:20px}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;flex:1}
+.stat .num{font-size:22px;font-weight:700;line-height:1}
+.stat .lbl{font-size:11px;color:var(--text2);margin-top:3px;text-transform:uppercase;letter-spacing:0.04em}
+.stat.blue .num{color:var(--blue)}
+.stat.green .num{color:var(--green)}
+.stat.amber .num{color:var(--amber)}
+
+/* FILTROS */
+.filters{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+.search{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);width:260px;outline:none;background:var(--white)}
+.search:focus{border-color:var(--blue)}
+.fbtn{padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--white);font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+.fbtn:hover,.fbtn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* TABELA */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{border-bottom:1px solid var(--border)}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{color:var(--blue)}
+thead th.sort-active{color:var(--blue)}
+.sort-icon{margin-left:4px;opacity:0.5;font-size:10px}
+thead th.sort-active .sort-icon{opacity:1}
+tbody tr{border-bottom:1px solid #F3F4F6;transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#F9FAFB}
+td{padding:10px 14px;vertical-align:middle}
+td.codigo{font-weight:600;color:var(--blue)}
+td.salario{font-variant-numeric:tabular-nums;color:var(--text)}
+.badge-niv{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.badge-niv.Junior, .badge-niv.Júnior{background:#F3F4F6;color:#374151}
+.badge-niv.Pleno{background:#DBEAFE;color:#1E40AF}
+.badge-niv.Senior, .badge-niv.Sênior{background:#ECFDF5;color:#065F46}
+.badge-niv.Especialista{background:#FFF7ED;color:#C2410C}
+.badge-niv.Master{background:#F5F3FF;color:#6D28D9}
+.badge-niv.Gerencial{background:#FEF2F2;color:#991B1B}
+.qtd-badge{display:inline-flex;align-items:center;justify-content:center;min-width:24px;padding:2px 8px;border-radius:20px;font-size:12px;font-weight:600;background:#EEF0FF;color:var(--blue)}
+.qtd-badge.zero{background:#F3F4F6;color:var(--text2)}
+.empty{text-align:center;padding:40px;color:var(--text2);font-size:13px}
+.loading{text-align:center;padding:60px;color:var(--text2);font-size:13px}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <div class="logo">B</div>
+    <span class="brand">BBTS · RH</span>
+  </div>
+  <a href="/" class="back">← Voltar</a>
+</header>
+
+<div class="main">
+  <div class="page-title">
+    <h1>Cargos e Salários</h1>
+    <p>Consulta da base SGPS — postos, senioridade e ocupação</p>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-btn-cargos">📋 Cargos e Salários</div>
+    <div class="tab" id="tab-btn-quant">📊 Quantitativo</div>
+  </div>
+
+  <!-- ── ABA: CARGOS E SALÁRIOS ── -->
+  <div id="aba-cargos">
+    <div class="stats">
+      <div class="stat blue"><div class="num" id="st-total">—</div><div class="lbl">Total de Postos</div></div>
+      <div class="stat"><div class="num" id="st-pleno">—</div><div class="lbl">Pleno</div></div>
+      <div class="stat green"><div class="num" id="st-senior">—</div><div class="lbl">Sênior</div></div>
+      <div class="stat amber"><div class="num" id="st-master">—</div><div class="lbl">Master</div></div>
+    </div>
+
+    <div class="filters">
+      <input class="search" id="busca-cargo" type="text" placeholder="Buscar por código ou descrição...">
+      <button class="fbtn active" data-niv="">Todos</button>
+      <button class="fbtn" data-niv="Pleno">Pleno</button>
+      <button class="fbtn" data-niv="Sênior">Sênior</button>
+      <button class="fbtn" data-niv="Master">Master</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="sortable sort-active" data-f="codigo" style="width:14%">SGPS <span class="sort-icon">↑</span></th>
+            <th class="sortable" data-f="descricao" style="width:42%">Descrição <span class="sort-icon">↕</span></th>
+            <th class="sortable" data-f="senioridade" style="width:18%">Senioridade <span class="sort-icon">↕</span></th>
+            <th class="sortable" data-f="salario" style="width:26%;text-align:right">Salário <span class="sort-icon">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-cargos"><tr><td colspan="4" class="loading">Carregando cargos...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── ABA: QUANTITATIVO ── -->
+  <div id="aba-quant" style="display:none">
+    <div class="stats">
+      <div class="stat blue"><div class="num" id="qt-total">—</div><div class="lbl">Colaboradores Ativos</div></div>
+      <div class="stat green"><div class="num" id="qt-ocupados">—</div><div class="lbl">Postos Ocupados</div></div>
+      <div class="stat amber"><div class="num" id="qt-vazios">—</div><div class="lbl">Postos Sem Ocupantes</div></div>
+    </div>
+
+    <div class="filters">
+      <input class="search" id="busca-quant" type="text" placeholder="Buscar por código ou descrição...">
+      <button class="fbtn active" data-qf="">Todos</button>
+      <button class="fbtn" data-qf="ocupados">Com colaboradores</button>
+      <button class="fbtn" data-qf="vazios">Sem colaboradores</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="sortable sort-active-q" data-fq="codigo" style="width:14%">SGPS <span class="sort-icon">↑</span></th>
+            <th class="sortable" data-fq="descricao" style="width:38%">Descrição <span class="sort-icon">↕</span></th>
+            <th class="sortable" data-fq="senioridade" style="width:18%">Senioridade <span class="sort-icon">↕</span></th>
+            <th class="sortable" data-fq="qtd" style="width:30%;text-align:right">Colaboradores Ativos <span class="sort-icon">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-quant"><tr><td colspan="4" class="loading">Carregando dados...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/api/notion';
+let cargos = [];
+let vinculos = [];
+let pessoaMap = {};
+
+// ── Abas ──
+function setTab(tab) {
+  document.getElementById('tab-btn-cargos').classList.toggle('active', tab === 'cargos');
+  document.getElementById('tab-btn-quant').classList.toggle('active', tab === 'quant');
+  document.getElementById('aba-cargos').style.display = tab === 'cargos' ? 'block' : 'none';
+  document.getElementById('aba-quant').style.display = tab === 'quant' ? 'block' : 'none';
+}
+document.getElementById('tab-btn-cargos').addEventListener('click', function(){ setTab('cargos'); });
+document.getElementById('tab-btn-quant').addEventListener('click', function(){ setTab('quant'); });
+
+// ── Formatação ──
+function fmtMoeda(v) {
+  if (v === null || v === undefined) return '—';
+  return 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}
+
+// ════════════════ ABA CARGOS ════════════════
+let sortFieldC = 'codigo';
+let sortAscC = true;
+let filtroNivC = '';
+
+function renderStatsCargos() {
+  document.getElementById('st-total').textContent = cargos.length;
+  document.getElementById('st-pleno').textContent = cargos.filter(c => c.senioridade === 'Pleno').length;
+  document.getElementById('st-senior').textContent = cargos.filter(c => c.senioridade === 'Sênior').length;
+  document.getElementById('st-master').textContent = cargos.filter(c => c.senioridade === 'Master').length;
+}
+
+document.querySelectorAll('#aba-cargos .fbtn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#aba-cargos .fbtn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    filtroNivC = b.dataset.niv;
+    renderCargos();
+  });
+});
+
+document.querySelectorAll('#aba-cargos thead th.sortable').forEach(th => {
+  th.addEventListener('click', () => {
+    var f = th.dataset.f;
+    if (sortFieldC === f) sortAscC = !sortAscC;
+    else { sortFieldC = f; sortAscC = true; }
+    document.querySelectorAll('#aba-cargos thead th').forEach(x => {
+      x.classList.remove('sort-active');
+      x.querySelector('.sort-icon').textContent = '↕';
+    });
+    th.classList.add('sort-active');
+    th.querySelector('.sort-icon').textContent = sortAscC ? '↑' : '↓';
+    renderCargos();
+  });
+});
+
+function renderCargos() {
+  var busca = document.getElementById('busca-cargo').value.toLowerCase();
+  var tbody = document.getElementById('tbody-cargos');
+
+  var filtrados = cargos.filter(c => {
+    var matchBusca = !busca || (c.codigo||'').toLowerCase().includes(busca) || (c.descricao||'').toLowerCase().includes(busca);
+    var matchNiv = !filtroNivC || c.senioridade === filtroNivC;
+    return matchBusca && matchNiv;
+  });
+
+  filtrados.sort((a, b) => {
+    var va = a[sortFieldC], vb = b[sortFieldC];
+    if (sortFieldC === 'salario') {
+      va = va || 0; vb = vb || 0;
+      return sortAscC ? va - vb : vb - va;
+    }
+    va = (va || '').toString().toLowerCase();
+    vb = (vb || '').toString().toLowerCase();
+    return sortAscC ? va.localeCompare(vb, 'pt-BR') : vb.localeCompare(va, 'pt-BR');
+  });
+
+  if (!filtrados.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum cargo encontrado.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtrados.map(c => {
+    var nivClass = (c.senioridade || '').replace('ê','e').replace('ú','u');
+    var badge = c.senioridade ? '<span class="badge-niv ' + nivClass + '">' + c.senioridade + '</span>' : '<span style="color:var(--text2)">—</span>';
+    return '<tr>' +
+      '<td class="codigo">' + (c.codigo || '—') + '</td>' +
+      '<td>' + (c.descricao || '—') + '</td>' +
+      '<td>' + badge + '</td>' +
+      '<td class="salario" style="text-align:right">' + fmtMoeda(c.salario) + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+document.getElementById('busca-cargo').addEventListener('input', renderCargos);
+
+// ════════════════ ABA QUANTITATIVO ════════════════
+let sortFieldQ = 'codigo';
+let sortAscQ = true;
+let filtroQtdQ = '';
+let quantData = [];
+
+function calcularQuantitativo() {
+  var contagem = {};
+  vinculos.forEach(v => {
+    if (v.status !== 'Ativo') return;
+    if (!v.cargo_id) return;
+    contagem[v.cargo_id] = (contagem[v.cargo_id] || 0) + 1;
+  });
+
+  quantData = cargos.map(c => ({
+    id: c.id,
+    codigo: c.codigo,
+    descricao: c.descricao,
+    senioridade: c.senioridade,
+    qtd: contagem[c.id] || 0,
+  }));
+
+  var totalAtivos = vinculos.filter(v => v.status === 'Ativo').length;
+  var ocupados = quantData.filter(c => c.qtd > 0).length;
+  var vazios = quantData.filter(c => c.qtd === 0).length;
+
+  document.getElementById('qt-total').textContent = totalAtivos;
+  document.getElementById('qt-ocupados').textContent = ocupados;
+  document.getElementById('qt-vazios').textContent = vazios;
+}
+
+document.querySelectorAll('#aba-quant .fbtn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#aba-quant .fbtn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    filtroQtdQ = b.dataset.qf;
+    renderQuant();
+  });
+});
+
+document.querySelectorAll('#aba-quant thead th.sortable').forEach(th => {
+  th.addEventListener('click', () => {
+    var f = th.dataset.fq;
+    if (sortFieldQ === f) sortAscQ = !sortAscQ;
+    else { sortFieldQ = f; sortAscQ = true; }
+    document.querySelectorAll('#aba-quant thead th').forEach(x => {
+      x.classList.remove('sort-active');
+      x.querySelector('.sort-icon').textContent = '↕';
+    });
+    th.classList.add('sort-active');
+    th.querySelector('.sort-icon').textContent = sortAscQ ? '↑' : '↓';
+    renderQuant();
+  });
+});
+
+function renderQuant() {
+  var busca = document.getElementById('busca-quant').value.toLowerCase();
+  var tbody = document.getElementById('tbody-quant');
+
+  var filtrados = quantData.filter(c => {
+    var matchBusca = !busca || (c.codigo||'').toLowerCase().includes(busca) || (c.descricao||'').toLowerCase().includes(busca);
+    var matchQtd = !filtroQtdQ || (filtroQtdQ === 'ocupados' ? c.qtd > 0 : c.qtd === 0);
+    return matchBusca && matchQtd;
+  });
+
+  filtrados.sort((a, b) => {
+    var va = a[sortFieldQ], vb = b[sortFieldQ];
+    if (sortFieldQ === 'qtd') {
+      return sortAscQ ? va - vb : vb - va;
+    }
+    va = (va || '').toString().toLowerCase();
+    vb = (vb || '').toString().toLowerCase();
+    return sortAscQ ? va.localeCompare(vb, 'pt-BR') : vb.localeCompare(va, 'pt-BR');
+  });
+
+  if (!filtrados.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum cargo encontrado.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtrados.map(c => {
+    var nivClass = (c.senioridade || '').replace('ê','e').replace('ú','u');
+    var badge = c.senioridade ? '<span class="badge-niv ' + nivClass + '">' + c.senioridade + '</span>' : '<span style="color:var(--text2)">—</span>';
+    var qtdBadge = '<span class="qtd-badge' + (c.qtd === 0 ? ' zero' : '') + '">' + c.qtd + '</span>';
+    return '<tr>' +
+      '<td class="codigo">' + (c.codigo || '—') + '</td>' +
+      '<td>' + (c.descricao || '—') + '</td>' +
+      '<td>' + badge + '</td>' +
+      '<td style="text-align:right">' + qtdBadge + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+document.getElementById('busca-quant').addEventListener('input', renderQuant);
+
+// ── Init ──
+async function init() {
+  try {
+    var [rCargos, rVinculos] = await Promise.all([
+      fetch(API + '?db=cargos_lista').then(r => r.json()),
+      fetch(API + '?db=vinculos').then(r => r.json()),
+    ]);
+    cargos = (rCargos.cargos || []).filter(c => c.codigo);
+    vinculos = rVinculos.vinculos || [];
+
+    renderStatsCargos();
+    renderCargos();
+    calcularQuantitativo();
+    renderQuant();
+  } catch (e) {
+    document.getElementById('tbody-cargos').innerHTML = '<tr><td colspan="4" class="empty">⚠ Erro ao carregar: ' + e.message + '</td></tr>';
+    document.getElementById('tbody-quant').innerHTML = '<tr><td colspan="4" class="empty">⚠ Erro ao carregar: ' + e.message + '</td></tr>';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
