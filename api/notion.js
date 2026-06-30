@@ -533,7 +533,8 @@ module.exports = async function handler(req, res) {
       cargoPages.forEach(function(pg) {
         var codigo = prop(pg.properties, 'Código SGPS', 'title');
         var desc = prop(pg.properties, 'Descrição do Posto', 'text');
-        cargoMap[pg.id] = codigo + (desc ? ' — ' + desc : '');
+        var nivel = prop(pg.properties, 'Senioridade', 'select');
+        cargoMap[pg.id] = codigo + (desc ? ' — ' + desc : '') + (nivel ? ' (' + nivel + ')' : '');
       });
       var candidatos = candPages.map(function(pg) {
         var p = pg.properties;
